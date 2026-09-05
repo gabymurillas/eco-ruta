@@ -1,0 +1,24 @@
+# Secretos — nunca se commitean
+.env
+.env.local
+.env*.local
+.mcp.json
+
+# Dependencias
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Expo
+.expo/
+dist/
+
+# Build / EAS
+android/
+ios/
+
+# Sistema
+.DS_Store
+Thumbs.db
