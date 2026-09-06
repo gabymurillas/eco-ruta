@@ -1,4 +1,4 @@
-import { colorDeRuta } from "@/domain/colores";
+import { colorDeRuta, tintaSobreColorDeRuta } from "@/domain/colores";
 import type { RutaEnParada } from "../types";
 import { IconoRuta } from "./IconoRuta";
 
@@ -12,11 +12,14 @@ export function ListaRutasEnParada({ rutas }: Props) {
       {rutas.map((ruta) => (
         <li
           key={ruta.rutaId}
-          className="flex h-[62px] items-center gap-3 rounded-2xl border-[0.5px] border-borde-suave bg-white px-4"
+          className="flex h-[62px] items-center gap-3 rounded-2xl border-[0.5px] border-borde-suave bg-superficie px-4"
         >
           <span
-            className="flex size-[34px] shrink-0 items-center justify-center rounded-full text-white"
-            style={{ backgroundColor: colorDeRuta(ruta.color) }}
+            className="flex size-[34px] shrink-0 items-center justify-center rounded-full"
+            style={{
+              backgroundColor: colorDeRuta(ruta.color),
+              color: tintaSobreColorDeRuta(ruta.color),
+            }}
           >
             <IconoRuta icono={ruta.icono} />
           </span>

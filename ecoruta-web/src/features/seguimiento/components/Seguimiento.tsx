@@ -21,14 +21,15 @@ export function Seguimiento() {
         </div>
 
         {ubicacion.estado === "concedida" && (
-          <span className="flex h-9 items-center gap-2 rounded-full border-[0.5px] border-borde bg-white px-4">
-            <span className="size-[7px] rounded-full bg-marca" />
+          <span className="flex h-9 items-center gap-2 rounded-full border-[0.5px] border-borde bg-superficie px-4">
+            {/* "En vivo" es un estado, no identidad: por regla del sistema usa verde, nunca el terracota de marca. */}
+            <span className="pulso-en-vivo size-[7px] rounded-full bg-exito" />
             <span className="text-[13px] font-bold">En vivo</span>
           </span>
         )}
       </header>
 
-      <main className="flex flex-1 flex-col gap-4 rounded-t-[20px] border-t-[0.5px] border-borde bg-white px-5 pb-8 pt-6">
+      <main className="flex flex-1 flex-col gap-4 rounded-t-[20px] border-t-[0.5px] border-borde bg-superficie px-5 pb-8 pt-6">
         {carga === "cargando" && (
           <p className="text-sm text-tinta-media">Buscando paradas cerca de ti…</p>
         )}

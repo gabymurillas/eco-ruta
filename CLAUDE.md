@@ -402,17 +402,107 @@ hacía vive ahora en otra capa.
 
 ## Sistema de diseño
 
-- Tipografía: Plus Jakarta Sans. **No usar Inter, Roboto, Open Sans ni fuentes por defecto.**
-- Superficies planas: sin sombras, sin degradados, sin glassmorphism.
-- Bordes de 0.5px, esquinas de 8–12px, pills de 999px.
+Paleta cálida sobre fondo crema, con acento terracota y titulares en serif. La intención es que
+el sistema se sienta cercano y local, no corporativo ni genérico.
+
+### Tipografía
+
+- Titulares y nombres de marca: serif (Instrument Serif, Fraunces o similar).
+- Cuerpo, datos e interfaz: sans-serif (Instrument Sans, Plus Jakarta Sans o similar).
+- **No usar Inter, Roboto, Open Sans ni las fuentes por defecto del sistema.**
+- Pesos: 400 y 500. Sentence case siempre.
+
+### Superficies
+
+- Fondo base: crema `oklch(97% 0.015 75)`
+- Superficie elevada: crema más claro `oklch(99% 0.008 75)`
+- Bordes: 0.5px, `oklch(85% 0.02 60)`
+- Sin sombras, sin degradados, sin glassmorphism.
+- Esquinas: 8–12px; pills 999px.
 - Espaciado en múltiplos de 4px.
-- Colores de ruta (asignados por el admin): teal, morado, ámbar, rosa, azul.
-- Semánticos: verde = en línea/éxito, ámbar = advertencia, rojo = error, azul = info/acción.
-- Ubicación del usuario: punto azul con aro de precisión (distinto de los marcadores de unidad).
-- Marcador de unidad: círculo del color de su ruta con ícono blanco (bus o camión de aseo).
-- Íconos lineales, peso consistente.
-- Animaciones: ease-out, 300–500ms. Sin bounce. Respetar `prefers-reduced-motion`.
-- Objetivos táctiles mínimos de 48px. Contraste WCAG AA.
+
+### Regla de color que no se rompe
+
+**El color de marca nunca es color de ruta, y nunca es color de estado.**
+
+Tres paletas con funciones separadas. Si se mezclan, el sistema deja de comunicar.
+
+**1. Marca — terracota**
+
+```
+Terracota          oklch(58% 0.17 35)   identidad, acentos de navegación
+Terracota profundo oklch(48% 0.15 35)   botones con texto blanco (4.8:1, cumple AA)
+```
+
+Uso exclusivo: logo, botones primarios, elementos de identidad, acentos de navegación.
+**Nunca** para representar una ruta ni un estado del sistema.
+
+> El terracota de marca con texto blanco da 3.4:1 y **no cumple AA**. Por eso todo relleno con
+> texto blanco encima usa la variante profunda. El tono de marca se conserva para identidad,
+> texto sobre crema y acentos.
+
+**2. Colores de ruta — cinco tonos distinguibles**
+
+El admin asigna uno por ruta. Se diferencian **por tono**, no por saturación.
+
+```
+Teal      oklch(52% 0.11 195)
+Mostaza   oklch(70% 0.14 75)
+Ciruela   oklch(48% 0.13 340)
+Oliva     oklch(50% 0.10 145)
+Índigo    oklch(48% 0.12 265)
+```
+
+Ninguno cae en el rango del terracota ni del rojo de error, a propósito.
+
+**Por qué importa:** la identificación de ruta por color es una función del sistema, no
+decoración. El gestor distingue unidades en el mapa por color; el ciudadano relaciona el chip
+de su ruta con la línea del mapa. Cinco tonos del mismo naranja hacen esa tarea imposible,
+especialmente para daltonismo rojo-verde (el más frecuente).
+
+**Regla de refuerzo:** el color nunca es el único portador de significado. Cada ruta lleva
+además su nombre visible, y cada marcador de unidad lleva su ícono.
+
+> Mostaza es el único tono claro de los cinco: un ícono blanco encima da 2.3:1 y no alcanza ni
+> el mínimo de 3:1 para elementos no textuales. El marcador de una ruta mostaza lleva el ícono
+> en tinta oscura. Los otros cuatro lo llevan blanco.
+
+**3. Colores de estado**
+
+```
+En vivo / éxito   oklch(52% 0.13 155)   verde
+Advertencia       oklch(68% 0.15 70)    ámbar
+Error / crítico   oklch(48% 0.19 25)    rojo profundo
+Información       oklch(52% 0.12 240)   azul
+Ubicación usuario oklch(55% 0.15 250)   azul distintivo
+```
+
+El rojo de error es más oscuro y saturado que el terracota de marca. Deben verse claramente
+distintos al lado. El azul de ubicación del usuario no se usa para ninguna otra cosa.
+
+### Componentes
+
+**Marcador de unidad.** Círculo del color de su ruta, ícono dentro (bus para transporte, camión
+para recolección). Halo pulsante si está transmitiendo; atenuado y sin halo si perdió señal.
+
+**Chip de ruta.** Punto del color de la ruta + nombre. Estado activo con fondo tenue del mismo
+tono. Nunca solo el punto sin nombre.
+
+**Tarjeta de unidad (admin).** Nombre, ruta, velocidad, última señal, batería. Borde ámbar si la
+batería está bajo umbral; borde rojo si superó el umbral sin señal.
+
+**Ubicación del ciudadano.** Punto azul con aro de precisión pulsante. Visualmente distinto de
+cualquier marcador de unidad.
+
+### Animación y accesibilidad
+
+- Easing `ease-out`, duración 300–500ms. Sin bounce.
+- El pulso de "en vivo" es de 2s, suave, no intrusivo.
+- Respetar `prefers-reduced-motion`: sin animación cuando esté activo.
+- Objetivos táctiles mínimos de 48px.
+- Foco visible en todo elemento interactivo.
+- Contraste WCAG AA como mínimo (4.5:1 en texto, 3:1 en elementos de interfaz).
+- Marcado semántico: `<button>`, `<label>`, `<nav>`. Nunca un `<div>` con estilos de botón.
 
 ---
 

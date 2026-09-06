@@ -9,8 +9,8 @@ export function ParadaCercana({ parada }: Props) {
   const caminata = estimarCaminataMinutos(parada.distanciaM);
 
   return (
-    <div className="flex items-center gap-4 rounded-[18px] border-[0.5px] border-borde bg-superficie-tinte p-4">
-      <div className="flex size-11 shrink-0 items-center justify-center rounded-full border-[0.5px] border-borde bg-white text-marca-profundo">
+    <div className="flex items-center gap-4 rounded-[18px] border-[0.5px] border-borde bg-marca-tenue p-4">
+      <div className="flex size-11 shrink-0 items-center justify-center rounded-full border-[0.5px] border-borde bg-superficie text-marca-profundo">
         <svg
           width="21"
           height="21"

@@ -1,32 +1,40 @@
 @import "tailwindcss";
 
 /*
-  Paleta Sunset. E94F37 es la marca y se usa en rellenos y marcadores;
-  para texto blanco sobre relleno se usa C43D28, que sí cumple WCAG AA (5,2:1).
-  Superficies planas: sin sombras. Los bordes de 0.5px definen cada superficie.
+  Sistema de diseño v2 (ver CLAUDE.md).
+
+  Tres paletas con funciones separadas que nunca se mezclan:
+  marca (terracota), colores de ruta (cinco tonos) y colores de estado.
+
+  El terracota de marca con texto blanco da 3,4:1 y no cumple AA, así que todo relleno
+  con texto blanco encima usa --color-marca-profundo (4,8:1).
 */
 @theme {
-  --color-fondo: #fff2e7;
-  --color-superficie: #ffffff;
-  --color-superficie-tinte: #fff8f2;
+  --color-fondo: oklch(97% 0.015 75);
+  --color-superficie: oklch(99% 0.008 75);
+  --color-borde: oklch(85% 0.02 60);
+  --color-borde-suave: oklch(90% 0.015 60);
 
-  --color-tinta: #1f1512;
-  --color-tinta-media: #7a6a63;
-  --color-tinta-suave: #a08a7e;
+  --color-tinta: oklch(25% 0.02 60);
+  --color-tinta-media: oklch(48% 0.02 60);
+  --color-tinta-suave: oklch(62% 0.02 60);
 
-  --color-marca: #e94f37;
-  --color-marca-profundo: #c43d28;
-  --color-ruta-naranja: #f9844a;
-  --color-ruta-ambar: #f9c74f;
+  --color-marca: oklch(58% 0.17 35);
+  --color-marca-profundo: oklch(48% 0.15 35);
+  --color-marca-tenue: oklch(95% 0.03 35);
 
-  --color-borde: rgba(31, 21, 18, 0.14);
-  --color-borde-suave: rgba(31, 21, 18, 0.11);
+  --color-ruta-teal: oklch(52% 0.11 195);
+  --color-ruta-mostaza: oklch(70% 0.14 75);
+  --color-ruta-ciruela: oklch(48% 0.13 340);
+  --color-ruta-oliva: oklch(50% 0.1 145);
+  --color-ruta-indigo: oklch(48% 0.12 265);
 
-  --color-aviso-fondo: #fef6e7;
-  --color-aviso-borde: #f0c98a;
-  --color-aviso-tinta: #7a4e08;
-  --color-error: #b3261e;
-  --color-ubicacion: #2f6fed;
+  --color-exito: oklch(52% 0.13 155);
+  --color-advertencia: oklch(68% 0.15 70);
+  --color-advertencia-fondo: oklch(96% 0.04 75);
+  --color-error: oklch(48% 0.19 25);
+  --color-info: oklch(52% 0.12 240);
+  --color-ubicacion: oklch(55% 0.15 250);
 
   --font-sans: var(--font-source-sans), system-ui, sans-serif;
   --font-serif: var(--font-merriweather), Georgia, serif;
@@ -38,11 +46,27 @@ body {
   font-family: var(--font-sans);
 }
 
+/* El pulso de "en vivo": 2s, suave, no intrusivo. */
+@keyframes pulso-en-vivo {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.pulso-en-vivo {
+  animation: pulso-en-vivo 2s ease-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
