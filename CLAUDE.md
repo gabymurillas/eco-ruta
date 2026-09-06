@@ -181,6 +181,10 @@ El modelo predictivo con históricos es trabajo futuro declarado, no parte de es
 - Nombres de variables y funciones en **inglés**, salvo términos del dominio (`ruta`, `parada`,
   `unidad`, `viaje`), que se mantienen en español para no traducir a medias.
 - Componentes React en PascalCase, archivos de utilidades en kebab-case.
+- `types/database.generated.ts` **sale del esquema, no se edita a mano**. Tras cada migración se
+  regenera con `npm run types:db` (requiere `SUPABASE_ACCESS_TOKEN` en el entorno). Los nombres
+  cómodos que usa la aplicación viven en `types/database.ts`, que solo hace alias. Un tipo escrito
+  a mano se desincroniza del esquema en silencio; uno generado no puede.
 - Todo texto visible al usuario va en **español**, en sentence case. Nunca TODO MAYÚSCULAS.
 - Nunca commitear `.env` ni `.env.local`. Las claves van en variables de entorno.
 

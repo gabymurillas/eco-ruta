@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "types:db": "npx -y supabase@latest gen types typescript --project-id yumfwnqvmcitjnskazgx > src/types/database.generated.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",

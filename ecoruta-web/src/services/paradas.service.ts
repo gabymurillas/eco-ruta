@@ -33,5 +33,5 @@ export async function buscarParadasCercanas({
     return fallo("No se pudieron buscar las paradas cercanas.");
   }
 
-  return exito((data ?? []) as ParadaCercanaRow[]);
+  return exito(data ?? []);
 }

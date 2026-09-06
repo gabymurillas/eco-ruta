@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 
 /**
  * Cliente de Supabase. Por regla del proyecto se importa SOLO desde services/:
@@ -13,4 +14,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+/**
+ * Tipado con el esquema generado: las consultas y los RPC se validan contra las
+ * tablas reales, así que un nombre de columna mal escrito no compila.
+ */
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);

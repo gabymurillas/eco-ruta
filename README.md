@@ -45,6 +45,16 @@ cp .env.local.example .env.local   # completa con tu URL y clave de Supabase
 npm run dev
 ```
 
+### Tipos de la base de datos
+
+`src/types/database.generated.ts` sale del esquema real y no se edita a mano. Después de cada
+migración:
+
+```bash
+export SUPABASE_ACCESS_TOKEN=...   # token personal de Supabase
+npm run types:db
+```
+
 ### App de la ruta (`ecoruta-ruta/`)
 
 ```bash
