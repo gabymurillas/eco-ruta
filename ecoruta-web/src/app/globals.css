@@ -32,6 +32,8 @@
   --color-exito: oklch(52% 0.13 155);
   --color-advertencia: oklch(68% 0.15 70);
   --color-advertencia-fondo: oklch(96% 0.04 75);
+  --color-advertencia-borde: oklch(82% 0.09 75);
+  --color-advertencia-tinta: oklch(42% 0.09 70);
   --color-error: oklch(48% 0.19 25);
   --color-info: oklch(52% 0.12 240);
   --color-ubicacion: oklch(55% 0.15 250);

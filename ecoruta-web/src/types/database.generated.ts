@@ -602,6 +602,25 @@ export type Database = {
         | { Args: { table_name: string }; Returns: string }
       enablelongtransactions: { Args: never; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+      es_admin: { Args: never; Returns: boolean }
+      estado_flota: {
+        Args: never
+        Returns: {
+          bateria_pct: number
+          capturado_at: string
+          dispositivo_vinculado: boolean
+          en_recorrido: boolean
+          ruta_color: string
+          ruta_icono: string
+          ruta_id: string
+          ruta_nombre: string
+          segundos_sin_senal: number
+          unidad_id: string
+          unidad_nombre: string
+          velocidad_kmh: number
+          viaje_id: string
+        }[]
+      }
       geometry: { Args: { "": string }; Returns: unknown }
       geometry_above: {
         Args: { geom1: unknown; geom2: unknown }
@@ -760,6 +779,17 @@ export type Database = {
       }
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
+      resumen_historicos: {
+        Args: { dias?: number }
+        Returns: {
+          cobertura_pct: number
+          duracion_promedio_min: number
+          incidencias: number
+          paradas_planificadas: number
+          paradas_visitadas: number
+          viajes_completados: number
+        }[]
+      }
       st_3dclosestpoint: {
         Args: { geom1: unknown; geom2: unknown }
         Returns: unknown
@@ -1341,6 +1371,7 @@ export type Database = {
         Args: { geom: unknown; move: number; wrap: number }
         Returns: unknown
       }
+      unidad_del_dispositivo: { Args: never; Returns: string }
       unlockrows: { Args: { "": string }; Returns: number }
       updategeometrysrid: {
         Args: {
@@ -1351,6 +1382,16 @@ export type Database = {
           table_name: string
         }
         Returns: string
+      }
+      viajes_por_dia: {
+        Args: { dias?: number }
+        Returns: {
+          dia: string
+          ruta_color: string
+          ruta_id: string
+          ruta_nombre: string
+          viajes: number
+        }[]
       }
     }
     Enums: {

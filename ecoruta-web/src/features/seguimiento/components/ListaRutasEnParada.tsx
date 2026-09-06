@@ -1,6 +1,6 @@
 import { colorDeRuta, tintaSobreColorDeRuta } from "@/domain/colores";
 import type { RutaEnParada } from "../types";
-import { IconoRuta } from "./IconoRuta";
+import { IconoRuta } from "@/components/ui/IconoRuta";
 
 type Props = {
   rutas: readonly RutaEnParada[];
