@@ -1,0 +1,178 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@400;600;700&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: oklch(48% 0.15 35); text-decoration: none; }
+    a:hover { color: oklch(40% 0.14 35); }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 900px; background: oklch(97% 0.015 75); font-family: 'Source Sans 3', -apple-system, 'Segoe UI', sans-serif; color: oklch(25% 0.02 60); display: flex; flex-direction: column; overflow: hidden;">
+
+  <header style="height: 72px; flex-shrink: 0; background: oklch(99% 0.008 75); border-bottom: 0.5px solid oklch(85% 0.02 60); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; gap: 24px;">
+    <div style="display: flex; flex-direction: column; gap: 1px;">
+      <span style="font-family: Merriweather, Georgia, serif; font-size: 19px; font-weight: 900; letter-spacing: -0.3px;">Unidades y dispositivos</span>
+      <span style="font-size: 12px; font-weight: 600; color: oklch(62% 0.02 60);">4 unidades registradas · 3 con dispositivo vinculado</span>
+    </div>
+
+    <div style="height: 40px; padding: 0 20px; border-radius: 999px; background: oklch(48% 0.15 35); display: flex; align-items: center; gap: 8px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="oklch(99% 0.008 75)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 6v12M6 12h12"></path>
+      </svg>
+      <span style="font-size: 14px; font-weight: 700; color: oklch(99% 0.008 75);">Nueva unidad</span>
+    </div>
+  </header>
+
+  <div style="flex: 1; padding: 26px 28px; display: flex; gap: 24px; overflow: hidden;">
+
+    <div style="flex: 1; background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;">
+
+      <div style="height: 46px; flex-shrink: 0; border-bottom: 0.5px solid oklch(85% 0.02 60); background: oklch(99% 0.008 75); display: flex; align-items: center; padding: 0 20px; gap: 16px;">
+        <span style="width: 190px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; color: oklch(62% 0.02 60);">Unidad</span>
+        <span style="flex: 1; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; color: oklch(62% 0.02 60);">Ruta asignada</span>
+        <span style="width: 160px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; color: oklch(62% 0.02 60);">Dispositivo</span>
+        <span style="width: 130px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; color: oklch(62% 0.02 60);">Última señal</span>
+        <span style="width: 90px;"></span>
+      </div>
+
+      <div style="height: 68px; border-bottom: 0.5px solid oklch(92% 0.012 60); display: flex; align-items: center; padding: 0 20px; gap: 16px;">
+        <div style="width: 190px; display: flex; align-items: center; gap: 11px;">
+          <span style="width: 32px; height: 32px; border-radius: 999px; background: oklch(58% 0.17 35); display: flex; align-items: center; justify-content: center;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="oklch(99% 0.008 75)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="3" width="16" height="13.5" rx="3.4"></rect>
+              <path d="M4 11h16"></path>
+              <path d="M8 16.5v2.4M16 16.5v2.4"></path>
+            </svg>
+          </span>
+          <span style="font-family: Merriweather, Georgia, serif; font-size: 15px; font-weight: 700;">Unidad 03</span>
+        </div>
+        <span style="flex: 1; font-size: 14px; font-weight: 600;">Centro–UNERG</span>
+        <div style="width: 160px; display: flex; align-items: center; gap: 7px;">
+          <span style="width: 7px; height: 7px; border-radius: 999px; background: oklch(58% 0.17 35); display: block;"></span>
+          <span style="font-size: 13px; font-weight: 700;">Vinculado</span>
+        </div>
+        <span style="width: 130px; font-size: 13px; font-weight: 600; color: oklch(48% 0.02 60);">hace 4 s</span>
+        <span style="width: 90px; font-size: 13px; font-weight: 700; color: oklch(48% 0.15 35);">Editar</span>
+      </div>
+
+      <div style="height: 68px; border-bottom: 0.5px solid oklch(92% 0.012 60); display: flex; align-items: center; padding: 0 20px; gap: 16px;">
+        <div style="width: 190px; display: flex; align-items: center; gap: 11px;">
+          <span style="width: 32px; height: 32px; border-radius: 999px; background: #F9844A; display: flex; align-items: center; justify-content: center;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="oklch(99% 0.008 75)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="3" width="16" height="13.5" rx="3.4"></rect>
+              <path d="M4 11h16"></path>
+              <path d="M8 16.5v2.4M16 16.5v2.4"></path>
+            </svg>
+          </span>
+          <span style="font-family: Merriweather, Georgia, serif; font-size: 15px; font-weight: 700;">Unidad 07</span>
+        </div>
+        <span style="flex: 1; font-size: 14px; font-weight: 600;">Terminal–Hospital</span>
+        <div style="width: 160px; display: flex; align-items: center; gap: 7px;">
+          <span style="width: 7px; height: 7px; border-radius: 999px; background: oklch(58% 0.17 35); display: block;"></span>
+          <span style="font-size: 13px; font-weight: 700;">Vinculado</span>
+        </div>
+        <span style="width: 130px; font-size: 13px; font-weight: 600; color: oklch(48% 0.02 60);">hace 9 s</span>
+        <span style="width: 90px; font-size: 13px; font-weight: 700; color: oklch(48% 0.15 35);">Editar</span>
+      </div>
+
+      <div style="height: 68px; border-bottom: 0.5px solid oklch(92% 0.012 60); display: flex; align-items: center; padding: 0 20px; gap: 16px;">
+        <div style="width: 190px; display: flex; align-items: center; gap: 11px;">
+          <span style="width: 32px; height: 32px; border-radius: 999px; background: #F9C74F; display: flex; align-items: center; justify-content: center;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="oklch(99% 0.008 75)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 15.5V9h9v6.5"></path>
+              <path d="M12 11h3.6l2.8 3v1.5"></path>
+              <circle cx="7" cy="17.5" r="1.9"></circle>
+              <circle cx="16" cy="17.5" r="1.9"></circle>
+            </svg>
+          </span>
+          <span style="font-family: Merriweather, Georgia, serif; font-size: 15px; font-weight: 700;">Camión 02</span>
+        </div>
+        <span style="flex: 1; font-size: 14px; font-weight: 600;">Aseo · Las Flores</span>
+        <div style="width: 160px; display: flex; align-items: center; gap: 7px;">
+          <span style="width: 7px; height: 7px; border-radius: 999px; background: #F9C74F; display: block;"></span>
+          <span style="font-size: 13px; font-weight: 700;">Batería 12 %</span>
+        </div>
+        <span style="width: 130px; font-size: 13px; font-weight: 600; color: oklch(48% 0.02 60);">hace 21 s</span>
+        <span style="width: 90px; font-size: 13px; font-weight: 700; color: oklch(48% 0.15 35);">Editar</span>
+      </div>
+
+      <div style="height: 68px; display: flex; align-items: center; padding: 0 20px; gap: 16px; background: oklch(99% 0.008 75);">
+        <div style="width: 190px; display: flex; align-items: center; gap: 11px;">
+          <span style="width: 32px; height: 32px; border-radius: 999px; border: 0.5px dashed oklch(72% 0.02 60); display: flex; align-items: center; justify-content: center; color: oklch(62% 0.02 60);">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="3" width="16" height="13.5" rx="3.4"></rect>
+              <path d="M4 11h16"></path>
+            </svg>
+          </span>
+          <span style="font-family: Merriweather, Georgia, serif; font-size: 15px; font-weight: 700; color: oklch(48% 0.02 60);">Unidad 11</span>
+        </div>
+        <span style="flex: 1; font-size: 14px; font-weight: 600; color: oklch(48% 0.02 60);">Centro–UNERG</span>
+        <div style="width: 160px; display: flex; align-items: center; gap: 7px;">
+          <span style="width: 7px; height: 7px; border-radius: 999px; background: oklch(62% 0.02 60); display: block;"></span>
+          <span style="font-size: 13px; font-weight: 700; color: oklch(48% 0.02 60);">Sin vincular</span>
+        </div>
+        <span style="width: 130px; font-size: 13px; font-weight: 600; color: oklch(62% 0.02 60);">Nunca</span>
+        <span style="width: 90px; font-size: 13px; font-weight: 700; color: oklch(48% 0.15 35);">Vincular</span>
+      </div>
+
+    </div>
+
+    <div style="width: 356px; flex-shrink: 0; background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 18px;">
+
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <span style="font-family: Merriweather, Georgia, serif; font-size: 17px; font-weight: 900; letter-spacing: -0.2px;">Vincular Unidad 11</span>
+        <span style="font-size: 12px; font-weight: 600; color: oklch(62% 0.02 60);">Escribe este código en el teléfono de la unidad</span>
+      </div>
+
+      <div style="border-radius: 14px; border: 0.5px solid oklch(88% 0.05 35); background: oklch(99% 0.008 75); padding: 22px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <span style="font-family: Merriweather, Georgia, serif; font-size: 38px; font-weight: 900; letter-spacing: 6px; color: oklch(48% 0.15 35);">4T9K2</span>
+        <div style="display: flex; align-items: center; gap: 7px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="oklch(48% 0.07 70)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="8.5"></circle>
+            <path d="M12 7.5V12l3 1.8"></path>
+          </svg>
+          <span style="font-size: 13px; font-weight: 700; color: oklch(48% 0.07 70);">Vence en 9 min 42 s</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; gap: 10px; align-items: flex-start;">
+          <span style="width: 22px; height: 22px; border-radius: 999px; background: oklch(97% 0.015 75); border: 0.5px solid oklch(85% 0.02 60); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">1</span>
+          <span style="font-size: 13px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.5;">Abre EcoRuta en el teléfono que vive dentro del vehículo.</span>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: flex-start;">
+          <span style="width: 22px; height: 22px; border-radius: 999px; background: oklch(97% 0.015 75); border: 0.5px solid oklch(85% 0.02 60); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">2</span>
+          <span style="font-size: 13px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.5;">Escribe el código. Sirve una sola vez y el teléfono queda atado a esta unidad.</span>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: flex-start;">
+          <span style="width: 22px; height: 22px; border-radius: 999px; background: oklch(97% 0.015 75); border: 0.5px solid oklch(85% 0.02 60); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">3</span>
+          <span style="font-size: 13px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.5;">Déjalo conectado al sistema eléctrico. No hace falta cuenta para el chofer.</span>
+        </div>
+      </div>
+
+      <div style="flex: 1;"></div>
+
+      <div style="height: 46px; border-radius: 999px; border: 0.5px solid oklch(78% 0.02 60); display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="oklch(25% 0.02 60)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"></path>
+          <path d="M20 4v4h-4"></path>
+        </svg>
+        <span style="font-size: 14px; font-weight: 700;">Generar otro código</span>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

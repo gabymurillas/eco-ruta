@@ -1,0 +1,208 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@400;600;700&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: oklch(48% 0.15 35); text-decoration: none; }
+    a:hover { color: oklch(40% 0.14 35); }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 900px; background: oklch(97% 0.015 75); font-family: 'Source Sans 3', -apple-system, 'Segoe UI', sans-serif; color: oklch(25% 0.02 60); display: flex; flex-direction: column; overflow: hidden;">
+
+  <header style="height: 72px; flex-shrink: 0; background: oklch(99% 0.008 75); border-bottom: 0.5px solid oklch(85% 0.02 60); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; gap: 24px;">
+    <div style="display: flex; flex-direction: column; gap: 1px;">
+      <span style="font-family: Merriweather, Georgia, serif; font-size: 19px; font-weight: 900; letter-spacing: -0.3px;">Parámetros del sistema</span>
+      <span style="font-size: 12px; font-weight: 600; color: oklch(62% 0.02 60);">Última calibración: 5 de septiembre</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="height: 40px; padding: 0 18px; border-radius: 999px; border: 0.5px solid oklch(78% 0.02 60); display: flex; align-items: center;">
+        <span style="font-size: 14px; font-weight: 700;">Restaurar valores</span>
+      </div>
+      <div style="height: 40px; padding: 0 20px; border-radius: 999px; background: oklch(48% 0.15 35); display: flex; align-items: center;">
+        <span style="font-size: 14px; font-weight: 700; color: oklch(99% 0.008 75);">Guardar cambios</span>
+      </div>
+    </div>
+  </header>
+
+  <div style="flex: 1; padding: 24px 28px; display: flex; gap: 24px; overflow: hidden;">
+
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 20px; overflow: hidden;">
+
+      <div style="background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 14px; padding: 22px; display: flex; flex-direction: column; gap: 18px;">
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: Merriweather, Georgia, serif; font-size: 16px; font-weight: 700;">Detección de geocercas</span>
+          <span style="font-size: 12px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.5;">Controlan cuándo se considera que una unidad llegó a una parada, y evitan que la deriva del GPS genere notificaciones repetidas.</span>
+        </div>
+
+        <div style="height: 0.5px; background: oklch(90% 0.015 60);"></div>
+
+        <div style="display: flex; align-items: flex-start; gap: 24px;">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 14px; font-weight: 700;">Permanencia mínima</span>
+            <span style="font-size: 12px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.5;">Segundos que la unidad debe estar dentro de la geocerca antes de notificar. Más bajo, notifica antes pero con más falsos positivos.</span>
+          </div>
+          <div style="width: 150px; flex-shrink: 0; display: flex; align-items: center; gap: 8px;">
+            <div style="flex: 1; height: 46px; border-radius: 10px; border: 0.5px solid oklch(78% 0.02 60); display: flex; align-items: center; justify-content: center;">
+              <span style="font-family: Merriweather, Georgia, serif; font-size: 17px; font-weight: 900;">45</span>
+            </div>
+            <span style="font-size: 13px; font-weight: 600; color: oklch(62% 0.02 60); width: 24px;">s</span>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: flex-start; gap: 24px;">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 14px; font-weight: 700;">Histéresis de salida</span>
+            <span style="font-size: 12px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.5;">Segundos continuos fuera antes de dar por terminada la estadía. Si la unidad reentra antes, se considera que nunca salió.</span>
+          </div>
+          <div style="width: 150px; flex-shrink: 0; display: flex; align-items: center; gap: 8px;">
+            <div style="flex: 1; height: 46px; border-radius: 10px; border: 0.5px solid oklch(78% 0.02 60); display: flex; align-items: center; justify-content: center;">
+              <span style="font-family: Merriweather, Georgia, serif; font-size: 17px; font-weight: 900;">30</span>
+            </div>
+            <span style="font-size: 13px; font-weight: 600; color: oklch(62% 0.02 60); width: 24px;">s</span>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: flex-start; gap: 24px;">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 14px; font-weight: 700;">Exactitud máxima</span>
+            <span style="font-size: 12px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.5;">Lecturas con exactitud peor a este valor se guardan pero no evalúan geocercas. Este es el número que sale de la prueba de campo.</span>
+          </div>
+          <div style="width: 150px; flex-shrink: 0; display: flex; align-items: center; gap: 8px;">
+            <div style="flex: 1; height: 46px; border-radius: 10px; border: 2px solid oklch(48% 0.15 35); display: flex; align-items: center; justify-content: center;">
+              <span style="font-family: Merriweather, Georgia, serif; font-size: 17px; font-weight: 900;">50</span>
+            </div>
+            <span style="font-size: 13px; font-weight: 600; color: oklch(62% 0.02 60); width: 24px;">m</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 14px; padding: 22px; display: flex; flex-direction: column; gap: 18px;">
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: Merriweather, Georgia, serif; font-size: 16px; font-weight: 700;">Transmisión y salud del equipo</span>
+          <span style="font-size: 12px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.5;">Cada cuánto emite el teléfono de la unidad y cuándo el sistema considera que algo va mal.</span>
+        </div>
+
+        <div style="height: 0.5px; background: oklch(90% 0.015 60);"></div>
+
+        <div style="display: flex; gap: 20px;">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 7px;">
+            <span style="font-size: 13px; font-weight: 700;">En movimiento</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="flex: 1; height: 44px; border-radius: 10px; border: 0.5px solid oklch(78% 0.02 60); display: flex; align-items: center; justify-content: center;">
+                <span style="font-family: Merriweather, Georgia, serif; font-size: 16px; font-weight: 900;">5</span>
+              </div>
+              <span style="font-size: 13px; font-weight: 600; color: oklch(62% 0.02 60); width: 20px;">s</span>
+            </div>
+          </div>
+
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 7px;">
+            <span style="font-size: 13px; font-weight: 700;">Detenido</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="flex: 1; height: 44px; border-radius: 10px; border: 0.5px solid oklch(78% 0.02 60); display: flex; align-items: center; justify-content: center;">
+                <span style="font-family: Merriweather, Georgia, serif; font-size: 16px; font-weight: 900;">30</span>
+              </div>
+              <span style="font-size: 13px; font-weight: 600; color: oklch(62% 0.02 60); width: 20px;">s</span>
+            </div>
+          </div>
+
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 7px;">
+            <span style="font-size: 13px; font-weight: 700;">Sin señal</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="flex: 1; height: 44px; border-radius: 10px; border: 0.5px solid oklch(78% 0.02 60); display: flex; align-items: center; justify-content: center;">
+                <span style="font-family: Merriweather, Georgia, serif; font-size: 16px; font-weight: 900;">300</span>
+              </div>
+              <span style="font-size: 13px; font-weight: 600; color: oklch(62% 0.02 60); width: 20px;">s</span>
+            </div>
+          </div>
+
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 7px;">
+            <span style="font-size: 13px; font-weight: 700;">Alerta de batería</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="flex: 1; height: 44px; border-radius: 10px; border: 0.5px solid oklch(78% 0.02 60); display: flex; align-items: center; justify-content: center;">
+                <span style="font-family: Merriweather, Georgia, serif; font-size: 16px; font-weight: 900;">15</span>
+              </div>
+              <span style="font-size: 13px; font-weight: 600; color: oklch(62% 0.02 60); width: 20px;">%</span>
+            </div>
+          </div>
+        </div>
+
+        <span style="font-size: 12px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.5;">Emitir más seguido gasta más datos móviles. El intervalo en movimiento es el que más pesa en el consumo mensual de cada unidad.</span>
+      </div>
+
+    </div>
+
+    <aside style="width: 356px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px;">
+
+      <div style="background: oklch(96% 0.04 75); border: 0.5px solid oklch(82% 0.09 75); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 9px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="oklch(50% 0.10 70)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 8.5v5"></path>
+            <circle cx="12" cy="17" r="0.6" fill="oklch(50% 0.10 70)"></circle>
+            <path d="M10.3 3.9L2.6 17.4a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path>
+          </svg>
+          <span style="font-size: 14px; font-weight: 700; color: oklch(42% 0.09 70);">Cambia el sistema entero</span>
+        </div>
+        <span style="font-size: 12px; font-weight: 400; color: oklch(48% 0.07 70); line-height: 1.55;">Estos valores afectan a todas las rutas y unidades a la vez. Un cambio mal calibrado puede llenar de notificaciones a los ciudadanos o dejarlos sin ninguna.</span>
+      </div>
+
+      <div style="background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 14px;">
+        <span style="font-family: Merriweather, Georgia, serif; font-size: 15px; font-weight: 700;">Prueba de campo</span>
+        <span style="font-size: 12px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.55;">La exactitud máxima y los radios de geocerca salen de medir el GPS en la calle, no de suponerlos.</span>
+
+        <div style="border-radius: 10px; border: 0.5px solid oklch(90% 0.015 60); padding: 13px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 12px; font-weight: 600; color: oklch(48% 0.02 60);">Exactitud mediana medida</span>
+            <span style="font-family: Merriweather, Georgia, serif; font-size: 14px; font-weight: 900;">40 m</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 12px; font-weight: 600; color: oklch(48% 0.02 60);">Lecturas tomadas</span>
+            <span style="font-family: Merriweather, Georgia, serif; font-size: 14px; font-weight: 900;">1 240</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 12px; font-weight: 600; color: oklch(48% 0.02 60);">Radio mínimo sugerido</span>
+            <span style="font-family: Merriweather, Georgia, serif; font-size: 14px; font-weight: 900;">80 m</span>
+          </div>
+        </div>
+
+        <div style="height: 44px; border-radius: 999px; border: 0.5px solid oklch(78% 0.02 60); display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="oklch(25% 0.02 60)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"></path>
+            <path d="M20 4v4h-4"></path>
+          </svg>
+          <span style="font-size: 14px; font-weight: 700;">Repetir medición</span>
+        </div>
+      </div>
+
+      <div style="flex: 1; background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px; overflow: hidden;">
+        <span style="font-family: Merriweather, Georgia, serif; font-size: 15px; font-weight: 700;">Cambios recientes</span>
+
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <span style="font-size: 13px; font-weight: 700;">Exactitud máxima: 30 m → 50 m</span>
+          <span style="font-size: 12px; font-weight: 600; color: oklch(62% 0.02 60);">5 de septiembre · tras la prueba de campo</span>
+        </div>
+
+        <div style="height: 0.5px; background: oklch(92% 0.012 60);"></div>
+
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <span style="font-size: 13px; font-weight: 700;">Permanencia mínima: 30 s → 45 s</span>
+          <span style="font-size: 12px; font-weight: 600; color: oklch(62% 0.02 60);">2 de septiembre · exceso de avisos repetidos</span>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

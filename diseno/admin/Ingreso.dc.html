@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@400;600;700&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: oklch(48% 0.15 35); text-decoration: none; }
+    a:hover { color: oklch(40% 0.14 35); }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 900px; background: oklch(97% 0.015 75); font-family: 'Source Sans 3', -apple-system, 'Segoe UI', sans-serif; color: oklch(25% 0.02 60); display: flex; overflow: hidden;">
+
+  <div style="width: 560px; flex-shrink: 0; background: oklch(99% 0.008 75); border-right: 0.5px solid oklch(85% 0.02 60); display: flex; flex-direction: column; justify-content: center; padding: 0 80px;">
+
+    <div style="display: flex; flex-direction: column; gap: 4px; padding-bottom: 36px;">
+      <span style="font-family: Merriweather, Georgia, serif; font-size: 30px; font-weight: 900; letter-spacing: -0.7px;">EcoRuta</span>
+      <span style="font-size: 13px; font-weight: 600; color: oklch(62% 0.02 60); letter-spacing: 0.3px;">Administración · San Juan de los Morros</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 18px;">
+      <div style="display: flex; flex-direction: column; gap: 7px;">
+        <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.6px; color: oklch(62% 0.02 60);">Correo</span>
+        <div style="height: 50px; border-radius: 10px; border: 0.5px solid oklch(78% 0.02 60); display: flex; align-items: center; padding: 0 15px;">
+          <span style="font-size: 15px; font-weight: 600;">admin@ecoruta.ve</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 7px;">
+        <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.6px; color: oklch(62% 0.02 60);">Contraseña</span>
+        <div style="height: 50px; border-radius: 10px; border: 0.5px solid oklch(78% 0.02 60); display: flex; align-items: center; justify-content: space-between; padding: 0 15px;">
+          <span style="font-size: 18px; font-weight: 700; letter-spacing: 3px; color: oklch(48% 0.02 60);">••••••••••</span>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="oklch(62% 0.02 60)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </div>
+      </div>
+
+      <div style="height: 52px; border-radius: 999px; background: oklch(48% 0.15 35); display: flex; align-items: center; justify-content: center;">
+        <span style="font-size: 16px; font-weight: 700; color: oklch(99% 0.008 75);">Entrar</span>
+      </div>
+
+      <div style="border-radius: 12px; border: 0.5px solid oklch(90% 0.015 60); background: oklch(99% 0.008 75); padding: 14px 16px; display: flex; gap: 10px; align-items: flex-start;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="oklch(62% 0.02 60)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
+          <rect x="4.5" y="10.5" width="15" height="9.5" rx="2.5"></rect>
+          <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"></path>
+        </svg>
+        <span style="font-size: 12px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.5;">Solo el ente gestor inicia sesión. El ciudadano nunca se autentica y el dispositivo de cada unidad se vincula con un código, no con una cuenta.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="flex: 1; position: relative; overflow: hidden;">
+    <svg width="100%" height="100%" viewBox="0 0 880 900" preserveAspectRatio="xMidYMid slice" style="display: block;">
+      <rect width="880" height="900" fill="oklch(93% 0.02 70)"></rect>
+      <g fill="oklch(96% 0.014 72)">
+        <rect x="40" y="60" width="220" height="180" rx="4"></rect>
+        <rect x="286" y="60" width="260" height="180" rx="4"></rect>
+        <rect x="572" y="60" width="270" height="180" rx="4"></rect>
+        <rect x="40" y="270" width="220" height="250" rx="4"></rect>
+        <rect x="286" y="270" width="260" height="250" rx="4"></rect>
+        <rect x="572" y="270" width="270" height="250" rx="4"></rect>
+        <rect x="40" y="550" width="220" height="300" rx="4"></rect>
+        <rect x="286" y="550" width="260" height="300" rx="4"></rect>
+        <rect x="572" y="550" width="270" height="300" rx="4"></rect>
+      </g>
+      <g stroke="oklch(99% 0.008 75)" stroke-linecap="round">
+        <path d="M0 255h880" stroke-width="15"></path>
+        <path d="M0 535h880" stroke-width="15"></path>
+        <path d="M273 0v900" stroke-width="15"></path>
+        <path d="M559 0v900" stroke-width="12"></path>
+      </g>
+      <path d="M110 760 L273 760 L273 535 L559 535 L559 255 L800 255" fill="none" stroke="oklch(58% 0.17 35)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"></path>
+      <path d="M110 255 L110 760" fill="none" stroke="#F9844A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"></path>
+      <g fill="oklch(99% 0.008 75)" stroke="oklch(58% 0.17 35)" stroke-width="3">
+        <circle cx="273" cy="535" r="7"></circle>
+        <circle cx="559" cy="255" r="7"></circle>
+      </g>
+      <g>
+        <circle cx="420" cy="535" r="24" fill="oklch(58% 0.17 35)" stroke="oklch(99% 0.008 75)" stroke-width="3.4"></circle>
+        <g transform="translate(408 523)" fill="none" stroke="oklch(99% 0.008 75)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="2.6" width="18" height="15" rx="3.8"></rect>
+          <path d="M3 11.6h18"></path>
+          <path d="M7.5 17.6v2.4M16.5 17.6v2.4"></path>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

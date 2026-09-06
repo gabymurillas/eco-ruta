@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@400;600;700&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: oklch(48% 0.15 35); text-decoration: none; }
+    a:hover { color: oklch(40% 0.14 35); }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 900px; background: oklch(97% 0.015 75); font-family: 'Source Sans 3', -apple-system, 'Segoe UI', sans-serif; color: oklch(25% 0.02 60); display: flex; flex-direction: column; overflow: hidden;">
+
+  <header style="height: 72px; flex-shrink: 0; background: oklch(99% 0.008 75); border-bottom: 0.5px solid oklch(85% 0.02 60); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; gap: 24px;">
+    <div style="display: flex; flex-direction: column; gap: 1px;">
+      <span style="font-family: Merriweather, Georgia, serif; font-size: 19px; font-weight: 900; letter-spacing: -0.3px;">Históricos</span>
+      <span style="font-size: 12px; font-weight: 600; color: oklch(62% 0.02 60);">Del 1 al 5 de septiembre · todas las rutas</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="height: 40px; padding: 0 16px; border-radius: 999px; border: 0.5px solid oklch(78% 0.02 60); display: flex; align-items: center; gap: 9px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="oklch(25% 0.02 60)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="5" width="16" height="15" rx="3"></rect>
+          <path d="M4 10h16M9 3v4M15 3v4"></path>
+        </svg>
+        <span style="font-size: 14px; font-weight: 600;">Últimos 5 días</span>
+      </div>
+      <div style="height: 40px; padding: 0 16px; border-radius: 999px; border: 0.5px solid oklch(78% 0.02 60); display: flex; align-items: center; gap: 9px;">
+        <span style="width: 9px; height: 9px; border-radius: 999px; background: oklch(52% 0.11 195); display: block;"></span>
+        <span style="font-size: 14px; font-weight: 600;">Todas las rutas</span>
+      </div>
+      <div style="height: 40px; padding: 0 18px; border-radius: 999px; background: oklch(48% 0.15 35); display: flex; align-items: center; gap: 8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="oklch(99% 0.008 75)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 4v11"></path>
+          <path d="M8 11l4 4 4-4"></path>
+          <path d="M5 19h14"></path>
+        </svg>
+        <span style="font-size: 14px; font-weight: 700; color: oklch(99% 0.008 75);">Exportar</span>
+      </div>
+    </div>
+  </header>
+
+  <div style="flex-shrink: 0; padding: 20px 28px 0; display: flex; gap: 16px;">
+    <div style="flex: 1; background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+      <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.5px; color: oklch(62% 0.02 60);">Viajes completados</span>
+      <div style="display: flex; align-items: baseline; gap: 7px;">
+        <span style="font-family: Merriweather, Georgia, serif; font-size: 30px; font-weight: 900; line-height: 1;">142</span>
+        <span style="font-size: 13px; font-weight: 600; color: oklch(52% 0.13 155);">+8 % vs. semana previa</span>
+      </div>
+    </div>
+
+    <div style="flex: 1; background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+      <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.5px; color: oklch(62% 0.02 60);">Duración promedio</span>
+      <div style="display: flex; align-items: baseline; gap: 7px;">
+        <span style="font-family: Merriweather, Georgia, serif; font-size: 30px; font-weight: 900; line-height: 1;">38</span>
+        <span style="font-size: 13px; font-weight: 600; color: oklch(48% 0.02 60);">min por recorrido</span>
+      </div>
+    </div>
+
+    <div style="flex: 1; background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+      <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.5px; color: oklch(62% 0.02 60);">Cobertura de paradas</span>
+      <div style="display: flex; align-items: baseline; gap: 7px;">
+        <span style="font-family: Merriweather, Georgia, serif; font-size: 30px; font-weight: 900; line-height: 1;">94 %</span>
+        <span style="font-size: 13px; font-weight: 600; color: oklch(48% 0.02 60);">de paradas atendidas</span>
+      </div>
+    </div>
+
+    <div style="flex: 1; background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+      <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.5px; color: oklch(62% 0.02 60);">Incidencias</span>
+      <div style="display: flex; align-items: baseline; gap: 7px;">
+        <span style="font-family: Merriweather, Georgia, serif; font-size: 30px; font-weight: 900; line-height: 1;">6</span>
+        <span style="font-size: 13px; font-weight: 600; color: oklch(48% 0.02 60);">en el período</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex: 1; padding: 20px 28px 24px; display: flex; gap: 20px; overflow: hidden;">
+
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 20px; overflow: hidden;">
+
+      <div style="background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-family: Merriweather, Georgia, serif; font-size: 15px; font-weight: 700;">Viajes por día</span>
+          <div style="display: flex; gap: 14px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="width: 8px; height: 8px; border-radius: 2px; background: oklch(52% 0.11 195); display: block;"></span>
+              <span style="font-size: 12px; font-weight: 600; color: oklch(48% 0.02 60);">Centro–UNERG</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="width: 8px; height: 8px; border-radius: 2px; background: oklch(48% 0.12 265); display: block;"></span>
+              <span style="font-size: 12px; font-weight: 600; color: oklch(48% 0.02 60);">Terminal–Hospital</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="width: 8px; height: 8px; border-radius: 2px; background: oklch(70% 0.14 75); display: block;"></span>
+              <span style="font-size: 12px; font-weight: 600; color: oklch(48% 0.02 60);">Aseo · Las Flores</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: flex-end; gap: 26px; height: 168px; padding-top: 4px;">
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <div style="width: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 5px; height: 140px;">
+              <div style="width: 20px; height: 96px; border-radius: 4px 4px 0 0; background: oklch(52% 0.11 195);"></div>
+              <div style="width: 20px; height: 72px; border-radius: 4px 4px 0 0; background: oklch(48% 0.12 265);"></div>
+              <div style="width: 20px; height: 40px; border-radius: 4px 4px 0 0; background: oklch(70% 0.14 75);"></div>
+            </div>
+            <span style="font-size: 12px; font-weight: 600; color: oklch(62% 0.02 60);">Lun 1</span>
+          </div>
+
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <div style="width: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 5px; height: 140px;">
+              <div style="width: 20px; height: 108px; border-radius: 4px 4px 0 0; background: oklch(52% 0.11 195);"></div>
+              <div style="width: 20px; height: 80px; border-radius: 4px 4px 0 0; background: oklch(48% 0.12 265);"></div>
+              <div style="width: 20px; height: 36px; border-radius: 4px 4px 0 0; background: oklch(70% 0.14 75);"></div>
+            </div>
+            <span style="font-size: 12px; font-weight: 600; color: oklch(62% 0.02 60);">Mar 2</span>
+          </div>
+
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <div style="width: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 5px; height: 140px;">
+              <div style="width: 20px; height: 64px; border-radius: 4px 4px 0 0; background: oklch(52% 0.11 195);"></div>
+              <div style="width: 20px; height: 52px; border-radius: 4px 4px 0 0; background: oklch(48% 0.12 265);"></div>
+              <div style="width: 20px; height: 38px; border-radius: 4px 4px 0 0; background: oklch(70% 0.14 75);"></div>
+            </div>
+            <span style="font-size: 12px; font-weight: 600; color: oklch(62% 0.02 60);">Mié 3</span>
+          </div>
+
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <div style="width: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 5px; height: 140px;">
+              <div style="width: 20px; height: 112px; border-radius: 4px 4px 0 0; background: oklch(52% 0.11 195);"></div>
+              <div style="width: 20px; height: 88px; border-radius: 4px 4px 0 0; background: oklch(48% 0.12 265);"></div>
+              <div style="width: 20px; height: 42px; border-radius: 4px 4px 0 0; background: oklch(70% 0.14 75);"></div>
+            </div>
+            <span style="font-size: 12px; font-weight: 600; color: oklch(62% 0.02 60);">Jue 4</span>
+          </div>
+
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <div style="width: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 5px; height: 140px;">
+              <div style="width: 20px; height: 84px; border-radius: 4px 4px 0 0; background: oklch(52% 0.11 195);"></div>
+              <div style="width: 20px; height: 60px; border-radius: 4px 4px 0 0; background: oklch(48% 0.12 265);"></div>
+              <div style="width: 20px; height: 30px; border-radius: 4px 4px 0 0; background: oklch(70% 0.14 75);"></div>
+            </div>
+            <span style="font-size: 12px; font-weight: 600; color: oklch(62% 0.02 60);">Vie 5</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex: 1; background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow: hidden;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-family: Merriweather, Georgia, serif; font-size: 15px; font-weight: 700;">Reproducir un recorrido</span>
+          <span style="font-size: 12px; font-weight: 600; color: oklch(62% 0.02 60);">Unidad 03 · jueves 4, 6:30 a 7:12</span>
+        </div>
+
+        <div style="flex: 1; position: relative; border-radius: 10px; overflow: hidden; border: 0.5px solid oklch(90% 0.015 60);">
+          <svg width="100%" height="100%" viewBox="0 0 700 180" preserveAspectRatio="xMidYMid slice" style="display: block;">
+            <rect width="700" height="180" fill="oklch(93% 0.02 70)"></rect>
+            <g stroke="oklch(99% 0.008 75)" stroke-linecap="round">
+              <path d="M0 60h700" stroke-width="11"></path>
+              <path d="M0 130h700" stroke-width="11"></path>
+              <path d="M220 0v180" stroke-width="11"></path>
+              <path d="M470 0v180" stroke-width="9"></path>
+            </g>
+            <path d="M40 160 L220 160 L220 130 L470 130 L470 60 L660 60" fill="none" stroke="oklch(52% 0.11 195)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"></path>
+            <path d="M40 160 L220 160 L220 130 L400 130" fill="none" stroke="oklch(52% 0.11 195)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <circle cx="400" cy="130" r="9" fill="oklch(52% 0.11 195)" stroke="oklch(99% 0.008 75)" stroke-width="3"></circle>
+            <g fill="oklch(99% 0.008 75)" stroke="oklch(52% 0.11 195)" stroke-width="2.2">
+              <circle cx="220" cy="130" r="5"></circle>
+              <circle cx="470" cy="60" r="5"></circle>
+            </g>
+          </svg>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 40px; height: 40px; border-radius: 999px; background: oklch(48% 0.15 35); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="oklch(99% 0.008 75)" stroke="none">
+              <path d="M8 5.5v13l11-6.5z"></path>
+            </svg>
+          </div>
+          <div style="flex: 1; height: 5px; border-radius: 999px; background: oklch(90% 0.015 60); position: relative;">
+            <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 52%; border-radius: 999px; background: oklch(52% 0.11 195);"></div>
+            <div style="position: absolute; left: 52%; top: -6px; width: 17px; height: 17px; border-radius: 999px; background: oklch(99% 0.008 75); border: 2px solid oklch(52% 0.11 195);"></div>
+          </div>
+          <span style="font-size: 13px; font-weight: 700; width: 92px; text-align: right;">6:52 / 7:12</span>
+        </div>
+      </div>
+
+    </div>
+
+    <aside style="width: 344px; flex-shrink: 0; background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow: hidden;">
+      <span style="font-family: Merriweather, Georgia, serif; font-size: 15px; font-weight: 700;">Zonas problemáticas</span>
+      <span style="font-size: 12px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.5;">Tramos donde las unidades tardan más de lo habitual, según los viajes del período.</span>
+
+      <div style="border-radius: 12px; border: 0.5px solid oklch(82% 0.09 75); background: oklch(96% 0.04 75); padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <span style="font-size: 14px; font-weight: 700; color: oklch(42% 0.09 70);">Av. Miranda → Redoma</span>
+          <span style="font-family: Merriweather, Georgia, serif; font-size: 15px; font-weight: 900; color: oklch(42% 0.09 70);">+9 min</span>
+        </div>
+        <span style="font-size: 12px; font-weight: 600; color: oklch(48% 0.07 70);">Sobre el promedio · 18 viajes afectados</span>
+      </div>
+
+      <div style="border-radius: 12px; border: 0.5px solid oklch(90% 0.015 60); padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <span style="font-size: 14px; font-weight: 700;">Plaza Bolívar → Av. Miranda</span>
+          <span style="font-family: Merriweather, Georgia, serif; font-size: 15px; font-weight: 900;">+4 min</span>
+        </div>
+        <span style="font-size: 12px; font-weight: 600; color: oklch(48% 0.02 60);">Sobre el promedio · 11 viajes afectados</span>
+      </div>
+
+      <div style="border-radius: 12px; border: 0.5px solid oklch(90% 0.015 60); padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <span style="font-size: 14px; font-weight: 700;">Terminal → Hospital</span>
+          <span style="font-family: Merriweather, Georgia, serif; font-size: 15px; font-weight: 900;">+2 min</span>
+        </div>
+        <span style="font-size: 12px; font-weight: 600; color: oklch(48% 0.02 60);">Sobre el promedio · 7 viajes afectados</span>
+      </div>
+
+      <div style="flex: 1;"></div>
+
+      <div style="border-radius: 12px; border: 0.5px solid oklch(90% 0.015 60); padding: 13px 14px; display: flex; gap: 9px; align-items: flex-start;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="oklch(62% 0.02 60)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
+          <circle cx="12" cy="12" r="8.5"></circle>
+          <path d="M12 11v5.5"></path>
+          <circle cx="12" cy="8" r="0.6" fill="oklch(62% 0.02 60)"></circle>
+        </svg>
+        <span style="font-size: 11px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.5;">Esto describe lo que ya pasó. No predice el tráfico de mañana: para eso haría falta un modelo con históricos, que está fuera de este alcance.</span>
+      </div>
+    </aside>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "title": "Seguimiento · parada más cercana",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "RutaDetalle.dc.html",
+      "title": "Detalle de ruta",
+      "x": 490,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "AlertaProximidad.dc.html",
+      "title": "Alerta de proximidad",
+      "x": 980,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "SinUnidades.dc.html",
+      "title": "Sin unidades activas",
+      "x": 1470,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Escritorio.dc.html",
+      "title": "Escritorio",
+      "x": 0,
+      "y": 984,
+      "w": 1440,
+      "h": 900
+    }
+  ],
+  "annotations": [
+    {
+      "id": "parada-primero",
+      "x": 0,
+      "y": -210,
+      "w": 460,
+      "text": "La parada manda, no la unidad.\nTu ubicación determina la parada más cercana, y esa parada lista qué unidades vienen y en cuánto.\nLas paradas se dibujan en el mapa, y la más cercana aparece resaltada."
+    },
+    {
+      "id": "tipos",
+      "x": 490,
+      "y": -210,
+      "w": 460,
+      "text": "El servicio lo define la ruta, no la unidad: rutas.tipo es texto libre (transporte, aseo, agua, gas) y rutas.icono decide el marcador, elegido por el admin junto al color.\nValores reconocidos hoy: bus, camion, cisterna, van, generico. Uno desconocido cae al marcador genérico."
+    },
+    {
+      "id": "estilo",
+      "x": 980,
+      "y": -210,
+      "w": 460,
+      "text": "Tipografía unificada en Merriweather (nombres y números) más Source Sans 3 (interfaz).\nSuperficies planas: sin sombras. Los bordes de 0.5px son los que definen cada superficie."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}
