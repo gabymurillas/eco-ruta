@@ -411,10 +411,16 @@ el sistema se sienta cercano y local, no corporativo ni genérico.
 
 ### Tipografía
 
-- Titulares y nombres de marca: serif (Instrument Serif, Fraunces o similar).
-- Cuerpo, datos e interfaz: sans-serif (Instrument Sans, Plus Jakarta Sans o similar).
+Elegidas y en uso. No son candidatas: cambiarlas implica tocar `layout.tsx`, los tokens de
+`globals.css` y las once maquetas de `diseno/`.
+
+- Titulares, nombres de ruta y cifras: **Merriweather** (serif). Pesos 400, 700, 900.
+- Cuerpo, datos e interfaz: **Source Sans 3** (sans-serif). Pesos 400, 600, 700.
 - **No usar Inter, Roboto, Open Sans ni las fuentes por defecto del sistema.**
-- Pesos: 400 y 500. Sentence case siempre.
+- Sentence case siempre.
+
+> Merriweather es más pesada y menos elegante que una serif de display, pero se eligió por
+> legibilidad: las cifras de tiempo estimado se leen de un vistazo, en la calle y con sol.
 
 ### Superficies
 

@@ -64,11 +64,19 @@
     </div>
 
     <div style="flex: 1; background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
-      <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.5px; color: oklch(62% 0.02 60);">Cobertura de paradas</span>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.5px; color: oklch(62% 0.02 60);">Cobertura de paradas</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="oklch(62% 0.02 60)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="8.5"></circle>
+          <path d="M12 11v5.5"></path>
+          <circle cx="12" cy="8" r="0.6" fill="oklch(62% 0.02 60)"></circle>
+        </svg>
+      </div>
       <div style="display: flex; align-items: baseline; gap: 7px;">
         <span style="font-family: Merriweather, Georgia, serif; font-size: 30px; font-weight: 900; line-height: 1;">94 %</span>
-        <span style="font-size: 13px; font-weight: 600; color: oklch(48% 0.02 60);">de paradas atendidas</span>
+        <span style="font-size: 13px; font-weight: 600; color: oklch(48% 0.02 60);">1 331 de 1 416</span>
       </div>
+      <span style="font-size: 11px; font-weight: 400; color: oklch(62% 0.02 60); line-height: 1.4;">Paradas con registro de llegada sobre paradas planificadas de cada viaje.</span>
     </div>
 
     <div style="flex: 1; background: oklch(99% 0.008 75); border: 0.5px solid oklch(85% 0.02 60); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
@@ -228,7 +236,7 @@
           <path d="M12 11v5.5"></path>
           <circle cx="12" cy="8" r="0.6" fill="oklch(62% 0.02 60)"></circle>
         </svg>
-        <span style="font-size: 11px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.5;">Esto describe lo que ya pasó. No predice el tráfico de mañana: para eso haría falta un modelo con históricos, que está fuera de este alcance.</span>
+        <span style="font-size: 11px; font-weight: 400; color: oklch(48% 0.02 60); line-height: 1.5;">Esto describe lo que ya pasó. No predice el tráfico de mañana: para eso haría falta un modelo con históricos, fuera de este alcance.<br><br>La cobertura depende del radio de geocerca: achicarlo la baja sin que el servicio haya empeorado. Al comparar períodos, verifica que los parámetros no cambiaron.</span>
       </div>
     </aside>
 

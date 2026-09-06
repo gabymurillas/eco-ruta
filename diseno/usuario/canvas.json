@@ -9,9 +9,17 @@
       "h": 844
     },
     {
+      "file": "SenalPerdida.dc.html",
+      "title": "Señal perdida a mitad de camino",
+      "x": 490,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
       "file": "RutaDetalle.dc.html",
       "title": "Detalle de ruta",
-      "x": 490,
+      "x": 980,
       "y": 0,
       "w": 390,
       "h": 844
@@ -19,7 +27,7 @@
     {
       "file": "AlertaProximidad.dc.html",
       "title": "Alerta de proximidad",
-      "x": 980,
+      "x": 1470,
       "y": 0,
       "w": 390,
       "h": 844
@@ -27,7 +35,7 @@
     {
       "file": "SinUnidades.dc.html",
       "title": "Sin unidades activas",
-      "x": 1470,
+      "x": 1960,
       "y": 0,
       "w": 390,
       "h": 844
@@ -45,23 +53,23 @@
     {
       "id": "parada-primero",
       "x": 0,
-      "y": -210,
+      "y": -240,
       "w": 460,
-      "text": "La parada manda, no la unidad.\nTu ubicación determina la parada más cercana, y esa parada lista qué unidades vienen y en cuánto.\nLas paradas se dibujan en el mapa, y la más cercana aparece resaltada."
+      "text": "La parada manda, no la unidad.\nTu ubicación determina la parada más cercana, y esa parada lista qué unidades vienen y en cuánto."
     },
     {
-      "id": "tipos",
+      "id": "dos-vacios",
       "x": 490,
-      "y": -210,
+      "y": -240,
       "w": 460,
-      "text": "El servicio lo define la ruta, no la unidad: rutas.tipo es texto libre (transporte, aseo, agua, gas) y rutas.icono decide el marcador, elegido por el admin junto al color.\nValores reconocidos hoy: bus, camion, cisterna, van, generico. Uno desconocido cae al marcador genérico."
+      "text": "Dos estados distintos que no hay que confundir:\n'Sin unidades' es que no había nada circulando.\n'Señal perdida' es que el ciudadano ya estaba esperando y el número dejó de ser confiable: el tiempo se tacha, se dice hace cuánto fue la última posición, y la otra ruta sigue mostrando su tiempo normal."
     },
     {
       "id": "estilo",
-      "x": 980,
-      "y": -210,
+      "x": 1470,
+      "y": -240,
       "w": 460,
-      "text": "Tipografía unificada en Merriweather (nombres y números) más Source Sans 3 (interfaz).\nSuperficies planas: sin sombras. Los bordes de 0.5px son los que definen cada superficie."
+      "text": "Merriweather para nombres y cifras, Source Sans 3 para interfaz.\nSuperficies planas: sin sombras, bordes de 0.5px.\nTres paletas separadas: marca terracota, cinco tonos de ruta, y verde/ámbar/rojo solo para estados."
     }
   ],
   "launch": {
