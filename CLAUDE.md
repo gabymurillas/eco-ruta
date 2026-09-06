@@ -519,7 +519,9 @@ cualquier marcador de unidad.
 ## Reglas de seguridad
 
 - El ciudadano **nunca** se autentica. Lectura pública vía RLS sobre `rutas`, `paradas`,
-  `unidades`, `posiciones` e `incidencias`.
+  `unidades`, `posiciones`, `viajes`, `incidencias` y `parametros`. Los parámetros se leen —no se
+  escriben— porque la web debe usar los mismos umbrales que el servidor; quemarlos en el
+  código los desincronizaría de las geocercas.
 - Un dispositivo **solo** puede escribir posiciones de su propia unidad. Se garantiza por RLS
   comparando `unidad_id` contra el JWT, no por lógica en el cliente.
 - El código de vinculación es temporal (expira en minutos) y de un solo uso.

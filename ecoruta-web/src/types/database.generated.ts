@@ -720,6 +720,22 @@ export type Database = {
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
       gettransactionid: { Args: never; Returns: unknown }
+      llegadas_a_parada: {
+        Args: { parada: string }
+        Returns: {
+          distancia_recta_m: number
+          ruta_color: string
+          ruta_icono: string
+          ruta_id: string
+          ruta_nombre: string
+          ruta_tiene_trazado: boolean
+          segundos_sin_senal: number
+          ultima_parada: string
+          unidad_id: string
+          unidad_nombre: string
+          viaje_id: string
+        }[]
+      }
       longtransactionsenabled: { Args: never; Returns: boolean }
       paradas_cercanas: {
         Args: {

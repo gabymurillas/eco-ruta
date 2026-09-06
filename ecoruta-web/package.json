@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "types:db": "npx -y supabase@latest gen types typescript --project-id yumfwnqvmcitjnskazgx > src/types/database.generated.ts"
   },
   "dependencies": {

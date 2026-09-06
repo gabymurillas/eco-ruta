@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { clienteNavegador } from "@/lib/supabase/client";
 import type { ParadaCercanaRow } from "@/types/database";
 import { exito, fallo, type Resultado } from "./resultado";
 
@@ -22,7 +22,7 @@ export async function buscarParadasCercanas({
   radioMaximoM = 1500,
   limite = 5,
 }: OpcionesBusqueda): Promise<Resultado<ParadaCercanaRow[]>> {
-  const { data, error } = await supabase.rpc("paradas_cercanas", {
+  const { data, error } = await clienteNavegador().rpc("paradas_cercanas", {
     lat,
     lng,
     radio_max_m: radioMaximoM,

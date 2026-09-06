@@ -2,17 +2,30 @@
 
 import { useSeguimiento } from "../hooks/useSeguimiento";
 import { EstadoSinUbicacion } from "./EstadoSinUbicacion";
-import { ListaRutasEnParada } from "./ListaRutasEnParada";
+import { ListaLlegadas } from "./ListaLlegadas";
 import { ParadaCercana } from "./ParadaCercana";
 
-export function Seguimiento() {
-  const { ubicacion, carga, error, paradaMasCercana } = useSeguimiento();
+type Props = {
+  umbralSinSenalS: number;
+};
+
+export function Seguimiento({ umbralSinSenalS }: Props) {
+  const { ubicacion, carga, error, paradaMasCercana, llegadas } = useSeguimiento({
+    umbralSinSenalS,
+  });
+
+  const hayUnidadEnVivo = llegadas.some(
+    (llegada) =>
+      llegada.viaje_id !== null &&
+      llegada.segundos_sin_senal !== null &&
+      llegada.segundos_sin_senal <= umbralSinSenalS,
+  );
 
   return (
     <div className="flex min-h-dvh flex-col bg-fondo text-tinta">
       <header className="flex items-center justify-between gap-3 px-5 pb-4 pt-14">
-        <div className="flex flex-col gap-[2px]">
-          <span className="font-serif text-[22px] font-black leading-tight tracking-tight">
+        <div className="flex flex-col gap-0.5">
+          <span className="font-serif text-[22px] font-black tracking-tight">
             EcoRuta
           </span>
           <span className="text-xs font-semibold tracking-wide text-tinta-suave">
@@ -20,10 +33,13 @@ export function Seguimiento() {
           </span>
         </div>
 
-        {ubicacion.estado === "concedida" && (
+        {hayUnidadEnVivo && (
           <span className="flex h-9 items-center gap-2 rounded-full border-[0.5px] border-borde bg-superficie px-4">
-            {/* "En vivo" es un estado, no identidad: por regla del sistema usa verde, nunca el terracota de marca. */}
-            <span className="pulso-en-vivo size-[7px] rounded-full bg-exito" />
+            {/* "En vivo" es un estado, no identidad: por regla del sistema usa verde. */}
+            <span
+              aria-hidden="true"
+              className="pulso-en-vivo size-[7px] rounded-full bg-exito"
+            />
             <span className="text-[13px] font-bold">En vivo</span>
           </span>
         )}
@@ -34,7 +50,7 @@ export function Seguimiento() {
           <p className="text-sm text-tinta-media">Buscando paradas cerca de ti…</p>
         )}
 
-        {carga === "error" && (
+        {carga === "error" && error && (
           <p className="text-sm text-error" role="alert">
             {error}
           </p>
@@ -61,10 +77,10 @@ export function Seguimiento() {
             <ParadaCercana parada={paradaMasCercana} />
 
             <span className="pt-1 text-xs font-bold tracking-wide text-tinta-suave">
-              Rutas que pasan por esta parada
+              Próximas llegadas a esta parada
             </span>
 
-            <ListaRutasEnParada rutas={paradaMasCercana.rutas} />
+            <ListaLlegadas llegadas={llegadas} umbralSinSenalS={umbralSinSenalS} />
           </>
         )}
       </main>

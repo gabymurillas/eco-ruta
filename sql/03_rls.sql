@@ -28,8 +28,19 @@ create policy publico_lee_unidades on unidades
 create policy publico_lee_posiciones on posiciones
   for select using (usable);
 
+-- Sin esto el ciudadano no distingue "va en camino" de "no hay recorrido activo":
+-- el join a viajes le devuelve vacio y toda unidad parece detenida.
+create policy publico_lee_viajes on viajes
+  for select using (true);
+
 create policy publico_lee_incidencias on incidencias
   for select using (activa);
+
+-- La web del ciudadano usa los mismos umbrales que el servidor: sin lectura publica
+-- tendria que quemarlos en el codigo y dejarian de coincidir. Escribirlos sigue siendo
+-- exclusivo del administrador.
+create policy publico_lee_parametros on parametros
+  for select using (true);
 
 
 -- ── DISPOSITIVO: solo escribe SU propia unidad ──
