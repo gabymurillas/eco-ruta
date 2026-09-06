@@ -4,9 +4,17 @@
 -- ============================================================
 
 -- ── RUTAS ──
+-- 'tipo' es texto libre a propósito: el ente gestor registra el servicio que sea
+-- (transporte, aseo, agua, gas) sin que haya que modificar el esquema.
+-- 'icono' lo elige el admin al crear la ruta, junto al color. Tampoco lleva check:
+-- agregar un ícono nuevo no debe requerir una migración. La interfaz dibuja un
+-- marcador genérico cuando el valor es nulo o desconocido.
+-- Valores que la interfaz reconoce hoy: bus, camion, cisterna, van, generico.
 create table rutas (
   id            uuid primary key default gen_random_uuid(),
   nombre        text not null,
+  tipo          text,
+  icono         text,
   color         text not null,
   trazado       geography(LineString, 4326),
   horario       text,
@@ -34,10 +42,10 @@ create index paradas_ruta_idx on paradas (ruta_id);
 
 
 -- ── UNIDADES ──
+-- La unidad no declara qué servicio presta: eso lo dice la ruta a la que pertenece.
 create table unidades (
   id       uuid primary key default gen_random_uuid(),
   nombre   text not null,
-  tipo     text not null check (tipo in ('transporte','recoleccion')),
   ruta_id  uuid references rutas(id) on delete set null,
   activa   boolean not null default true
 );

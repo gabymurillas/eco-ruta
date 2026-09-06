@@ -99,9 +99,9 @@ cualquier consulta**.
 
 | Tabla | Rol |
 |---|---|
-| `rutas` | Recorrido, color, trazado (LineString) |
+| `rutas` | Recorrido, tipo de servicio, color, trazado (LineString) |
 | `paradas` | Puntos de la ruta + radio de geocerca |
-| `unidades` | Vehículos (transporte o recolección) |
+| `unidades` | Vehículos. Su servicio lo define la ruta a la que pertenecen |
 | `dispositivos` | Teléfono-baliza vinculado a una unidad; salud del equipo |
 | `viajes` | Un recorrido, de "iniciar" a "finalizar" |
 | `posiciones` | Telemetría GPS. Tabla de alta escritura |
@@ -117,6 +117,13 @@ cualquier consulta**.
   en la tabla `parametros`, **nunca hardcodeados**. Se ajustan tras la prueba de campo de GPS.
 - `eventos_geocerca` tiene `unique (viaje_id, parada_id)`. Esa restricción es la garantía final
   contra notificaciones duplicadas: aunque la lógica fallara, la base de datos la rechaza.
+- `rutas.tipo` es **texto libre a propósito**. El ente gestor registra el servicio que sea
+  (transporte, aseo, agua, gas) sin que haya que tocar el esquema. La unidad no declara su tipo:
+  lo hereda de su ruta.
+- `rutas.icono` lo elige el admin al crear la ruta, junto al color. Como el tipo es libre, la
+  interfaz no puede deducir el ícono: se elige explícitamente. Valores reconocidos hoy: `bus`,
+  `camion`, `cisterna`, `van`, `generico`. Un valor nulo o desconocido cae al marcador genérico,
+  así que agregar un ícono nuevo no rompe nada ni exige una migración.
 
 ---
 

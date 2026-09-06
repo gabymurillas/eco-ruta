@@ -1,0 +1,42 @@
+import { colorDeRuta } from "@/domain/colores";
+import type { RutaEnParada } from "../types";
+import { IconoRuta } from "./IconoRuta";
+
+type Props = {
+  rutas: readonly RutaEnParada[];
+};
+
+export function ListaRutasEnParada({ rutas }: Props) {
+  return (
+    <ul className="flex flex-col gap-[10px]">
+      {rutas.map((ruta) => (
+        <li
+          key={ruta.rutaId}
+          className="flex h-[62px] items-center gap-3 rounded-2xl border-[0.5px] border-borde-suave bg-white px-4"
+        >
+          <span
+            className="flex size-[34px] shrink-0 items-center justify-center rounded-full text-white"
+            style={{ backgroundColor: colorDeRuta(ruta.color) }}
+          >
+            <IconoRuta icono={ruta.icono} />
+          </span>
+
+          <div className="flex flex-1 flex-col gap-[2px]">
+            <span className="font-serif text-sm font-bold">{ruta.nombre}</span>
+            <span className="text-xs font-semibold text-tinta-suave">
+              {ruta.tipo ?? "Servicio sin tipo declarado"}
+            </span>
+          </div>
+
+          {/*
+            El tiempo estimado exige el trazado de la ruta y posiciones transmitiéndose.
+            Mientras no existan, se dice que no hay dato en vez de inventar un número.
+          */}
+          <span className="text-xs font-semibold text-tinta-suave">
+            Sin unidad en vivo
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}

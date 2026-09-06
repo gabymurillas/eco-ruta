@@ -1,26 +1,48 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+  Paleta Sunset. E94F37 es la marca y se usa en rellenos y marcadores;
+  para texto blanco sobre relleno se usa C43D28, que sí cumple WCAG AA (5,2:1).
+  Superficies planas: sin sombras. Los bordes de 0.5px definen cada superficie.
+*/
+@theme {
+  --color-fondo: #fff2e7;
+  --color-superficie: #ffffff;
+  --color-superficie-tinte: #fff8f2;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-tinta: #1f1512;
+  --color-tinta-media: #7a6a63;
+  --color-tinta-suave: #a08a7e;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-marca: #e94f37;
+  --color-marca-profundo: #c43d28;
+  --color-ruta-naranja: #f9844a;
+  --color-ruta-ambar: #f9c74f;
+
+  --color-borde: rgba(31, 21, 18, 0.14);
+  --color-borde-suave: rgba(31, 21, 18, 0.11);
+
+  --color-aviso-fondo: #fef6e7;
+  --color-aviso-borde: #f0c98a;
+  --color-aviso-tinta: #7a4e08;
+  --color-error: #b3261e;
+  --color-ubicacion: #2f6fed;
+
+  --font-sans: var(--font-source-sans), system-ui, sans-serif;
+  --font-serif: var(--font-merriweather), Georgia, serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-fondo);
+  color: var(--color-tinta);
+  font-family: var(--font-sans);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
