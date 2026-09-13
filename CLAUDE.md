@@ -69,9 +69,15 @@ Los proyectos web y móvil son independientes. Comparten backend, no código.
 
 **Web (`ecoruta-web/`)**
 - Next.js App Router + TypeScript + Tailwind CSS
-- `@supabase/supabase-js` (con Realtime)
-- `react-map-gl` sobre Mapbox GL JS
+- `@supabase/supabase-js` + `@supabase/ssr` (sesión en cookies, con Realtime)
+- `react-leaflet` sobre Leaflet, con teselas de OpenStreetMap
 - Deploy: Vercel
+
+> Se descartó Mapbox GL: exige clave y cuenta, pesa ~230 KB contra ~42 KB de Leaflet
+> —lo que importa en un teléfono de gama baja con datos móviles— y no tiene primitiva
+> de círculo con radio en metros, que es justo lo que necesitan las geocercas. El
+> servidor público de teselas de OSM es para volumen bajo: si el sistema se despliega
+> para toda la ciudad, se apunta a un proveedor con atribución cambiando una URL.
 
 **App de la ruta (`ecoruta-ruta/`)**
 - Expo (React Native) + TypeScript
@@ -256,10 +262,13 @@ src/
 │   ├── geocerca.ts               # Reglas de permanencia e histéresis
 │   └── telemetria.ts             # Filtro de exactitud, suavizado
 │
-├── components/ui/                # Componentes compartidos: Button, Card, Badge...
+├── components/
+│   ├── ui/                       # Compartidos: Boton, Tarjeta, Campo, IconoRuta...
+│   └── mapa/                     # Capas de Leaflet: Mapa, marcadores, trazados
 ├── lib/
-│   ├── supabase.ts               # Cliente. Se importa SOLO desde services/
-│   └── mapbox.ts
+│   └── supabase/
+│       ├── client.ts             # clienteNavegador() — lectura pública del ciudadano
+│       └── server.ts             # crearClienteServidor() — Server Components y Actions
 └── types/
     └── database.ts               # Tipos generados del esquema
 ```
@@ -550,6 +559,58 @@ cualquier marcador de unidad.
 6. Admin: monitoreo en vivo
 7. Web del usuario
 8. Admin: históricos
+
+---
+
+## Principios de trabajo del agente
+
+De cumplimiento estricto, en todas las tareas:
+
+1. **Piensa antes de programar.** Expón suposiciones, dudas, alternativas y trade-offs antes de
+   escribir código.
+2. **KISS.** Resuelve la solicitud actual sin funciones ni abstracciones especulativas. La
+   solución más simple que cubra del todo la necesidad.
+3. **Cambios quirúrgicos.** Modifica solo lo que la tarea requiere; preserva el código
+   circundante.
+4. **Define y verifica el objetivo.** Conviértelo en un resultado verificable antes de darlo por
+   terminado (typecheck, lint, prueba manual, etc.).
+5. **Escritura clara.** El código se explica solo. El comentario dice el *por qué*, nunca el
+   *qué*, y solo cuando hace falta.
+
+Estos principios conviven con "Cómo trabajar en este proyecto" (abajo) y con "Clean Code
+aplicado" (arriba); si algo se contradice, gana lo más restrictivo.
+
+---
+
+## Navegación del código: codegraph
+
+El repo está indexado con **codegraph** (existe `.codegraph/` en la raíz). Para entender o
+localizar código, **usa codegraph antes que `grep`, `find` o abrir archivos a ciegas**:
+
+- Tool MCP `codegraph_explore` (tras reiniciar Claude Code) — símbolos relevantes + su código
+  verbatim + las rutas de llamada entre ellos, en una sola llamada.
+- Shell (siempre): `codegraph explore "<pregunta o símbolos>"`, `codegraph node "<archivo|símbolo>"`,
+  `codegraph callers "<símbolo>"`, `codegraph impact "<símbolo>"`, `codegraph query "<texto>"`.
+- Tras **crear** archivos nuevos: `codegraph index` (el sync incremental a veces no los toma).
+
+Recurrir a lectura directa está bien para confirmar el contenido actual de un archivo que
+codegraph ya señaló; no para descubrir dónde está algo.
+
+---
+
+## Skills del proyecto
+
+Skills de Claude Code en `.claude/skills/<nombre>/SKILL.md`, cargadas bajo demanda. Invócalas
+cuando la tarea encaje, en vez de re-derivar las reglas desde este documento.
+
+| Skill | Cuándo usarla |
+|---|---|
+| **web-capas** | Añadir o modificar una pantalla, componente de feature, hook (ViewModel) o Server Action en `ecoruta-web`. Reglas de capas, límites de tamaño, patrones de composición. |
+| **servicio-datos** | Escribir o cambiar un método en `services/*.service.ts`: patrón `Resultado<T>`, elegir cliente servidor vs. navegador, tipos del esquema, RPC de PostGIS. |
+| **edge-geocerca** | La Edge Function de geocercas o cualquier trabajo sobre proximidad, permanencia, histéresis o suavizado. Contiene el algoritmo de 5 pasos que **no se simplifica**. |
+| **esquema-sql** | Cambiar `sql/` (tablas, columnas geográficas, índices GiST, RLS) y regenerar tipos con `npm run types:db`. |
+
+Al terminar una skill, el resto de reglas de este documento siguen aplicando.
 
 ---
 
