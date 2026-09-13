@@ -16,6 +16,8 @@ export type EstadoUbicacion =
 export type ParadaConRutas = {
   paradaId: string;
   nombre: string;
+  lat: number;
+  lng: number;
   distanciaM: number;
   rutas: RutaEnParada[];
 };
@@ -44,6 +46,8 @@ export function agruparPorParada(
     paradas.set(fila.parada_id, {
       paradaId: fila.parada_id,
       nombre: fila.parada_nombre,
+      lat: fila.parada_lat,
+      lng: fila.parada_lng,
       distanciaM: fila.distancia_m,
       rutas: [aRutaEnParada(fila)],
     });

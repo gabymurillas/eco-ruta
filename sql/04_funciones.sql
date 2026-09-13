@@ -313,12 +313,14 @@ as $$
 $$;
 
 
+-- El parametro lleva sufijo para no chocar con la columna homonima: `nombre` a secas
+-- se resolvia como paradas.nombre y, al haber un max(), Postgres exigia un GROUP BY.
 create or replace function crear_parada(
-  ruta    uuid,
-  nombre  text,
-  lat     double precision,
-  lng     double precision,
-  radio_m integer
+  ruta           uuid,
+  nombre_parada  text,
+  lat            double precision,
+  lng            double precision,
+  radio_m        integer
 )
 returns uuid
 language sql
@@ -327,14 +329,13 @@ security invoker
 set search_path = public
 as $$
   insert into paradas (ruta_id, nombre, orden, ubicacion, radio_geocerca_m)
-  select
+  values (
     ruta,
-    nombre,
-    coalesce(max(p.orden), 0) + 1,
+    nombre_parada,
+    (select coalesce(max(p.orden), 0) + 1 from paradas p where p.ruta_id = ruta),
     ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography,
     radio_m
-  from paradas p
-  where p.ruta_id = ruta
+  )
   returning id;
 $$;
 

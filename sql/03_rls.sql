@@ -115,3 +115,22 @@ create policy admin_total_incidencias on incidencias
 
 create policy admin_total_parametros on parametros
   for all using (es_admin()) with check (es_admin());
+
+
+-- ── PENDIENTE CONOCIDO: spatial_ref_sys ──
+--
+-- PostGIS se instalo en el esquema `public`, que es el que PostgREST expone. Eso deja
+-- su tabla de sistemas de referencia (spatial_ref_sys, ~8500 codigos EPSG) alcanzable
+-- desde internet, y supabase_admin le concedio INSERT, UPDATE, DELETE y TRUNCATE a los
+-- roles anon y authenticated. Comprobado: un PATCH anonimo con la clave publica
+-- devuelve 204, o sea que la escritura se acepta.
+--
+-- No se puede corregir desde este proyecto: la tabla pertenece a supabase_admin y el
+-- rol postgres no es miembro suyo, asi que ni `enable row level security` ni `revoke`
+-- surten efecto. Tampoco se puede mover la extension: PostGIS no admite
+-- ALTER EXTENSION ... SET SCHEMA.
+--
+-- Que se pierde si alguien la vacia: PostGIS deja de resolver proyecciones. Es un
+-- riesgo de disponibilidad, no de fuga de datos, y se recupera reinstalando la
+-- extension. La forma de evitarlo de raiz habria sido instalar PostGIS en el esquema
+-- `extensions` desde el principio.

@@ -83,6 +83,9 @@ export function useSeguimiento({ umbralSinSenalS }: Props) {
     carga: derivarCarga(ubicacion.estado, respuesta),
     error: respuesta && !respuesta.ok ? respuesta.error : null,
     paradaMasCercana,
+    // El mapa dibuja todas las paradas cercanas, no solo la elegida: ver las de
+    // alrededor ayuda al ciudadano a ubicarse.
+    paradasCercanas: paradas,
     otrasParadas: paradas.slice(1),
     llegadas,
     umbralSinSenalS,

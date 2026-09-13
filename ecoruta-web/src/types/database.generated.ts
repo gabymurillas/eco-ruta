@@ -569,6 +569,16 @@ export type Database = {
             }
             Returns: string
           }
+      crear_parada: {
+        Args: {
+          lat: number
+          lng: number
+          nombre_parada: string
+          radio_m: number
+          ruta: string
+        }
+        Returns: string
+      }
       disablelongtransactions: { Args: never; Returns: string }
       dropgeometrycolumn:
         | {
@@ -616,6 +626,8 @@ export type Database = {
           ruta_nombre: string
           segundos_sin_senal: number
           unidad_id: string
+          unidad_lat: number
+          unidad_lng: number
           unidad_nombre: string
           velocidad_kmh: number
           viaje_id: string
@@ -720,6 +732,10 @@ export type Database = {
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
       gettransactionid: { Args: never; Returns: unknown }
+      guardar_trazado_de_ruta: {
+        Args: { coordenadas: Json; ruta: string }
+        Returns: undefined
+      }
       llegadas_a_parada: {
         Args: { parada: string }
         Returns: {
@@ -732,11 +748,17 @@ export type Database = {
           segundos_sin_senal: number
           ultima_parada: string
           unidad_id: string
+          unidad_lat: number
+          unidad_lng: number
           unidad_nombre: string
           viaje_id: string
         }[]
       }
       longtransactionsenabled: { Args: never; Returns: boolean }
+      mover_parada: {
+        Args: { lat: number; lng: number; parada: string; radio_m: number }
+        Returns: undefined
+      }
       paradas_cercanas: {
         Args: {
           lat: number
@@ -747,12 +769,27 @@ export type Database = {
         Returns: {
           distancia_m: number
           parada_id: string
+          parada_lat: number
+          parada_lng: number
           parada_nombre: string
+          radio_geocerca_m: number
           ruta_color: string
           ruta_icono: string
           ruta_id: string
           ruta_nombre: string
           ruta_tipo: string
+        }[]
+      }
+      paradas_de_ruta: {
+        Args: { ruta: string }
+        Returns: {
+          notifica: boolean
+          orden: number
+          parada_id: string
+          parada_lat: number
+          parada_lng: number
+          parada_nombre: string
+          radio_geocerca_m: number
         }[]
       }
       populate_geometry_columns:
@@ -804,6 +841,16 @@ export type Database = {
           paradas_planificadas: number
           paradas_visitadas: number
           viajes_completados: number
+        }[]
+      }
+      rutas_para_mapa: {
+        Args: never
+        Returns: {
+          ruta_color: string
+          ruta_icono: string
+          ruta_id: string
+          ruta_nombre: string
+          trazado_geojson: Json
         }[]
       }
       st_3dclosestpoint: {
