@@ -1,4 +1,5 @@
 import { crearClienteServidor } from "@/lib/supabase/server";
+import type { Database } from "@/types/database";
 import { exito, fallo, type Resultado } from "./resultado";
 
 export type RutaConResumen = {
@@ -93,6 +94,141 @@ export async function actualizarRuta(
 
   if (error) {
     return fallo("No se pudo guardar la ruta.");
+  }
+
+  return exito(null);
+}
+
+// ── EDICIÓN SOBRE EL MAPA ──
+//
+// Estas funciones viven aquí y no en `paradas.service.ts` porque ese módulo lo importa
+// un hook de cliente: meterle `crearClienteServidor` arrastraría `next/headers` al
+// bundle del navegador y el build fallaría.
+
+export type RutaDeMapa =
+  Database["public"]["Functions"]["rutas_para_mapa"]["Returns"][number];
+
+export type ParadaDeRuta =
+  Database["public"]["Functions"]["paradas_de_ruta"]["Returns"][number];
+
+export async function obtenerRutaDeMapa(
+  id: string,
+): Promise<Resultado<RutaDeMapa | null>> {
+  const supabase = await crearClienteServidor();
+  const { data, error } = await supabase.rpc("rutas_para_mapa");
+
+  if (error) {
+    return fallo("No se pudo cargar la ruta.");
+  }
+
+  return exito(data?.find((ruta) => ruta.ruta_id === id) ?? null);
+}
+
+export async function obtenerParadasDeRuta(
+  id: string,
+): Promise<Resultado<ParadaDeRuta[]>> {
+  const supabase = await crearClienteServidor();
+  const { data, error } = await supabase.rpc("paradas_de_ruta", { ruta: id });
+
+  if (error) {
+    return fallo("No se pudieron cargar las paradas.");
+  }
+
+  return exito(data ?? []);
+}
+
+type NuevaParada = {
+  rutaId: string;
+  nombre: string;
+  lat: number;
+  lng: number;
+  radioM: number;
+};
+
+export async function agregarParadaARuta({
+  rutaId,
+  nombre,
+  lat,
+  lng,
+  radioM,
+}: NuevaParada): Promise<Resultado<string>> {
+  const supabase = await crearClienteServidor();
+
+  const { data, error } = await supabase.rpc("crear_parada", {
+    ruta: rutaId,
+    nombre_parada: nombre,
+    lat,
+    lng,
+    radio_m: radioM,
+  });
+
+  if (error) {
+    return fallo("No se pudo crear la parada.");
+  }
+
+  return exito(data);
+}
+
+type CambioDeParada = {
+  paradaId: string;
+  lat: number;
+  lng: number;
+  radioM: number;
+};
+
+export async function moverParadaDeRuta({
+  paradaId,
+  lat,
+  lng,
+  radioM,
+}: CambioDeParada): Promise<Resultado<null>> {
+  const supabase = await crearClienteServidor();
+
+  const { error } = await supabase.rpc("mover_parada", {
+    parada: paradaId,
+    lat,
+    lng,
+    radio_m: radioM,
+  });
+
+  if (error) {
+    return fallo("No se pudo mover la parada.");
+  }
+
+  return exito(null);
+}
+
+export async function eliminarParadaDeRuta(
+  paradaId: string,
+): Promise<Resultado<null>> {
+  const supabase = await crearClienteServidor();
+  const { error } = await supabase.from("paradas").delete().eq("id", paradaId);
+
+  if (error) {
+    return fallo("No se pudo eliminar la parada.");
+  }
+
+  return exito(null);
+}
+
+/**
+ * El trazado llega en orden GeoJSON [lng, lat]: la conversión desde Leaflet la hace
+ * `domain/mapa`, y la geometría la arma PostGIS. Menos de dos puntos borra el trazado.
+ */
+export async function guardarTrazado(
+  rutaId: string,
+  coordenadas: readonly [number, number][],
+): Promise<Resultado<null>> {
+  const supabase = await crearClienteServidor();
+
+  const { error } = await supabase.rpc("guardar_trazado_de_ruta", {
+    ruta: rutaId,
+    // Se copia porque el tipo generado del RPC espera un arreglo mutable (Json).
+    coordenadas: coordenadas.map(([lng, lat]) => [lng, lat]),
+  });
+
+  if (error) {
+    return fallo("No se pudo guardar el trazado.");
   }
 
   return exito(null);

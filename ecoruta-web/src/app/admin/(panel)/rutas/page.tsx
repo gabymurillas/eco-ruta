@@ -88,6 +88,13 @@ export default async function RutasPage() {
                     Inactiva
                   </span>
                 )}
+
+                <Link
+                  href={`/admin/rutas/${ruta.id}`}
+                  className="inline-flex h-10 shrink-0 items-center rounded-full border-[0.5px] border-borde px-4 text-[13px] font-bold text-marca-profundo transition-colors duration-300 ease-out hover:bg-marca-tenue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo"
+                >
+                  Trazado y paradas
+                </Link>
               </li>
             ))}
           </ul>
