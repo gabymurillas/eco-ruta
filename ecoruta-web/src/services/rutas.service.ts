@@ -233,3 +233,20 @@ export async function guardarTrazado(
 
   return exito(null);
 }
+
+export async function renombrarParadaDeRuta(
+  paradaId: string,
+  nombre: string,
+): Promise<Resultado<null>> {
+  const supabase = await crearClienteServidor();
+  const { error } = await supabase
+    .from("paradas")
+    .update({ nombre })
+    .eq("id", paradaId);
+
+  if (error) {
+    return fallo("No se pudo renombrar la parada.");
+  }
+
+  return exito(null);
+}

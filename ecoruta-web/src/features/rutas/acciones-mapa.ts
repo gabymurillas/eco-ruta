@@ -7,6 +7,7 @@ import {
   eliminarParadaDeRuta,
   guardarTrazado,
   moverParadaDeRuta,
+  renombrarParadaDeRuta,
 } from "@/services/rutas.service";
 import { obtenerParametros } from "@/services/parametros.service";
 
@@ -63,6 +64,27 @@ export async function moverParada({
   ...cambio
 }: CambioDeParada): Promise<ResultadoAccion> {
   const resultado = await moverParadaDeRuta(cambio);
+
+  if (!resultado.ok) {
+    return { ok: false, error: resultado.error };
+  }
+
+  revalidarRuta(rutaId);
+  return { ok: true };
+}
+
+export async function renombrarParada(
+  rutaId: string,
+  paradaId: string,
+  nombre: string,
+): Promise<ResultadoAccion> {
+  const limpio = nombre.trim();
+
+  if (!limpio) {
+    return { ok: false, error: "La parada necesita un nombre." };
+  }
+
+  const resultado = await renombrarParadaDeRuta(paradaId, limpio);
 
   if (!resultado.ok) {
     return { ok: false, error: resultado.error };

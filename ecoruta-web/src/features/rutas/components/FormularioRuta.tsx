@@ -9,29 +9,53 @@ import { colorDeRuta, TOKENS_DE_COLOR, tintaSobreColorDeRuta } from "@/domain/co
 import { ICONOS_DISPONIBLES, ICONO_POR_DEFECTO } from "@/domain/iconos";
 import { guardarRuta, type EstadoRuta } from "../acciones";
 
+export type DatosDeRuta = {
+  id: string;
+  nombre: string;
+  tipo: string | null;
+  icono: string | null;
+  color: string;
+  horario: string | null;
+};
+
 type Props = {
   radioMinimoSugeridoM: number;
   exactitudMaximaM: number;
+  /** Presente al editar. Ausente al crear. */
+  ruta?: DatosDeRuta;
 };
 
 const ESTADO_INICIAL: EstadoRuta = {};
 
-export function FormularioRuta({ radioMinimoSugeridoM, exactitudMaximaM }: Props) {
+export function FormularioRuta({
+  radioMinimoSugeridoM,
+  exactitudMaximaM,
+  ruta,
+}: Props) {
   const [estado, enviar, enviando] = useActionState(guardarRuta, ESTADO_INICIAL);
-  const [color, setColor] = useState(TOKENS_DE_COLOR[0]);
-  const [icono, setIcono] = useState<string>(ICONO_POR_DEFECTO);
+  const [color, setColor] = useState(ruta?.color ?? TOKENS_DE_COLOR[0]);
+  const [icono, setIcono] = useState<string>(ruta?.icono ?? ICONO_POR_DEFECTO);
 
   return (
     <form action={enviar} className="flex max-w-2xl flex-col gap-6">
+      {/* La accion decide entre crear y actualizar segun venga o no este id. */}
+      {ruta && <input type="hidden" name="id" value={ruta.id} />}
       <input type="hidden" name="color" value={color} />
       <input type="hidden" name="icono" value={icono} />
 
-      <Campo etiqueta="Nombre de la ruta" name="nombre" required placeholder="Centro–UNERG" />
+      <Campo
+        etiqueta="Nombre de la ruta"
+        name="nombre"
+        required
+        placeholder="Centro–UNERG"
+        defaultValue={ruta?.nombre}
+      />
 
       <Campo
         etiqueta="Tipo de servicio"
         name="tipo"
         placeholder="transporte"
+        defaultValue={ruta?.tipo ?? ""}
         ayuda="Texto libre: escribe el servicio que sea (transporte, aseo, agua, gas). No hay lista cerrada."
       />
 
@@ -115,6 +139,7 @@ export function FormularioRuta({ radioMinimoSugeridoM, exactitudMaximaM }: Props
         etiqueta="Horario"
         name="horario"
         placeholder="Lunes a viernes · 6:00 a 20:00"
+        defaultValue={ruta?.horario ?? ""}
       />
 
       <Tarjeta tono="advertencia" className="flex flex-col gap-1">
@@ -128,18 +153,20 @@ export function FormularioRuta({ radioMinimoSugeridoM, exactitudMaximaM }: Props
         </span>
       </Tarjeta>
 
-      <Tarjeta className="flex flex-col gap-1">
-        <span className="text-[13px] font-bold">El trazado se dibuja después</span>
-        <span className="text-xs leading-relaxed text-tinta-media">
-          Guarda la ruta primero. El trazado y las paradas se colocan sobre el mapa, que
-          necesita la clave de Mapbox todavía sin configurar. Sin trazado no hay tiempo
-          estimado: la distancia no puede seguir el recorrido real.
-        </span>
-      </Tarjeta>
+      {!ruta && (
+        <Tarjeta className="flex flex-col gap-1">
+          <span className="text-[13px] font-bold">El trazado se dibuja después</span>
+          <span className="text-xs leading-relaxed text-tinta-media">
+            Guarda la ruta primero. Luego, desde «Trazado y paradas», colocas las paradas
+            sobre el mapa y dibujas el recorrido. Sin trazado no hay tiempo estimado: la
+            distancia no puede seguir el recorrido real.
+          </span>
+        </Tarjeta>
+      )}
 
       <div className="flex items-center gap-4">
         <Boton type="submit" disabled={enviando}>
-          {enviando ? "Guardando…" : "Guardar ruta"}
+          {enviando ? "Guardando…" : ruta ? "Guardar cambios" : "Guardar ruta"}
         </Boton>
 
         {estado.error && (

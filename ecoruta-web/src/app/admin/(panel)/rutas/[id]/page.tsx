@@ -71,6 +71,13 @@ export default async function EditorDeRutaPage({ params }: PageProps<"/admin/rut
             Trazado y paradas · {paradas.datos.length} paradas
           </p>
         </div>
+
+        <Link
+          href={`/admin/rutas/${id}/datos`}
+          className="ml-auto inline-flex h-10 items-center rounded-full border-[0.5px] border-borde px-4 text-[13px] font-bold text-marca-profundo transition-colors duration-300 ease-out hover:bg-marca-tenue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo"
+        >
+          Editar datos
+        </Link>
       </header>
 
       <main className="min-h-0 flex-1 p-7">

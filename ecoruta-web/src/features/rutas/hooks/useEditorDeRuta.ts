@@ -7,6 +7,7 @@ import {
   eliminarParada,
   guardarTrazadoDeRuta,
   moverParada,
+  renombrarParada,
 } from "../acciones-mapa";
 import type { ParadaEditable, Modo } from "../components/LienzoEditor";
 
@@ -132,6 +133,31 @@ export function useEditorDeRuta({
     });
   }
 
+  /** Se persiste al salir del campo, no en cada tecla. */
+  function cambiarNombre(paradaId: string, nombre: string) {
+    setParadas((actual) =>
+      actual.map((p) => (p.id === paradaId ? { ...p, nombre } : p)),
+    );
+  }
+
+  function confirmarNombre(paradaId: string) {
+    const parada = paradas.find((p) => p.id === paradaId);
+
+    if (!parada) {
+      return;
+    }
+
+    setError(null);
+
+    iniciarGuardado(async () => {
+      const resultado = await renombrarParada(rutaId, paradaId, parada.nombre);
+
+      if (!resultado.ok) {
+        setError(resultado.error ?? "No se pudo renombrar la parada.");
+      }
+    });
+  }
+
   function quitarParada(paradaId: string) {
     const respaldo = paradas;
     setParadas((actual) => actual.filter((p) => p.id !== paradaId));
@@ -183,6 +209,8 @@ export function useEditorDeRuta({
     moverEnMapa,
     cambiarRadio,
     confirmarRadio,
+    cambiarNombre,
+    confirmarNombre,
     quitarParada,
     deshacerUltimoPunto,
     limpiarTrazado,

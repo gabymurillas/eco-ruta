@@ -1,4 +1,6 @@
+import { FormularioUnidad } from "@/features/unidades/components/FormularioUnidad";
 import { TablaUnidades } from "@/features/unidades/components/TablaUnidades";
+import { obtenerRutas } from "@/services/rutas.service";
 import { obtenerUnidades } from "@/services/unidades.service";
 
 export const metadata = {
@@ -8,7 +10,7 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function UnidadesPage() {
-  const resultado = await obtenerUnidades();
+  const [resultado, rutas] = await Promise.all([obtenerUnidades(), obtenerRutas()]);
 
   if (!resultado.ok) {
     return (
@@ -37,8 +39,17 @@ export default async function UnidadesPage() {
         </div>
       </header>
 
-      <main className="flex flex-1 flex-col overflow-hidden p-7">
+      <main className="flex flex-1 flex-col gap-6 overflow-y-auto p-7">
         <TablaUnidades unidades={unidades} />
+
+        <div className="max-w-md">
+          <FormularioUnidad
+            rutas={(rutas.ok ? rutas.datos : []).map((ruta) => ({
+              id: ruta.id,
+              nombre: ruta.nombre,
+            }))}
+          />
+        </div>
       </main>
     </>
   );

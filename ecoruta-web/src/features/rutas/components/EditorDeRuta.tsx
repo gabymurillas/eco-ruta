@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { Boton } from "@/components/ui/Boton";
+import { Campo } from "@/components/ui/Campo";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import type { Punto } from "@/domain/mapa";
 import { useEditorDeRuta } from "../hooks/useEditorDeRuta";
@@ -206,7 +207,13 @@ function PanelParadas({
 
       {parada && (
         <Tarjeta className="flex flex-col gap-3">
-          <span className="font-serif text-[15px] font-bold">{parada.nombre}</span>
+          <Campo
+            etiqueta="Nombre de la parada"
+            id="nombre-parada"
+            value={parada.nombre}
+            onChange={(evento) => editor.cambiarNombre(parada.id, evento.target.value)}
+            onBlur={() => editor.confirmarNombre(parada.id)}
+          />
 
           <label
             htmlFor="radio-geocerca"
