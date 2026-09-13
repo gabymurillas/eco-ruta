@@ -1,6 +1,6 @@
 import { clienteNavegador } from "@/lib/supabase/client";
 import type { ParadaCercanaRow } from "@/types/database";
-import { exito, fallo, type Resultado } from "./resultado";
+import { exito, falloRegistrado, type Resultado } from "./resultado";
 
 type Coordenadas = {
   lat: number;
@@ -30,7 +30,11 @@ export async function buscarParadasCercanas({
   });
 
   if (error) {
-    return fallo("No se pudieron buscar las paradas cercanas.");
+    return falloRegistrado(
+      "paradas_cercanas",
+      error,
+      "No se pudieron buscar las paradas cercanas.",
+    );
   }
 
   return exito(data ?? []);

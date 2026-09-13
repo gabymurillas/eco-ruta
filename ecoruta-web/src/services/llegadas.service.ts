@@ -1,6 +1,6 @@
 import { clienteNavegador } from "@/lib/supabase/client";
 import type { Database } from "@/types/database";
-import { exito, fallo, type Resultado } from "./resultado";
+import { exito, falloRegistrado, type Resultado } from "./resultado";
 
 export type LlegadaRow =
   Database["public"]["Functions"]["llegadas_a_parada"]["Returns"][number];
@@ -20,7 +20,11 @@ export async function obtenerLlegadas(
   });
 
   if (error) {
-    return fallo("No se pudieron cargar las llegadas a esta parada.");
+    return falloRegistrado(
+      "llegadas_a_parada",
+      error,
+      "No se pudieron cargar las llegadas a esta parada.",
+    );
   }
 
   return exito(data ?? []);
