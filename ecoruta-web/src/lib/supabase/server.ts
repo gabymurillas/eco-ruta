@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/entorno";
 import type { Database } from "@/types/database";
 
 /**
@@ -14,22 +15,18 @@ import type { Database } from "@/types/database";
 export async function crearClienteServidor() {
   const almacenDeCookies = await cookies();
 
-  return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => almacenDeCookies.getAll(),
-        setAll: (cookiesNuevas) => {
-          try {
-            for (const { name, value, options } of cookiesNuevas) {
-              almacenDeCookies.set(name, value, options);
-            }
-          } catch {
-            // Server Component: el proxy ya refrescó la sesión.
+  return createServerClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    cookies: {
+      getAll: () => almacenDeCookies.getAll(),
+      setAll: (cookiesNuevas) => {
+        try {
+          for (const { name, value, options } of cookiesNuevas) {
+            almacenDeCookies.set(name, value, options);
           }
-        },
+        } catch {
+          // Server Component: el proxy ya refrescó la sesión.
+        }
       },
     },
-  );
+  });
 }

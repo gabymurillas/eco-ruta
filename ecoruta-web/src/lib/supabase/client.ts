@@ -1,4 +1,5 @@
 import { createBrowserClient } from "@supabase/ssr";
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/entorno";
 import type { Database } from "@/types/database";
 
 /**
@@ -13,10 +14,7 @@ import type { Database } from "@/types/database";
 let instancia: ReturnType<typeof createBrowserClient<Database>> | null = null;
 
 export function clienteNavegador() {
-  instancia ??= createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
+  instancia ??= createBrowserClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   return instancia;
 }

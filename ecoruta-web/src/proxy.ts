@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/entorno";
 
 const RUTA_INGRESO = "/admin/ingreso";
 
@@ -14,24 +15,20 @@ const RUTA_INGRESO = "/admin/ingreso";
 export async function proxy(request: NextRequest) {
   let respuesta = NextResponse.next({ request });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => request.cookies.getAll(),
-        setAll: (cookiesNuevas) => {
-          for (const { name, value } of cookiesNuevas) {
-            request.cookies.set(name, value);
-          }
-          respuesta = NextResponse.next({ request });
-          for (const { name, value, options } of cookiesNuevas) {
-            respuesta.cookies.set(name, value, options);
-          }
-        },
+  const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    cookies: {
+      getAll: () => request.cookies.getAll(),
+      setAll: (cookiesNuevas) => {
+        for (const { name, value } of cookiesNuevas) {
+          request.cookies.set(name, value);
+        }
+        respuesta = NextResponse.next({ request });
+        for (const { name, value, options } of cookiesNuevas) {
+          respuesta.cookies.set(name, value, options);
+        }
       },
     },
-  );
+  });
 
   // getUser() valida el token contra Supabase; getSession() solo lee la cookie
   // y por eso no sirve para decidir un acceso.
