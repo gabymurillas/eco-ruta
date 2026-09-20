@@ -14,15 +14,19 @@ proyecto) vive en [`CLAUDE.md`](./CLAUDE.md). Este README es solo la guía rápi
 ecoruta/
 ├── CLAUDE.md            ← arquitectura y decisiones del proyecto
 ├── sql/                 ← esquema, parámetros y RLS de Supabase
-├── ecoruta-web/         ← Next.js: seguimiento del ciudadano (público) + admin (/admin)
-└── ecoruta-ruta/        ← Expo: app del dispositivo instalado en cada unidad
+├── docs/                ← contrato de vinculación con la app
+├── supabase/functions/  ← Edge Functions (Deno)
+└── ecoruta-web/         ← Next.js: seguimiento del ciudadano (público) + admin (/admin)
 ```
+
+La app que va instalada en cada unidad **no está en este repositorio**: es un proyecto
+Android nativo (Kotlin + Compose) aparte. Lo único que comparte con este repo es el backend
+y [`docs/contrato-vinculacion.md`](./docs/contrato-vinculacion.md).
 
 ## Requisitos
 
 - Node.js 18+
 - Un proyecto de Supabase con PostGIS activado
-- Cuenta de Expo (para `ecoruta-ruta`) y Android Studio o Expo Go para probar
 
 ## Puesta en marcha
 
@@ -34,7 +38,12 @@ Corre en orden, en el SQL Editor de Supabase:
 sql/01_schema.sql
 sql/02_parametros.sql
 sql/03_rls.sql
+sql/04_funciones.sql
+sql/06_vinculacion.sql
 ```
+
+`sql/05_consultas_historicos.sql` no crea nada: documenta cómo se calcula cada indicador
+de la pantalla de históricos.
 
 ### Web (`ecoruta-web/`)
 
@@ -55,15 +64,15 @@ export SUPABASE_ACCESS_TOKEN=...   # token personal de Supabase
 npm run types:db
 ```
 
-### App de la ruta (`ecoruta-ruta/`)
+### Edge Functions
 
-```bash
-cd ecoruta-ruta
-npm install
-npx expo start
-```
+`supabase/functions/vincular-dispositivo` se despliega con `verify_jwt = false`: el teléfono
+todavía no tiene sesión cuando la llama.
 
 ## Variables de entorno
 
-Ninguna clave se commitea. Ver `.env.local` (web) y el equivalente en `ecoruta-ruta/`, ambos
-ignorados por git.
+Ninguna clave se commitea. La web usa `.env.local`, ignorado por git; ver
+`.env.local.example`.
+
+**La clave `service_role` vive solo en el servidor.** Nunca en la web, nunca en el APK: salta
+RLS por completo.

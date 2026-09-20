@@ -49,8 +49,11 @@ la geocerca varias veces por minuto y el usuario recibe notificaciones spam.
 ## Lógica compartida
 
 El filtro de exactitud y el suavizado son conceptualmente los mismos que en
-`ecoruta-web/src/domain/telemetria.ts` y `ecoruta-ruta/src/domain/telemetria.ts` (cuando
-existan). Una implementación por proyecto, no una por pantalla.
+`ecoruta-web/src/domain/telemetria.ts` (cuando exista) y que en la app de la ruta, que es
+un proyecto Android aparte. Una implementación por proyecto, no una por pantalla.
+
+Si cambias la regla aquí, avísale a la sesión de la app: que el APK calcule distinto al
+servidor no falla ruidosamente, solo produce notificaciones mal disparadas.
 
 ## Texto
 

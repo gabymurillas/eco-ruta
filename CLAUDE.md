@@ -21,10 +21,16 @@ estimado de llegada y notifica por proximidad.
 |---|---|---|---|
 | **Web del usuario** | Cualquier ciudadano | Next.js (rutas públicas) | No |
 | **Web de administración** | Ente gestor (alcaldía, cooperativa) | Next.js (`/admin`) | Sí |
-| **App de la ruta** | Teléfono dedicado en el vehículo | Expo / React Native (APK Android) | Vinculación única |
+| **App de la ruta** | Teléfono dedicado en el vehículo | Android nativo (Kotlin + Compose) | Vinculación única |
 | **Backend** | — | Supabase (PostgreSQL + PostGIS) | — |
 
 **La web de administración NO es el backend.** Es otra interfaz cliente. El backend es Supabase.
+
+**La app de la ruta no vive en este repositorio.** Está en `C:\Users\usuario\EcoRutaDispositivo`,
+como proyecto Android aparte, y la trabaja otra sesión. Lo único que comparte con este repo es el
+backend y el contrato de `docs/contrato-vinculacion.md`. Si necesitas cambiar algo que la app
+consume —una función, una política de RLS, la respuesta de una Edge Function—, se cambia aquí y
+se anuncia allá; nunca al revés.
 
 ### Decisión de arquitectura clave: el dispositivo pertenece a la ruta
 
@@ -63,11 +69,15 @@ ecoruta/
 ├── supabase/functions/           ← Edge Functions (Deno)
 ├── docs/
 │   └── contrato-vinculacion.md   ← frontera web ↔ app
-├── ecoruta-web/         ← Next.js: usuario (público) + admin (/admin)
-└── ecoruta-ruta/        ← Expo: app del dispositivo
+└── ecoruta-web/         ← Next.js: usuario (público) + admin (/admin)
 ```
 
-Los proyectos web y móvil son independientes. Comparten backend, no código.
+La app de la ruta **no está aquí**: es un proyecto Android independiente, fuera de este
+repositorio. Comparten backend, no código.
+
+> Hubo un `ecoruta-ruta/` con un scaffold de Expo. Se eliminó al cambiar la app a Android
+> nativo: era boilerplate sin tocar, y dejarlo solo servía para que alguien lo confundiera con
+> el proyecto real. Está en el historial, en el commit `690633e`.
 
 ---
 
@@ -85,12 +95,19 @@ Los proyectos web y móvil son independientes. Comparten backend, no código.
 > servidor público de teselas de OSM es para volumen bajo: si el sistema se despliega
 > para toda la ciudad, se apunta a un proveedor con atribución cambiando una URL.
 
-**App de la ruta (`ecoruta-ruta/`)**
-- Expo (React Native) + TypeScript
-- `expo-location` + `expo-task-manager` → GPS en segundo plano vía foreground service
-- `expo-keep-awake`
-- AsyncStorage → buffer offline
-- Build: EAS Build, **solo Android**. iOS está descartado del proyecto.
+**App de la ruta — proyecto aparte, fuera de este repositorio**
+- Android nativo: Kotlin + Jetpack Compose. **Solo Android**; iOS está descartado del proyecto.
+- GPS en segundo plano vía foreground service; el equipo va enchufado y en modo kiosco.
+- Los tokens de sesión se cifran con Android Keystore.
+- Se autentica canjeando un código: ver `docs/contrato-vinculacion.md`.
+
+> Se descartó Expo/React Native, que era el plan original. La app es un proceso de GPS en
+> segundo plano que debe sobrevivir a la gestión agresiva de batería de Android y a teléfonos
+> de gama baja; eso se controla mejor desde el SDK nativo que a través de una capa de
+> abstracción. El costo del cambio fue tirar un scaffold sin código propio.
+>
+> Su arquitectura interna la documenta el propio proyecto Android, no este archivo. Aquí solo
+> se describe lo que la app consume del backend.
 
 **Backend (Supabase)**
 - PostgreSQL 15 + **PostGIS 3.3**
@@ -188,7 +205,8 @@ El modelo predictivo con históricos es trabajo futuro declarado, no parte de es
 
 ## Convenciones de código
 
-- TypeScript en todo. Sin `any` salvo justificación en comentario.
+- TypeScript en todo lo de este repositorio. Sin `any` salvo justificación en comentario.
+  (La app de la ruta es Kotlin y sigue sus propias convenciones.)
 - Nombres de tablas, columnas y campos en **español** (coinciden con el dominio y con la tesis).
 - Nombres de variables y funciones en **inglés**, salvo términos del dominio (`ruta`, `parada`,
   `unidad`, `viaje`), que se mantienen en español para no traducir a medias.
@@ -296,82 +314,36 @@ app/  →  features/  →  services/  →  lib/supabase
 que explicar en la tesis. Aisladas en funciones puras, se leen, se prueban y se defienden. Metidas
 dentro de un componente React, no.
 
-### App de la ruta (`ecoruta-ruta/`) — MVVM
+### App de la ruta — su arquitectura no se decide aquí
 
-Aquí sí aplica MVVM con claridad: la app tiene estado complejo y de larga vida (viaje activo,
-buffer offline, estado de conexión) que no pertenece a ninguna pantalla.
+Es un proyecto Android independiente y documenta su propia estructura. Este archivo no la
+prescribe: hacerlo desde afuera produciría dos documentos que se contradicen, y el de aquí
+sería el que nadie actualiza.
 
-```
-src/
-├── views/                        # VIEW — solo presentación
-│   ├── VinculacionView.tsx
-│   ├── EnEsperaView.tsx
-│   ├── EnRecorridoView.tsx
-│   └── IncidenciaView.tsx
-│
-├── viewmodels/                   # VIEWMODEL — estado y acciones
-│   ├── useVinculacionViewModel.ts
-│   ├── useRecorridoViewModel.ts
-│   └── useIncidenciaViewModel.ts
-│
-├── models/                       # MODEL — entidades del dominio
-│   ├── Viaje.ts
-│   ├── Posicion.ts
-│   └── Dispositivo.ts
-│
-├── services/                     # Acceso a datos y APIs del sistema
-│   ├── supabase.service.ts
-│   ├── location.service.ts       # expo-location + TaskManager
-│   ├── buffer.service.ts         # cola offline en AsyncStorage
-│   └── vinculacion.service.ts
-│
-├── domain/                       # Lógica pura, compartida conceptualmente con la web
-│   ├── telemetria.ts             # filtro de exactitud, suavizado
-│   └── frecuencia.ts             # intervalo adaptativo movimiento/detenido
-│
-├── components/                   # UI reutilizable: EstadoCard, BotonGrande...
-├── tasks/
-│   └── locationTask.ts           # tarea de segundo plano registrada
-└── config/
-    └── theme.ts
-```
+Lo que sí es responsabilidad de este repositorio, porque afecta a las dos superficies:
 
-#### Contrato MVVM
+**Las reglas del dominio son las mismas en ambos lados.** El filtro de exactitud, el suavizado y
+la frecuencia de emisión adaptativa se implementan en la app y en el servidor, pero la
+definición autoritativa es la de este documento (ver «Lógica crítica: evaluación de geocercas»)
+y la de `sql/`. Si una regla cambia, cambia aquí primero y se anuncia; que la app la calcule
+distinto al servidor es el peor resultado posible, porque nadie ve el error hasta que las
+notificaciones salen mal.
 
-**View** — Solo JSX y estilos. Recibe todo de su ViewModel. Sin `useState` propio salvo estado
-puramente visual (un acordeón abierto). Sin llamadas a servicios. Sin lógica condicional de
-negocio.
+**Los valores calibrables salen de la tabla `parametros`, no del código de la app.** Son los
+mismos umbrales que usa el servidor para evaluar geocercas. Quemarlos en el APK los
+desincroniza en silencio y obliga a publicar una versión nueva para cambiar un número.
 
-**ViewModel** — Un hook por vista. Contiene el estado de la pantalla y las acciones que la vista
-dispara. Llama a `services/` y a `domain/`. No contiene JSX.
+**Lo que la app puede hacer contra el backend está en `docs/contrato-vinculacion.md`**, con la
+tabla de lo que RLS le permite. Ese archivo es la frontera: si la app necesita algo que no está
+ahí, se agrega ahí y se implementa en este repositorio.
 
-**Model** — Tipos y entidades. Sin lógica de acceso a datos.
-
-**Service** — Habla con Supabase, con el GPS, con AsyncStorage. No conoce las vistas.
-
-Ejemplo del contrato:
-
-```ts
-// viewmodels/useRecorridoViewModel.ts
-export function useRecorridoViewModel() {
-  // estado, efectos, llamadas a services y domain
-  return { viaje, estadoGps, bateria, ultimaSenal, iniciar, finalizar }
-}
-
-// views/EnRecorridoView.tsx
-export function EnRecorridoView() {
-  const vm = useRecorridoViewModel()
-  return (/* solo JSX usando vm */)
-}
-```
-
-### Nomenclatura de archivos
+### Nomenclatura de archivos (`ecoruta-web/`)
 
 | Tipo | Convención | Ejemplo |
 |---|---|---|
-| Componente / View | PascalCase | `EnRecorridoView.tsx` |
-| Hook / ViewModel | camelCase con `use` | `useRecorridoViewModel.ts` |
-| Servicio | camelCase + `.service` | `location.service.ts` |
+| Componente | PascalCase | `TarjetaUnidad.tsx` |
+| Hook | camelCase con `use` | `useEditorDeRuta.ts` |
+| Servicio | camelCase + `.service` | `unidades.service.ts` |
 | Dominio / utilidad | kebab-case | `eta.ts`, `telemetria.ts` |
 | Tipos | PascalCase | `Viaje.ts` |
 
@@ -561,8 +533,8 @@ cualquier marcador de unidad.
   probado de punta a punta (ver `docs/contrato-vinculacion.md`)
 
 **En curso**
-- App de la ruta (`ecoruta-ruta/`), en una sesión aparte. Consume el contrato de
-  vinculación; no cambia el backend.
+- App de la ruta, en una sesión aparte y en un proyecto Android fuera de este repositorio.
+  Consume el contrato de vinculación; no cambia el backend.
 
 **Siguiente, en este orden**
 1. Prueba de campo de precisión GPS → calibra `exactitud_maxima_m` y los radios de geocerca.

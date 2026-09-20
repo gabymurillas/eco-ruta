@@ -1,8 +1,8 @@
 # Contrato de vinculación del dispositivo
 
-Frontera entre `ecoruta-web` (admin) y `ecoruta-ruta` (app del vehículo). La app **solo
-consume** este contrato; el backend lo implementa y lo mantiene la sesión que trabaja
-la web.
+Frontera entre este repositorio (web + backend) y la app del vehículo, que es un
+proyecto Android aparte. La app **solo consume** este contrato; el backend lo
+implementa y lo mantiene la sesión que trabaja la web.
 
 ---
 
@@ -89,8 +89,9 @@ códigos por fuerza bruta.
 
 ## Qué hace la app con la respuesta
 
-1. **Guarda `refresh_token`** en almacenamiento seguro (`expo-secure-store`, no
-   AsyncStorage: AsyncStorage es texto plano legible en un dispositivo rooteado).
+1. **Guarda `refresh_token`** cifrado con Android Keystore. Guardarlo en
+   SharedPreferences a secas lo deja en texto plano, legible en un equipo rooteado —
+   y con ese token cualquiera escribe telemetría en nombre de la unidad.
 2. Entrega la sesión a supabase-js con `setSession({ access_token, refresh_token })`.
    A partir de ahí la librería renueva sola; el `access_token` dura una hora.
 3. **Guarda `unidad.id` y `unidad.nombre`** para mostrarlos y para armar los `insert`.
