@@ -57,6 +57,9 @@ create index unidades_ruta_idx on unidades (ruta_id);
 create table dispositivos (
   id                 uuid primary key default gen_random_uuid(),
   unidad_id          uuid not null unique references unidades(id) on delete cascade,
+  -- Cuenta de Supabase Auth del teléfono. Su app_metadata.unidad_id es lo que lee
+  -- RLS para decidir de qué unidad puede escribir posiciones.
+  auth_user_id       uuid,
   codigo_vinculacion text,
   codigo_expira_at   timestamptz,
   vinculado          boolean not null default false,

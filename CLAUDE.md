@@ -56,7 +56,13 @@ ecoruta/
 ├── sql/
 │   ├── 01_schema.sql
 │   ├── 02_parametros.sql
-│   └── 03_rls.sql
+│   ├── 03_rls.sql
+│   ├── 04_funciones.sql          ← consultas (security invoker)
+│   ├── 05_consultas_historicos.sql
+│   └── 06_vinculacion.sql        ← canje del código (security definer)
+├── supabase/functions/           ← Edge Functions (Deno)
+├── docs/
+│   └── contrato-vinculacion.md   ← frontera web ↔ app
 ├── ecoruta-web/         ← Next.js: usuario (público) + admin (/admin)
 └── ecoruta-ruta/        ← Expo: app del dispositivo
 ```
