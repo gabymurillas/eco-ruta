@@ -533,7 +533,11 @@ cualquier marcador de unidad.
   código los desincronizaría de las geocercas.
 - Un dispositivo **solo** puede escribir posiciones de su propia unidad. Se garantiza por RLS
   comparando `unidad_id` contra el JWT, no por lógica en el cliente.
-- El código de vinculación es temporal (expira en minutos) y de un solo uso.
+- El código de vinculación es temporal (expira en minutos) y de un solo uso. El canje ocurre
+  en la Edge Function `vincular-dispositivo`, nunca en el cliente: es la única forma de grabar
+  `app_metadata.unidad_id`, que es el claim del que depende toda la autorización del dispositivo.
+  **La clave `service_role` jamás entra en el APK** — salta RLS por completo y se extrae de un
+  APK en minutos. El contrato para la app está en `docs/contrato-vinculacion.md`.
 - Todas las tablas tienen RLS activo. Ninguna excepción.
 
 ---
