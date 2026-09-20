@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       dispositivos: {
         Row: {
+          auth_user_id: string | null
           codigo_expira_at: string | null
           codigo_vinculacion: string | null
           id: string
@@ -27,6 +28,7 @@ export type Database = {
           vinculado_at: string | null
         }
         Insert: {
+          auth_user_id?: string | null
           codigo_expira_at?: string | null
           codigo_vinculacion?: string | null
           id?: string
@@ -38,6 +40,7 @@ export type Database = {
           vinculado_at?: string | null
         }
         Update: {
+          auth_user_id?: string | null
           codigo_expira_at?: string | null
           codigo_vinculacion?: string | null
           id?: string
@@ -569,6 +572,15 @@ export type Database = {
             }
             Returns: string
           }
+      canjear_codigo_de_vinculacion: {
+        Args: { codigo: string }
+        Returns: {
+          auth_user_id: string
+          ruta_nombre: string
+          unidad_id: string
+          unidad_nombre: string
+        }[]
+      }
       crear_parada: {
         Args: {
           lat: number
@@ -832,6 +844,10 @@ export type Database = {
       }
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
+      registrar_auth_de_dispositivo: {
+        Args: { unidad: string; usuario: string }
+        Returns: undefined
+      }
       resumen_historicos: {
         Args: { dias?: number }
         Returns: {

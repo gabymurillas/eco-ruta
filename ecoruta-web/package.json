@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "types:db": "npx -y supabase@latest gen types typescript --project-id yumfwnqvmcitjnskazgx > src/types/database.generated.ts"
+    "types:db": "node scripts/generar-tipos.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.6",

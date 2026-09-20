@@ -128,6 +128,24 @@ Claves relevantes para la app: `emision_movimiento_s`, `emision_detenido_s`,
 
 ---
 
+## Estado: verificado
+
+El endpoint está desplegado con `verify_jwt = false` y probado de punta a punta
+el 20/09/2026. Lo comprobado, no lo supuesto:
+
+| Caso | Resultado |
+|---|---|
+| Código válido (incluso en minúsculas) | 200 con unidad y sesión |
+| El mismo código por segunda vez | 401 |
+| Petición sin código | 400 |
+| El token escribe una posición de **su** unidad | 201 |
+| El token escribe una posición de **otra** unidad | 403, `42501` desde Postgres |
+| El token lee la tabla `dispositivos` | `[]` — RLS la reserva al admin |
+
+El token emitido trae `app_metadata: { rol: "dispositivo", unidad_id: … }`.
+
+---
+
 ## Prueba de humo
 
 ```bash

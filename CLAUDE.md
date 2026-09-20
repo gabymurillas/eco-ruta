@@ -555,20 +555,22 @@ cualquier marcador de unidad.
 - Modelo de datos completo con índices y RLS
 - Prototipos visuales de las 9 pantallas
 - Respuesta a la revisión técnica del tutor, con correcciones integradas
+- Admin: rutas, paradas y trazado sobre el mapa; unidades; monitoreo
+- Web del ciudadano, desplegada en Vercel
+- Backend de vinculación: Edge Function `vincular-dispositivo` + RLS del dispositivo,
+  probado de punta a punta (ver `docs/contrato-vinculacion.md`)
 
 **En curso**
-- Montaje de la estructura de proyectos
+- App de la ruta (`ecoruta-ruta/`), en una sesión aparte. Consume el contrato de
+  vinculación; no cambia el backend.
 
 **Siguiente, en este orden**
 1. Prueba de campo de precisión GPS → calibra `exactitud_maxima_m` y los radios de geocerca.
    **Va antes de construir geocercas.** Sin ese dato se trabaja a ciegas.
-2. Admin: rutas y geocercas
-3. Admin: unidades y dispositivos
-4. App de la ruta: vinculación y transmisión
-5. Edge Function de geocercas
-6. Admin: monitoreo en vivo
-7. Web del usuario
-8. Admin: históricos
+2. App de la ruta: transmisión de posiciones y buffer offline
+3. Edge Function de geocercas
+4. Realtime en el monitoreo del admin (hoy refresca por consulta)
+5. Admin: históricos
 
 ---
 
