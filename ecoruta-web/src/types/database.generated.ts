@@ -576,6 +576,7 @@ export type Database = {
         Args: { codigo: string }
         Returns: {
           auth_user_id: string
+          ruta_id: string
           ruta_nombre: string
           unidad_id: string
           unidad_nombre: string
@@ -636,6 +637,7 @@ export type Database = {
           ruta_icono: string
           ruta_id: string
           ruta_nombre: string
+          segundos_sin_latido: number
           segundos_sin_senal: number
           unidad_id: string
           unidad_lat: number
@@ -846,6 +848,10 @@ export type Database = {
       postgis_wagyu_version: { Args: never; Returns: string }
       registrar_auth_de_dispositivo: {
         Args: { unidad: string; usuario: string }
+        Returns: undefined
+      }
+      registrar_salud_del_dispositivo: {
+        Args: { bateria?: number }
         Returns: undefined
       }
       resumen_historicos: {

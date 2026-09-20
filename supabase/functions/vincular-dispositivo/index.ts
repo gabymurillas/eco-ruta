@@ -33,6 +33,7 @@ const DOMINIO_DISPOSITIVOS = "dispositivos.ecoruta.test";
 type Canje = {
   unidad_id: string;
   unidad_nombre: string;
+  ruta_id: string | null;
   ruta_nombre: string | null;
   auth_user_id: string | null;
 };
@@ -88,6 +89,9 @@ Deno.serve(async (peticion) => {
     unidad: {
       id: canje.unidad_id,
       nombre: canje.unidad_nombre,
+      // La ruta al momento de vincular. Si el admin reasigna la unidad, este
+      // valor guardado en el teléfono queda viejo: ver el contrato.
+      ruta_id: canje.ruta_id,
       ruta: canje.ruta_nombre,
     },
     sesion,

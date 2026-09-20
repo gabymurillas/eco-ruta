@@ -150,7 +150,18 @@ $$;
 -- vez de traer todas las posiciones al cliente: `posiciones` es la tabla de alta
 -- escritura y crece sin parar. El índice posiciones_unidad_tiempo_idx
 -- (unidad_id, capturado_at desc) hace que cada lateral sea una sola lectura.
-create or replace function estado_flota()
+--
+-- `segundos_sin_senal` y `segundos_sin_latido` son dos preguntas distintas y no
+-- se mezclan. El primero sale de la última posición y decide si el marcador del
+-- mapa pulsa como "transmitiendo"; sumarle el latido haría pulsar a una unidad
+-- estacionada sobre una posición vieja. El segundo sale del reporte del equipo
+-- y es lo único que delata un teléfono apagado cuando no hay recorrido.
+--
+-- El drop es necesario para volver a correr el archivo: `create or replace` no
+-- admite cambiar el tipo de retorno, y cambió al agregarse esa columna.
+drop function if exists estado_flota();
+
+create function estado_flota()
 returns table (
   unidad_id             uuid,
   unidad_nombre         text,
@@ -165,6 +176,7 @@ returns table (
   velocidad_kmh         numeric,
   capturado_at          timestamptz,
   segundos_sin_senal    integer,
+  segundos_sin_latido   integer,
   bateria_pct           integer,
   dispositivo_vinculado boolean
 )
@@ -189,6 +201,10 @@ as $$
     case
       when p.capturado_at is null then null
       else extract(epoch from (now() - p.capturado_at))::integer
+    end,
+    case
+      when d.ultima_senal_at is null then null
+      else extract(epoch from (now() - d.ultima_senal_at))::integer
     end,
     d.ultima_bateria,
     coalesce(d.vinculado, false)

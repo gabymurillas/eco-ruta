@@ -18,6 +18,7 @@ const TONO_POR_SALUD: Record<SaludUnidad, "neutro" | "advertencia" | "error"> = 
   transmitiendo: "neutro",
   detenida: "neutro",
   sin_senal: "error",
+  equipo_caido: "error",
   sin_vincular: "neutro",
 };
 
@@ -25,6 +26,7 @@ const LEYENDA_POR_SALUD: Record<SaludUnidad, string> = {
   transmitiendo: "Transmitiendo",
   detenida: "Sin recorrido activo",
   sin_senal: "Sin señal",
+  equipo_caido: "Equipo sin reportar",
   sin_vincular: "Sin dispositivo vinculado",
 };
 
@@ -33,6 +35,7 @@ export function TarjetaUnidad({ unidad, umbralSinSenalS, umbralBateriaPct }: Pro
     vinculado: unidad.dispositivo_vinculado,
     enRecorrido: unidad.en_recorrido,
     segundosSinSenal: unidad.segundos_sin_senal,
+    segundosSinLatido: unidad.segundos_sin_latido,
     umbralSinSenalS,
   });
 
@@ -40,6 +43,12 @@ export function TarjetaUnidad({ unidad, umbralSinSenalS, umbralBateriaPct }: Pro
   const alertaBateria = bateriaEnAlerta(bateria, umbralBateriaPct);
   const ultimaSenal = describirUltimaSenal(unidad.segundos_sin_senal);
   const tono = alertaBateria ? "advertencia" : TONO_POR_SALUD[salud];
+  const esFalla = salud === "sin_senal" || salud === "equipo_caido";
+  const detalle = detallarFalla(
+    salud,
+    ultimaSenal,
+    describirUltimaSenal(unidad.segundos_sin_latido),
+  );
 
   return (
     <Tarjeta tono={tono} className="flex flex-col gap-3">
@@ -62,11 +71,9 @@ export function TarjetaUnidad({ unidad, umbralSinSenalS, umbralBateriaPct }: Pro
           <Dato titulo="Batería" valor={bateria === null ? "—" : `${bateria} %`} />
         </dl>
       ) : (
-        <p
-          className={`text-xs font-bold ${salud === "sin_senal" ? "text-error" : "text-tinta-media"}`}
-        >
+        <p className={`text-xs font-bold ${esFalla ? "text-error" : "text-tinta-media"}`}>
           {LEYENDA_POR_SALUD[salud]}
-          {ultimaSenal && salud === "sin_senal" && ` · última posición ${ultimaSenal}`}
+          {detalle && ` · ${detalle}`}
         </p>
       )}
 
@@ -77,6 +84,28 @@ export function TarjetaUnidad({ unidad, umbralSinSenalS, umbralBateriaPct }: Pro
       )}
     </Tarjeta>
   );
+}
+
+/**
+ * Las dos fallas se ven parecidas pero se arreglan distinto: "sin señal" es una
+ * unidad en recorrido que dejó de mandar posiciones, y "equipo sin reportar" es
+ * un teléfono que no da señales de vida estando estacionado. Decir cuál de las
+ * dos fechas es la vieja evita que el gestor vaya al vehículo equivocado.
+ */
+function detallarFalla(
+  salud: SaludUnidad,
+  ultimaPosicion: string | null,
+  ultimoLatido: string | null,
+): string | null {
+  if (salud === "sin_senal") {
+    return ultimaPosicion && `última posición ${ultimaPosicion}`;
+  }
+
+  if (salud === "equipo_caido") {
+    return ultimoLatido ? `último reporte ${ultimoLatido}` : "nunca ha reportado";
+  }
+
+  return null;
 }
 
 function Dato({ titulo, valor }: { titulo: string; valor: string }) {

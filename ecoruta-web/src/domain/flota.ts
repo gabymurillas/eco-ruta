@@ -6,12 +6,20 @@
  * recompilar para cambiar un número.
  */
 
-export type SaludUnidad = "transmitiendo" | "sin_senal" | "detenida" | "sin_vincular";
+export type SaludUnidad =
+  | "transmitiendo"
+  | "sin_senal"
+  | "detenida"
+  | "equipo_caido"
+  | "sin_vincular";
 
 export type EntradaSalud = {
   vinculado: boolean;
   enRecorrido: boolean;
+  /** Desde la última posición. Dice si el marcador del mapa está fresco. */
   segundosSinSenal: number | null;
+  /** Desde el último reporte del equipo. Dice si el teléfono sigue vivo. */
+  segundosSinLatido: number | null;
   umbralSinSenalS: number;
 };
 
@@ -19,6 +27,7 @@ export function evaluarSalud({
   vinculado,
   enRecorrido,
   segundosSinSenal,
+  segundosSinLatido,
   umbralSinSenalS,
 }: EntradaSalud): SaludUnidad {
   if (!vinculado) {
@@ -26,7 +35,18 @@ export function evaluarSalud({
   }
 
   if (!enRecorrido) {
-    return "detenida";
+    // Un equipo vinculado reporta batería y señal aunque no haya recorrido. Que
+    // deje de hacerlo es lo único que delata un teléfono apagado, sin datos o
+    // desenchufado mientras la unidad está estacionada: sin esto, un equipo
+    // muerto se ve igual que uno sano en reposo.
+    //
+    // Nunca haber reportado cuenta como caído: significa que la vinculación se
+    // completó pero el teléfono no llegó a levantar. Por eso la app manda el
+    // primer latido apenas se vincula.
+    const caido =
+      segundosSinLatido === null || segundosSinLatido > umbralSinSenalS;
+
+    return caido ? "equipo_caido" : "detenida";
   }
 
   // Sin lecturas todavía en un viaje abierto: se trata como pérdida de señal,

@@ -1,5 +1,5 @@
 import { IndicadorKpi } from "@/components/ui/IndicadorKpi";
-import { evaluarSalud } from "@/domain/flota";
+import { bateriaEnAlerta, evaluarSalud } from "@/domain/flota";
 import { MapaFlota } from "@/features/monitoreo/components/MapaFlota";
 import { TarjetaUnidad } from "@/features/monitoreo/components/TarjetaUnidad";
 import {
@@ -42,22 +42,28 @@ export default async function MonitoreoPage() {
   const umbralBateriaPct = valores.bateria_alerta_pct ?? 15;
 
   const unidades = flota.datos;
-  const enRecorrido = unidades.filter(
-    (unidad) =>
-      evaluarSalud({
-        vinculado: unidad.dispositivo_vinculado,
-        enRecorrido: unidad.en_recorrido,
-        segundosSinSenal: unidad.segundos_sin_senal,
-        umbralSinSenalS,
-      }) === "transmitiendo",
-  ).length;
 
-  const alertasDeEquipo = unidades.filter(
-    (unidad) =>
-      (unidad.bateria_pct !== null && unidad.bateria_pct <= umbralBateriaPct) ||
-      (unidad.en_recorrido &&
-        (unidad.segundos_sin_senal === null ||
-          unidad.segundos_sin_senal > umbralSinSenalS)),
+  // La salud se evalúa una sola vez por unidad y de aquí salen los dos KPI. Antes
+  // el contador de alertas repetía la regla a mano y se quedaba atrás cada vez que
+  // la regla cambiaba.
+  const saludes = unidades.map((unidad) => ({
+    unidad,
+    salud: evaluarSalud({
+      vinculado: unidad.dispositivo_vinculado,
+      enRecorrido: unidad.en_recorrido,
+      segundosSinSenal: unidad.segundos_sin_senal,
+      segundosSinLatido: unidad.segundos_sin_latido,
+      umbralSinSenalS,
+    }),
+  }));
+
+  const enRecorrido = saludes.filter((u) => u.salud === "transmitiendo").length;
+
+  const alertasDeEquipo = saludes.filter(
+    ({ unidad, salud }) =>
+      bateriaEnAlerta(unidad.bateria_pct, umbralBateriaPct) ||
+      salud === "sin_senal" ||
+      salud === "equipo_caido",
   ).length;
 
   return (

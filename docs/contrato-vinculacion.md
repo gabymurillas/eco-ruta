@@ -63,6 +63,7 @@ lo teclea dentro de un vehículo y a contraluz.
   "unidad": {
     "id": "d97c008a-9dc7-4251-947b-feb3196a5bc7",
     "nombre": "Unidad 12",
+    "ruta_id": "2393d27b-cbc6-4b6e-81f3-04d5bd85e5eb",
     "ruta": "Ruta de prueba · Sector oeste"
   },
   "sesion": {
@@ -93,6 +94,12 @@ códigos por fuerza bruta.
 2. Entrega la sesión a supabase-js con `setSession({ access_token, refresh_token })`.
    A partir de ahí la librería renueva sola; el `access_token` dura una hora.
 3. **Guarda `unidad.id` y `unidad.nombre`** para mostrarlos y para armar los `insert`.
+   `unidad.ruta_id` sirve para abrir un viaje sin una consulta extra, pero es la
+   ruta **al momento de vincular**: si el admin reasigna la unidad a otra ruta, el
+   valor guardado queda viejo y los viajes se abrirían contra la ruta equivocada.
+   Si eso puede pasar en el despliegue real, léelo en vivo al iniciar recorrido
+   (`GET unidades?id=eq.<id>&select=ruta_id`, lectura pública) y usa el del canje
+   solo como respaldo sin red.
 4. La vinculación es **única y permanente** salvo que el admin genere un código nuevo.
    No hay pantalla de «cerrar sesión»: el teléfono pertenece a la unidad, no a una persona.
 
@@ -107,11 +114,44 @@ Con el token de dispositivo, RLS le permite exactamente esto:
 | Operación | Tabla | Condición que impone RLS |
 |---|---|---|
 | Insertar posiciones | `posiciones` | `unidad_id` = el suyo |
+| Reportar batería y señal | `dispositivos` | vía RPC, ver abajo |
 | Abrir y cerrar viajes | `viajes` | `unidad_id` = el suyo |
 | Reportar incidencias | `incidencias` | `unidad_id` = el suyo |
 | Leer rutas, paradas, parámetros | varias | lectura pública |
 
 Cualquier intento de escribir con otro `unidad_id` lo rechaza Postgres, no el cliente.
+
+### El latido va por RPC, no por PATCH
+
+```
+POST /rest/v1/rpc/registrar_salud_del_dispositivo
+{ "bateria": 83 }        → 204. `bateria` es opcional.
+```
+
+**Un PATCH directo a `dispositivos` no funciona y no da error**: RLS reserva esa
+tabla al administrador, así que la petición afecta 0 filas y responde 200 con
+`[]`. Si viste eso, no era un bug tuyo.
+
+Por qué una función y no una política de RLS: RLS filtra filas, no columnas. Una
+política que dejara al dispositivo escribir su propia fila le dejaría escribir
+*toda* la fila, incluidos `codigo_vinculacion` y `codigo_expira_at` — un equipo
+comprometido podría emitirse una vinculación nueva. La función fija en su cuerpo
+las dos únicas columnas que toca.
+
+Dos consecuencias para la app:
+
+- **`ultima_senal_at` lo pone el servidor con `now()`**, no se manda. Un teléfono
+  que estuvo desenchufado suele arrancar con la hora corrida, y esa marca es la
+  que decide si el admin da la unidad por caída.
+- **La unidad sale del JWT**, no de un parámetro. No hay forma de escribir el
+  latido de otra unidad, ni de equivocarse de `unidad_id`.
+
+**Manda el primer latido apenas termine la vinculación.** El panel trata a un
+equipo vinculado que nunca reportó como caído, que es justo lo que se quiere ver
+cuando la vinculación se completó pero el teléfono no llegó a levantar.
+
+Cadencia sugerida: la misma de `emision_detenido_s`. El umbral con el que el
+panel da por caído un equipo es `sin_senal_umbral_s`.
 
 ### Los parámetros de emisión salen de la base, no del código
 
@@ -141,6 +181,9 @@ el 20/09/2026. Lo comprobado, no lo supuesto:
 | El token escribe una posición de **su** unidad | 201 |
 | El token escribe una posición de **otra** unidad | 403, `42501` desde Postgres |
 | El token lee la tabla `dispositivos` | `[]` — RLS la reserva al admin |
+| El token llama a `registrar_salud_del_dispositivo` | 204, y el panel ve la batería |
+| El token hace PATCH a `dispositivos` con `codigo_vinculacion` | no escribe nada |
+| `anon` llama a `registrar_salud_del_dispositivo` | 401, permiso denegado |
 
 El token emitido trae `app_metadata: { rol: "dispositivo", unidad_id: … }`.
 
