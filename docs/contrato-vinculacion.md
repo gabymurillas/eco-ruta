@@ -114,13 +114,54 @@ Con el token de dispositivo, RLS le permite exactamente esto:
 
 | Operación | Tabla | Condición que impone RLS |
 |---|---|---|
-| Insertar posiciones | `posiciones` | `unidad_id` = el suyo |
+| Insertar posiciones | `posiciones` | `unidad_id` = el suyo — **pero no las insertes directo, ver abajo** |
 | Reportar batería y señal | `dispositivos` | vía RPC, ver abajo |
 | Abrir y cerrar viajes | `viajes` | `unidad_id` = el suyo |
 | Reportar incidencias | `incidencias` | `unidad_id` = el suyo |
 | Leer rutas, paradas, parámetros | varias | lectura pública |
 
 Cualquier intento de escribir con otro `unidad_id` lo rechaza Postgres, no el cliente.
+
+### La telemetría va por Edge Function, no por insert directo
+
+```
+POST /functions/v1/registrar-posicion
+Cabeceras: apikey + Authorization: Bearer <access_token>
+
+{
+  "viaje_id": "fb3e56a3-…",          // null o ausente si no hay recorrido abierto
+  "posiciones": [
+    { "lat": 9.9165, "lng": -67.379,
+      "exactitud_m": 12, "velocidad_kmh": 38,
+      "capturado_at": "2026-09-21T01:55:00Z" }
+  ]
+}
+
+→ 200 { "guardadas": 1, "evaluada": true, "notificadas": ["Parada 1"] }
+```
+
+RLS te deja insertar en `posiciones` y seguirá dejándote, pero **por esa vía no se
+evalúa ninguna geocerca**: la posición se guarda y no pasa nada más. Este endpoint
+guarda y evalúa en la misma llamada.
+
+El insert lo hace la función **con tu propio token**, no con `service_role`, así que
+RLS sigue siendo quien garantiza que solo escribas tu unidad. Un `unidad_id` ajeno
+devuelve 403.
+
+Detalles que afectan tu implementación:
+
+- **`posiciones` es un arreglo**: manda el buffer offline completo en una llamada en
+  vez de una petición por lectura. Pueden venir desordenadas; la función las ordena.
+- **Las geocercas se evalúan solo contra la lectura más reciente del lote.** Cuando el
+  teléfono recupera señal y descarga veinte minutos de cola, notificar por una parada
+  que la unidad ya dejó atrás sería peor que no notificar: el ciudadano saldría a
+  esperar un vehículo que ya pasó.
+- **`exactitud_m` importa de verdad.** Si supera `exactitud_maxima_m`, la lectura se
+  guarda marcada `usable = false` y no evalúa geocercas: la respuesta trae
+  `"evaluada": false`. Mándalo siempre que el GPS lo dé.
+- **`capturado_at` es del teléfono**, y solo se usa para ordenar y para el histórico.
+  La permanencia en la parada se mide con el reloj del servidor.
+- Un 5xx significa que no se guardó: **no borres esas lecturas del buffer**, reintenta.
 
 ### El latido va por RPC, no por PATCH
 
@@ -208,8 +249,9 @@ curl -X POST \
 
 ## Lo que todavía no existe
 
-- **Evaluación de geocercas.** Al insertar una posición no se dispara nada aún. La Edge
-  Function de geocercas es trabajo del backend (ver `.claude/skills/edge-geocerca/`).
+- **Entrega de la notificación al ciudadano.** La evaluación ya corre y marca
+  `eventos_geocerca.notificado_at`, pero nada empuja ese aviso a la pantalla del
+  ciudadano todavía: falta Realtime. La lógica está completa; el último tramo no.
 - **Realtime.** El admin refresca por consulta, no por suscripción.
 
 Si la app necesita algo del backend que no está aquí, **pídelo en vez de resolverlo

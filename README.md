@@ -40,6 +40,7 @@ sql/02_parametros.sql
 sql/03_rls.sql
 sql/04_funciones.sql
 sql/06_vinculacion.sql
+sql/07_geocercas.sql
 ```
 
 `sql/05_consultas_historicos.sql` no crea nada: documenta cómo se calcula cada indicador
@@ -66,8 +67,11 @@ npm run types:db
 
 ### Edge Functions
 
-`supabase/functions/vincular-dispositivo` se despliega con `verify_jwt = false`: el teléfono
-todavía no tiene sesión cuando la llama.
+- `vincular-dispositivo` se despliega con `verify_jwt = false`: el teléfono todavía no tiene
+  sesión cuando la llama.
+- `registrar-posicion` con `verify_jwt = true`: recibe la telemetría y evalúa las geocercas.
+
+Las reglas puras que ambas comparten viven en `supabase/functions/_dominio/`.
 
 ## Variables de entorno
 

@@ -65,8 +65,12 @@ ecoruta/
 │   ├── 03_rls.sql
 │   ├── 04_funciones.sql          ← consultas (security invoker)
 │   ├── 05_consultas_historicos.sql
-│   └── 06_vinculacion.sql        ← canje del código (security definer)
-├── supabase/functions/           ← Edge Functions (Deno)
+│   ├── 06_vinculacion.sql        ← canje del código (security definer)
+│   └── 07_geocercas.sql          ← soporte PostGIS de la evaluación
+├── supabase/functions/
+│   ├── _dominio/                 ← reglas puras: telemetría y geocercas
+│   ├── vincular-dispositivo/     ← canje del código
+│   └── registrar-posicion/       ← telemetría + evaluación de geocercas
 ├── docs/
 │   └── contrato-vinculacion.md   ← frontera web ↔ app
 └── ecoruta-web/         ← Next.js: usuario (público) + admin (/admin)
@@ -158,8 +162,19 @@ cualquier consulta**.
 
 ## Lógica crítica: evaluación de geocercas
 
-Vive en una Edge Function, se dispara con cada posición nueva. **No la simplifiques.** Cada paso
-responde a un problema real detectado en la revisión técnica del proyecto.
+Vive en la Edge Function `registrar-posicion`, que es por donde la app entrega su telemetría:
+guardar y evaluar ocurren en la misma llamada. **No la simplifiques.** Cada paso responde a un
+problema real detectado en la revisión técnica del proyecto.
+
+> Se descartó dispararla con un webhook de `pg_net` sobre el insert: es asíncrono y sin
+> reintento, así que un fallo de la evaluación no le llega a nadie —y el producto de este
+> sistema son las notificaciones—, además de exigir un secreto guardado en la base. También se
+> descartó un trigger en PL/pgSQL, que habría llevado la lógica crítica a SQL. Así es síncrono
+> y el fallo vuelve a la app, que reintenta desde su buffer offline.
+>
+> Las reglas puras viven en `supabase/functions/_dominio/`: `telemetria.ts` (filtro de calidad
+> y suavizado) y `geocerca.ts` (permanencia e histéresis). Sin dependencias, para poder leerlas
+> y defenderlas sueltas.
 
 ```
 1. FILTRO DE CALIDAD
@@ -531,18 +546,25 @@ cualquier marcador de unidad.
 - Web del ciudadano, desplegada en Vercel
 - Backend de vinculación: Edge Function `vincular-dispositivo` + RLS del dispositivo,
   probado de punta a punta (ver `docs/contrato-vinculacion.md`)
+- Evaluación de geocercas: `registrar-posicion`, con los 5 pasos verificados contra la
+  base (entrada, permanencia, notificación única, salida e histéresis)
 
 **En curso**
 - App de la ruta, en una sesión aparte y en un proyecto Android fuera de este repositorio.
   Consume el contrato de vinculación; no cambia el backend.
 
 **Siguiente, en este orden**
-1. Prueba de campo de precisión GPS → calibra `exactitud_maxima_m` y los radios de geocerca.
-   **Va antes de construir geocercas.** Sin ese dato se trabaja a ciegas.
-2. App de la ruta: transmisión de posiciones y buffer offline
-3. Edge Function de geocercas
-4. Realtime en el monitoreo del admin (hoy refresca por consulta)
-5. Admin: históricos
+1. App de la ruta: transmisión de posiciones y buffer offline
+2. Prueba de campo de precisión GPS → calibra `exactitud_maxima_m` y los radios de geocerca.
+   El algoritmo ya está construido, pero **sus números no son de fiar hasta esta prueba**.
+   Todos salen de `parametros`, así que calibrar es correr `update`, no tocar código.
+3. Realtime: entregar la notificación al ciudadano y mover el mapa del admin sin recargar.
+   Hoy la evaluación marca `notificado_at` pero nadie recibe el aviso.
+4. Admin: históricos
+
+> El orden 1 y 2 estaba invertido: la prueba de campo iba primero. Se construyó el algoritmo
+> antes porque la prueba depende de que la app transmita, y esperar habría dejado parado el
+> núcleo del sistema. El motivo de la regla se respeta igual: nada quedó hardcodeado.
 
 ---
 
