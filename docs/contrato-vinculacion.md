@@ -162,6 +162,13 @@ Detalles que afectan tu implementación:
 - **`capturado_at` es del teléfono**, y solo se usa para ordenar y para el histórico.
   La permanencia en la parada se mide con el reloj del servidor.
 - Un 5xx significa que no se guardó: **no borres esas lecturas del buffer**, reintenta.
+- **Un viaje ya cerrado se puede subir con su `viaje_id`, y conviene hacerlo**: las
+  lecturas quedan atribuidas al recorrido, que es lo que necesitan el histórico y la
+  cobertura de paradas. No hay riesgo de notificación tardía — la evaluación solo mira
+  viajes abiertos, así que un respaldo así responde `"evaluada": false`.
+- `"evaluada": false` en un 200 significa: se guardó, no se evaluó. Pasa si el viaje está
+  cerrado, si no mandaste `viaje_id`, si la última lectura del lote no era usable o si la
+  ruta no tiene paradas cargadas. No es un error.
 
 ### El latido va por RPC, no por PATCH
 

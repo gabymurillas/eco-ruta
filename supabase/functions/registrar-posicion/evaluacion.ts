@@ -60,6 +60,17 @@ export async function evaluarGeocercas(
 
   const filas = (data ?? []) as FilaEstado[];
 
+  if (filas.length === 0) {
+    // `estado_de_geocercas` solo mira viajes abiertos, así que no devuelve nada
+    // cuando la app sube el respaldo de un recorrido ya cerrado. Ahí está la
+    // garantía de que un lote viejo no notifique por una parada de un viaje que
+    // terminó. Tampoco devuelve nada si la ruta no tiene paradas cargadas.
+    //
+    // En ambos casos la posición quedó guardada pero no se evaluó nada, y decir
+    // `evaluada: true` le mentiría a la app sobre lo que pasó con su lote.
+    return { evaluada: false, notificadas: [] };
+  }
+
   // La permanencia se mide contra el reloj del servidor, no contra el del
   // teléfono: un equipo de gama baja que estuvo desenchufado arranca con la hora
   // corrida, y una hora corrida haría creer que la unidad lleva media hora en la
