@@ -1,11 +1,10 @@
 import { IndicadorKpi } from "@/components/ui/IndicadorKpi";
 import { bateriaEnAlerta, evaluarSalud } from "@/domain/flota";
 import { MapaFlota } from "@/features/monitoreo/components/MapaFlota";
+import { TarjetaIncidencia } from "@/features/monitoreo/components/TarjetaIncidencia";
 import { TarjetaUnidad } from "@/features/monitoreo/components/TarjetaUnidad";
-import {
-  contarIncidenciasActivas,
-  obtenerEstadoDeFlota,
-} from "@/services/flota.service";
+import { obtenerEstadoDeFlota } from "@/services/flota.service";
+import { obtenerIncidenciasActivas } from "@/services/incidencias.service";
 import { obtenerRutasDeMapa } from "@/services/mapa.service";
 import { obtenerParametros } from "@/services/parametros.service";
 
@@ -20,7 +19,7 @@ export const dynamic = "force-dynamic";
 export default async function MonitoreoPage() {
   const [flota, incidencias, parametros, rutasDeMapa] = await Promise.all([
     obtenerEstadoDeFlota(),
-    contarIncidenciasActivas(),
+    obtenerIncidenciasActivas(),
     obtenerParametros(),
     obtenerRutasDeMapa(),
   ]);
@@ -94,7 +93,7 @@ export default async function MonitoreoPage() {
           />
           <IndicadorKpi
             titulo="Incidencias"
-            valor={incidencias.ok ? String(incidencias.datos) : "—"}
+            valor={incidencias.ok ? String(incidencias.datos.length) : "—"}
             detalle="activas"
           />
           <IndicadorKpi
@@ -135,6 +134,19 @@ export default async function MonitoreoPage() {
           />
 
           <aside className="flex w-86 shrink-0 flex-col gap-3 overflow-y-auto rounded-2xl border-[0.5px] border-borde bg-superficie p-5">
+            {/* Van antes que la flota: una incidencia activa pide una decisión del
+                gestor, y la lista de unidades puede ser larga. */}
+            {incidencias.ok && incidencias.datos.length > 0 && (
+              <>
+                <h2 className="text-xs font-bold tracking-wide text-tinta-suave">
+                  Incidencias activas
+                </h2>
+                {incidencias.datos.map((incidencia) => (
+                  <TarjetaIncidencia key={incidencia.id} incidencia={incidencia} />
+                ))}
+              </>
+            )}
+
             <h2 className="text-xs font-bold tracking-wide text-tinta-suave">Flota</h2>
 
             {unidades.length === 0 ? (
