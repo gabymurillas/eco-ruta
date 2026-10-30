@@ -24,7 +24,9 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
 
   return (
     <div className="flex min-h-dvh">
-      <aside className="flex w-58 shrink-0 flex-col border-r-[0.5px] border-borde bg-superficie p-4 pt-6">
+      {/* Fija a la altura de la ventana: si se estirara con el contenido, en una página
+          larga el botón de cerrar sesión quedaría abajo, fuera de la pantalla. */}
+      <aside className="sticky top-0 flex h-dvh w-58 shrink-0 flex-col overflow-y-auto border-r-[0.5px] border-borde bg-superficie p-4 pt-6">
         <div className="px-2 pb-6">
           <p className="font-serif text-xl font-black tracking-tight">EcoRuta</p>
           <p className="text-xs font-semibold text-tinta-suave">Administración</p>

@@ -10,7 +10,7 @@ export const metadata = {
 export default function IngresoPage() {
   return (
     <div className="flex min-h-dvh">
-      <main className="flex w-full flex-col justify-center gap-9 px-8 py-16 sm:px-16 lg:w-[560px] lg:shrink-0 lg:border-r-[0.5px] lg:border-borde lg:bg-superficie lg:px-20">
+      <main className="flex w-full flex-col justify-center gap-9 px-8 py-16 sm:px-16 md:w-[440px] md:shrink-0 md:border-r-[0.5px] md:border-borde md:bg-superficie md:px-12 lg:w-[560px] lg:px-20">
         <header className="flex flex-col gap-1">
           <h1 className="font-serif text-3xl font-black tracking-tight">EcoRuta</h1>
           <p className="text-[13px] font-semibold tracking-wide text-tinta-suave">
@@ -20,7 +20,7 @@ export default function IngresoPage() {
 
         <FormularioIngreso />
 
-        <aside className="flex items-start gap-2.5 rounded-xl border-[0.5px] border-borde bg-superficie p-4 lg:bg-fondo">
+        <aside className="flex items-start gap-2.5 rounded-xl border-[0.5px] border-borde bg-superficie p-4 md:bg-fondo">
           <svg
             width="18"
             height="18"
@@ -43,13 +43,15 @@ export default function IngresoPage() {
         </aside>
       </main>
 
-      {/* Sin `preload`: en móvil el panel está oculto y la carga diferida evita descargar la foto. */}
-      <figure className="relative hidden flex-1 bg-fondo lg:block">
+      {/* Desde md y no desde lg: una laptop con la escala de pantalla al 125–150 % queda
+          por debajo de 1024 px y se quedaba sin foto. Sin `preload`: en móvil el panel
+          está oculto y la carga diferida evita descargar la foto. */}
+      <figure className="relative hidden flex-1 bg-fondo md:block">
         <Image
           src={morrosAtardecer}
           alt=""
           fill
-          sizes="calc(100vw - 560px)"
+          sizes="(min-width: 1024px) calc(100vw - 560px), calc(100vw - 440px)"
           placeholder="blur"
           className="object-cover object-[50%_82%]"
         />
