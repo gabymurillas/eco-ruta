@@ -66,7 +66,8 @@ ecoruta/
 │   ├── 04_funciones.sql          ← consultas (security invoker)
 │   ├── 05_consultas_historicos.sql
 │   ├── 06_vinculacion.sql        ← canje del código (security definer)
-│   └── 07_geocercas.sql          ← soporte PostGIS de la evaluación
+│   ├── 07_geocercas.sql          ← soporte PostGIS de la evaluación
+│   └── 08_incidencia_otro.sql    ← tipo 'otro': observación libre del conductor
 ├── supabase/functions/
 │   ├── _dominio/                 ← reglas puras: telemetría y geocercas
 │   ├── vincular-dispositivo/     ← canje del código

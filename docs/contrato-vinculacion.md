@@ -202,6 +202,26 @@ cuando la vinculación se completó pero el teléfono no llegó a levantar.
 Cadencia sugerida: la misma de `emision_detenido_s`. El umbral con el que el
 panel da por caído un equipo es `sin_senal_umbral_s`.
 
+### Las incidencias van por insert directo
+
+```
+POST /rest/v1/incidencias
+{ "ruta_id": "…", "unidad_id": "<el suyo>", "tipo": "otro",
+  "descripcion": "Semáforo dañado en la Av. Bolívar" }
+```
+
+`tipo` es uno de `calle_cerrada`, `falla_mecanica`, `desvio`, `congestion` u `otro`.
+
+**`otro` exige `descripcion`.** Es la observación libre del conductor, para lo que no
+encaja en los cuatro tipos (un bache, un semáforo dañado): sin texto no le dice nada
+al administrador. Un `otro` con la descripción vacía o solo con espacios lo rechaza
+Postgres con un 400 (`23514`, `incidencias_otro_con_descripcion`). En los otros
+cuatro tipos la descripción es opcional.
+
+Valídalo también en la pantalla, para que el botón no se active sin texto: el 400 está
+para que un cliente con un error no pueda colar el registro, no para avisarle al
+conductor.
+
 ### Los parámetros de emisión salen de la base, no del código
 
 ```ts

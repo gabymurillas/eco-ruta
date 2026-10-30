@@ -130,12 +130,15 @@ create table incidencias (
   id          uuid primary key default gen_random_uuid(),
   ruta_id     uuid not null references rutas(id) on delete cascade,
   unidad_id   uuid references unidades(id) on delete set null,
-  tipo        text not null check (tipo in ('calle_cerrada','falla_mecanica','desvio','congestion')),
+  tipo        text not null check (tipo in ('calle_cerrada','falla_mecanica','desvio','congestion','otro')),
   descripcion text,
   ubicacion   geography(Point, 4326),
   activa      boolean not null default true,
   creada_at   timestamptz not null default now(),
-  resuelta_at timestamptz
+  resuelta_at timestamptz,
+  -- 'otro' es una observación libre del conductor: sin texto no dice nada.
+  constraint incidencias_otro_con_descripcion
+    check (tipo <> 'otro' or nullif(btrim(descripcion), '') is not null)
 );
 
 create index incidencias_ubicacion_gix on incidencias using gist (ubicacion);
