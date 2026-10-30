@@ -1,3 +1,6 @@
+import Image from "next/image";
+
+import morrosAtardecer from "@/assets/morros-atardecer.jpg";
 import { FormularioIngreso } from "@/features/autenticacion/components/FormularioIngreso";
 
 export const metadata = {
@@ -40,7 +43,20 @@ export default function IngresoPage() {
         </aside>
       </main>
 
-      <div aria-hidden="true" className="hidden flex-1 bg-fondo lg:block" />
+      {/* Sin `preload`: en móvil el panel está oculto y la carga diferida evita descargar la foto. */}
+      <figure className="relative hidden flex-1 bg-fondo lg:block">
+        <Image
+          src={morrosAtardecer}
+          alt=""
+          fill
+          sizes="calc(100vw - 560px)"
+          placeholder="blur"
+          className="object-cover object-[50%_82%]"
+        />
+        <figcaption className="absolute bottom-6 left-6 rounded-full border-[0.5px] border-borde bg-superficie px-3.5 py-1.5 text-xs font-semibold text-tinta-media">
+          Los Morros, San Juan de los Morros
+        </figcaption>
+      </figure>
     </div>
   );
 }

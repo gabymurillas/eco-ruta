@@ -433,6 +433,30 @@ Elegidas y en uso. No son candidatas: cambiarlas implica tocar `layout.tsx`, los
 - Esquinas: 8–12px; pills 999px.
 - Espaciado en múltiplos de 4px.
 
+### Fotografía
+
+Una sola foto de identidad: el atardecer sobre los Morros de San Juan (foto propia). Original y
+recortes en `diseno/recursos/`.
+
+**Dónde va:** solo en zonas de identidad, donde no compite con datos.
+- Panel derecho del ingreso del admin (solo escritorio).
+- Imagen de Open Graph de la web (`src/app/opengraph-image.jpg`): vista previa al compartir.
+- Hero de la landing, cuando exista.
+- Bienvenida de la app de la ruta, y fondo de pantalla del teléfono kiosco.
+
+**Dónde no:** pantallas con mapa, monitoreo, tablas, alertas ni estados vacíos. El mapa es el
+contenido; una foto detrás compite con las líneas y los marcadores de ruta. Su naranja también
+se confundiría con colores de ruta o de estado.
+
+**Texto y foto:** en la web el texto va al lado de la foto o sobre una superficie sólida, nunca
+directo encima, así que se mantiene la regla de "sin degradados". La única excepción es la
+bienvenida de la app de la ruta, que tiene su propio sistema visual y usa un degradado para
+fundir la foto con el fondo.
+
+**Técnica:** importación estática con `next/image` (medidas y placeholder automáticos), AVIF/WebP
+desde `next.config.ts`, y sin `preload` donde la foto está oculta en móvil. Si es decorativa,
+`alt=""`.
+
 ### Regla de color que no se rompe
 
 **El color de marca nunca es color de ruta, y nunca es color de estado.**

@@ -5,7 +5,8 @@ Maquetas de las dos superficies web, en el sistema de diseño v2 (ver `CLAUDE.md
 ```
 diseno/
 ├── usuario/   ← web del ciudadano, 5 pantallas
-└── admin/     ← web de administración, 6 pantallas
+├── admin/     ← web de administración, 6 pantallas
+└── recursos/  ← foto de identidad (Morros de San Juan) y sus recortes
 ```
 
 ## Qué son estos archivos
@@ -23,7 +24,8 @@ No afecta a cómo se ve cada pantalla por separado.
 `SinUnidades`, `Escritorio`.
 
 **Admin** — `Main` (monitoreo en vivo), `RutaEditar` (trazado, color, ícono, geocercas),
-`Historicos`, `Parametros`, `Unidades` (vinculación de dispositivos), `Ingreso`.
+`Historicos`, `Parametros`, `Unidades` (vinculación de dispositivos), `Ingreso` (con la foto de
+los Morros en el panel derecho).
 
 ## Relación con el código
 
