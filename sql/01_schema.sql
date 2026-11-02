@@ -125,6 +125,25 @@ create index eventos_geocerca_activos_idx
   where salio_at is null;
 
 
+-- ── AVISOS AL CIUDADANO ──
+-- Lo que sale hacia la web: «se acerca a tu parada» y «ya pasó por tu parada».
+-- `eventos_geocerca` es el estado interno del algoritmo; esta tabla es solo lo
+-- que se le dice al público, y la web la escucha por Realtime. El unique es la
+-- misma garantía que en eventos_geocerca: un aviso de cada tipo por parada y
+-- viaje, aunque la lógica fallara.
+create table avisos_parada (
+  id        uuid primary key default gen_random_uuid(),
+  viaje_id  uuid not null references viajes(id) on delete cascade,
+  unidad_id uuid not null references unidades(id) on delete cascade,
+  parada_id uuid not null references paradas(id) on delete cascade,
+  tipo      text not null check (tipo in ('acercandose','paso')),
+  creado_at timestamptz not null default now(),
+  unique (viaje_id, parada_id, tipo)
+);
+
+create index avisos_parada_parada_idx on avisos_parada (parada_id, creado_at desc);
+
+
 -- ── INCIDENCIAS ──
 create table incidencias (
   id          uuid primary key default gen_random_uuid(),

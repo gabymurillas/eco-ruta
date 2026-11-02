@@ -11,6 +11,7 @@ alter table dispositivos     enable row level security;
 alter table viajes           enable row level security;
 alter table posiciones       enable row level security;
 alter table eventos_geocerca enable row level security;
+alter table avisos_parada    enable row level security;
 alter table incidencias      enable row level security;
 alter table parametros       enable row level security;
 
@@ -35,6 +36,11 @@ create policy publico_lee_viajes on viajes
 
 create policy publico_lee_incidencias on incidencias
   for select using (activa);
+
+-- Los avisos son lo que la web del ciudadano escucha por Realtime. No exponen
+-- nada nuevo: la posición de las unidades ya es pública.
+create policy publico_lee_avisos on avisos_parada
+  for select using (true);
 
 -- La web del ciudadano usa los mismos umbrales que el servidor: sin lectura publica
 -- tendria que quemarlos en el codigo y dejarian de coincidir. Escribirlos sigue siendo
@@ -108,6 +114,9 @@ create policy admin_total_posiciones on posiciones
   for all using (es_admin()) with check (es_admin());
 
 create policy admin_total_eventos on eventos_geocerca
+  for all using (es_admin()) with check (es_admin());
+
+create policy admin_total_avisos on avisos_parada
   for all using (es_admin()) with check (es_admin());
 
 create policy admin_total_incidencias on incidencias

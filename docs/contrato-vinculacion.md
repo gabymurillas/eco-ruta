@@ -137,8 +137,13 @@ Cabeceras: apikey + Authorization: Bearer <access_token>
   ]
 }
 
-→ 200 { "guardadas": 1, "evaluada": true, "notificadas": ["Parada 1"] }
+→ 200 { "guardadas": 1, "evaluada": true, "notificadas": ["Parada 1"],
+        "avisos": [{ "tipo": "acercandose", "parada": "Parada 2" }] }
 ```
+
+`avisos` es lo que se publicó al ciudadano en esta llamada (`acercandose` o `paso`). Es
+informativo, como `notificadas`: la app no tiene que hacer nada con él. Se agregó sin
+cambiar los demás campos, así que un cliente que no lo lee sigue funcionando.
 
 RLS te deja insertar en `posiciones` y seguirá dejándote, pero **por esa vía no se
 evalúa ninguna geocerca**: la posición se guarda y no pasa nada más. Este endpoint

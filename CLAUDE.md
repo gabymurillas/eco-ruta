@@ -67,9 +67,10 @@ ecoruta/
 │   ├── 05_consultas_historicos.sql
 │   ├── 06_vinculacion.sql        ← canje del código (security definer)
 │   ├── 07_geocercas.sql          ← soporte PostGIS de la evaluación
-│   └── 08_incidencia_otro.sql    ← tipo 'otro': observación libre del conductor
+│   ├── 08_incidencia_otro.sql    ← tipo 'otro': observación libre del conductor
+│   └── 09_avisos_parada.sql      ← avisos al ciudadano (base ya existente; luego re-correr 07)
 ├── supabase/functions/
-│   ├── _dominio/                 ← reglas puras: telemetría y geocercas
+│   ├── _dominio/                 ← reglas puras: telemetría, geocercas y avisos
 │   ├── vincular-dispositivo/     ← canje del código
 │   └── registrar-posicion/       ← telemetría + evaluación de geocercas
 ├── docs/
@@ -128,7 +129,7 @@ repositorio. Comparten backend, no código.
 
 ## Modelo de datos
 
-Nueve tablas. El esquema autoritativo está en `sql/01_schema.sql` — **léelo antes de escribir
+Diez tablas. El esquema autoritativo está en `sql/01_schema.sql` — **léelo antes de escribir
 cualquier consulta**.
 
 | Tabla | Rol |
@@ -140,6 +141,7 @@ cualquier consulta**.
 | `viajes` | Un recorrido, de "iniciar" a "finalizar" |
 | `posiciones` | Telemetría GPS. Tabla de alta escritura |
 | `eventos_geocerca` | Control anti-spam de notificaciones |
+| `avisos_parada` | Lo que se le avisa al ciudadano: «se acerca» y «ya pasó». La web lo escucha por Realtime |
 | `incidencias` | Eventos reportados (calle cerrada, desvío, etc.) |
 | `parametros` | Valores calibrables del sistema |
 
@@ -197,6 +199,26 @@ problema real detectado en la revisión técnica del proyecto.
    se considera salida solo tras histeresis_salida_s continuos fuera.
    Si reentra antes, se considera que nunca salió (absorbe la deriva del GPS).
 ```
+
+### Avisos al ciudadano
+
+Salen del mismo estado que calculan los 5 pasos, sin cambiarlos (`_dominio/avisos.ts`), y se
+escriben en `avisos_parada` con `unique (viaje_id, parada_id, tipo)`:
+
+```
+SE ACERCA  dentro de radio_aproximacion_m (500 m), fuera del radio de la parada
+           y todavía sin evento en este viaje → el bus viene hacia la parada.
+           Un bus que ya pasó y se aleja tiene evento, así que no vuelve a avisar.
+YA PASÓ    salida confirmada por la histéresis del paso 5.
+```
+
+No hay aviso de «está en tu parada»: en San Juan de los Morros los buses no esperan, y la
+permanencia que exige `notificado_at` llegaría tarde o nunca. `notificado_at` se conserva como
+parte del algoritmo, pero no se publica.
+
+> Limitación conocida: el anillo mide en línea recta. Una ruta que da la vuelta y pasa a menos
+> de 500 m de una parada que le toca mucho después avisaría antes de tiempo. Se corrige
+> midiendo sobre el trazado, con la misma base que el ETA.
 
 **Por qué importa:** sin permanencia mínima e histéresis, la deriva del GPS hace que una unidad
 "entre y salga" de la geocerca varias veces por minuto y el usuario recibe notificaciones spam.
@@ -546,9 +568,9 @@ cualquier marcador de unidad.
 ## Reglas de seguridad
 
 - El ciudadano **nunca** se autentica. Lectura pública vía RLS sobre `rutas`, `paradas`,
-  `unidades`, `posiciones`, `viajes`, `incidencias` y `parametros`. Los parámetros se leen —no se
-  escriben— porque la web debe usar los mismos umbrales que el servidor; quemarlos en el
-  código los desincronizaría de las geocercas.
+  `unidades`, `posiciones`, `viajes`, `incidencias`, `parametros` y `avisos_parada`. Los
+  parámetros se leen —no se escriben— porque la web debe usar los mismos umbrales que el
+  servidor; quemarlos en el código los desincronizaría de las geocercas.
 - Un dispositivo **solo** puede escribir posiciones de su propia unidad. Se garantiza por RLS
   comparando `unidad_id` contra el JWT, no por lógica en el cliente.
 - El código de vinculación es temporal (expira en minutos) y de un solo uso. El canje ocurre
@@ -583,8 +605,10 @@ cualquier marcador de unidad.
 2. Prueba de campo de precisión GPS → calibra `exactitud_maxima_m` y los radios de geocerca.
    El algoritmo ya está construido, pero **sus números no son de fiar hasta esta prueba**.
    Todos salen de `parametros`, así que calibrar es correr `update`, no tocar código.
-3. Realtime: entregar la notificación al ciudadano y mover el mapa del admin sin recargar.
-   Hoy la evaluación marca `notificado_at` pero nadie recibe el aviso.
+3. Realtime: entregar los avisos al ciudadano y mover el mapa del admin sin recargar.
+   El backend ya los escribe en `avisos_parada`; falta la web: el flujo por ubicación con
+   «mi parada» preseleccionada, cambiable y recordada en el navegador (una sola parada),
+   el mensaje cuando no hay ubicación y el aviso de las limitaciones (solo con la web abierta).
 4. Admin: históricos
 
 > El orden 1 y 2 estaba invertido: la prueba de campo iba primero. Se construyó el algoritmo

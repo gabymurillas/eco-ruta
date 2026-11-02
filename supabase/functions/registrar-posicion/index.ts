@@ -1,6 +1,6 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { esUsable } from "../_dominio/telemetria.ts";
-import { evaluarGeocercas } from "./evaluacion.ts";
+import { evaluarGeocercas, type UmbralesDeEvaluacion } from "./evaluacion.ts";
 
 /**
  * Recibe telemetría del dispositivo, la guarda y evalúa las geocercas.
@@ -148,7 +148,7 @@ async function evaluarSiCorresponde(
   const ultimaEsUsable = filas[filas.length - 1].usable;
 
   if (!viajeId || !ultimaEsUsable) {
-    return { evaluada: false, notificadas: [] as string[] };
+    return { evaluada: false, notificadas: [] as string[], avisos: [] };
   }
 
   const admin = createClient(
@@ -160,11 +160,7 @@ async function evaluarSiCorresponde(
   return await evaluarGeocercas(admin, unidadId, viajeId, umbrales);
 }
 
-type Umbrales = {
-  exactitudMaximaM: number;
-  permanenciaMinimaS: number;
-  histeresisSalidaS: number;
-};
+type Umbrales = UmbralesDeEvaluacion & { exactitudMaximaM: number };
 
 /**
  * Los umbrales salen de la tabla `parametros`, nunca de constantes: son los
@@ -188,6 +184,7 @@ async function leerUmbrales(
     exactitudMaximaM: valores.get("exactitud_maxima_m") ?? 50,
     permanenciaMinimaS: valores.get("permanencia_minima_s") ?? 45,
     histeresisSalidaS: valores.get("histeresis_salida_s") ?? 30,
+    radioAproximacionM: valores.get("radio_aproximacion_m") ?? 500,
   };
 }
 

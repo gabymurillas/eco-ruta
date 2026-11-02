@@ -68,7 +68,7 @@ function decidirUna(
   }
 
   if (salioAt !== null) {
-    if (segundosEntre(salioAt, ahora) >= histeresisSalidaS) {
+    if (salidaConfirmada(salioAt, ahora, histeresisSalidaS)) {
       // Estuvo fuera el tiempo suficiente: la salida es real y cierra el evento
       // para este viaje. Que reentre después no vuelve a notificar — sería la
       // misma unidad en la misma parada del mismo recorrido.
@@ -98,6 +98,19 @@ function decidirNotificacion(
   const permanencia = segundosEntre(entroAt, ahora);
 
   return permanencia >= permanenciaMinimaS ? [{ tipo: "notificar", paradaId }] : [];
+}
+
+/**
+ * La unidad lleva fuera al menos la histéresis: ya no es deriva, se fue de la
+ * parada. Se exporta porque el aviso de «ya pasó» al ciudadano depende de esta
+ * misma regla, y calcularla dos veces es la forma de que un día discrepen.
+ */
+export function salidaConfirmada(
+  salioAt: string | null,
+  ahora: Date,
+  histeresisSalidaS: number,
+): boolean {
+  return salioAt !== null && segundosEntre(salioAt, ahora) >= histeresisSalidaS;
 }
 
 function segundosEntre(desde: string, hasta: Date): number {

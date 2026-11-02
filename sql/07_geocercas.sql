@@ -62,38 +62,62 @@ grant execute on function posiciones_para_suavizar(uuid, integer) to service_rol
 -- Devuelve todas las paradas, no solo las de dentro: el algoritmo necesita ver
 -- las de fuera para detectar salidas. Filtrarlas aquí haría que una unidad que
 -- se aleja nunca registrara su salida.
-create or replace function estado_de_geocercas(
-  viaje uuid,
-  lat   double precision,
-  lng   double precision
+--
+-- `dentro_aproximacion` y los `avisado_*` alimentan los avisos al ciudadano
+-- (ver `_dominio/avisos.ts`). El radio de aproximación entra como argumento y
+-- no se lee aquí de `parametros`: la Edge Function ya leyó los umbrales, y así
+-- todo lo calibrable llega por el mismo camino.
+--
+-- El drop es necesario para volver a correr el archivo: cambiaron los
+-- argumentos y el tipo de retorno, y `create or replace` no admite ninguno.
+drop function if exists estado_de_geocercas(uuid, double precision, double precision);
+drop function if exists estado_de_geocercas(uuid, double precision, double precision, integer);
+
+create function estado_de_geocercas(
+  viaje                uuid,
+  lat                  double precision,
+  lng                  double precision,
+  radio_aproximacion_m integer
 )
 returns table (
-  parada_id     uuid,
-  parada_nombre text,
-  notifica      boolean,
-  dentro        boolean,
-  entro_at      timestamptz,
-  notificado_at timestamptz,
-  salio_at      timestamptz
+  parada_id            uuid,
+  parada_nombre        text,
+  notifica             boolean,
+  dentro               boolean,
+  dentro_aproximacion  boolean,
+  entro_at             timestamptz,
+  notificado_at        timestamptz,
+  salio_at             timestamptz,
+  avisado_acercamiento boolean,
+  avisado_paso         boolean
 )
 language sql
 stable
 security definer
 set search_path = public
 as $$
+  with punto as (
+    select ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography as ubicacion
+  )
   select
     p.id,
     p.nombre,
     p.notifica,
-    ST_DWithin(
-      p.ubicacion,
-      ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography,
-      p.radio_geocerca_m
-    ),
+    ST_DWithin(p.ubicacion, punto.ubicacion, p.radio_geocerca_m),
+    ST_DWithin(p.ubicacion, punto.ubicacion, estado_de_geocercas.radio_aproximacion_m),
     e.entro_at,
     e.notificado_at,
-    e.salio_at
+    e.salio_at,
+    exists (
+      select 1 from avisos_parada a
+      where a.viaje_id = v.id and a.parada_id = p.id and a.tipo = 'acercandose'
+    ),
+    exists (
+      select 1 from avisos_parada a
+      where a.viaje_id = v.id and a.parada_id = p.id and a.tipo = 'paso'
+    )
   from viajes v
+  cross join punto
   join paradas p on p.ruta_id = v.ruta_id
   left join eventos_geocerca e
     on e.viaje_id = v.id
@@ -103,7 +127,7 @@ as $$
   order by p.orden;
 $$;
 
-revoke execute on function estado_de_geocercas(uuid, double precision, double precision)
+revoke execute on function estado_de_geocercas(uuid, double precision, double precision, integer)
   from public, anon, authenticated;
-grant execute on function estado_de_geocercas(uuid, double precision, double precision)
+grant execute on function estado_de_geocercas(uuid, double precision, double precision, integer)
   to service_role;

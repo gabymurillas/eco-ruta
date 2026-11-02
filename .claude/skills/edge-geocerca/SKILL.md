@@ -45,6 +45,10 @@ la geocerca varias veces por minuto y el usuario recibe notificaciones spam.
 - Todo umbral de tiempo/distancia sale de `parametros`, nunca hardcodeado. Se calibran tras la
   prueba de campo de GPS (roadmap paso 1, va antes que esto).
 - Canal de notificación: alerta en pantalla vía Realtime, no push.
+- Lo que ve el ciudadano no es `notificado_at` sino `avisos_parada` («se acerca» a
+  `radio_aproximacion_m`, «ya pasó» tras la salida confirmada). Las reglas están en
+  `_dominio/avisos.ts` y reutilizan `salidaConfirmada` de `geocerca.ts`: no la dupliques.
+  Ver «Avisos al ciudadano» en `CLAUDE.md`.
 
 ## Lógica compartida
 

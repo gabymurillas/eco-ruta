@@ -5,7 +5,9 @@ import {
   type EstadoDeParada,
   type Umbrales,
 } from "../_dominio/geocerca.ts";
+import { decidirAvisos, type EstadoParaAvisos } from "../_dominio/avisos.ts";
 import { suavizar, VENTANA_DE_SUAVIZADO, type Lectura } from "../_dominio/telemetria.ts";
+import { aplicarAvisos, type AvisoEmitido } from "./avisos.ts";
 
 /**
  * Pasos 2 a 5 del algoritmo: suavizar, detectar paradas cercanas, decidir y
@@ -24,26 +26,34 @@ type FilaEstado = {
   parada_nombre: string;
   notifica: boolean;
   dentro: boolean;
+  dentro_aproximacion: boolean;
   entro_at: string | null;
   notificado_at: string | null;
   salio_at: string | null;
+  avisado_acercamiento: boolean;
+  avisado_paso: boolean;
 };
 
 export type Resultado = {
   evaluada: boolean;
   notificadas: string[];
+  avisos: AvisoEmitido[];
 };
+
+export type UmbralesDeEvaluacion = Umbrales & { radioAproximacionM: number };
+
+const SIN_EVALUAR: Resultado = { evaluada: false, notificadas: [], avisos: [] };
 
 export async function evaluarGeocercas(
   admin: SupabaseClient,
   unidadId: string,
   viajeId: string,
-  umbrales: Umbrales,
+  umbrales: UmbralesDeEvaluacion,
 ): Promise<Resultado> {
   const lecturas = await leerVentana(admin, viajeId);
 
   if (lecturas.length === 0) {
-    return { evaluada: false, notificadas: [] };
+    return SIN_EVALUAR;
   }
 
   const punto = suavizar(lecturas);
@@ -52,6 +62,7 @@ export async function evaluarGeocercas(
     viaje: viajeId,
     lat: punto.lat,
     lng: punto.lng,
+    radio_aproximacion_m: umbrales.radioAproximacionM,
   });
 
   if (error) {
@@ -68,20 +79,31 @@ export async function evaluarGeocercas(
     //
     // En ambos casos la posición quedó guardada pero no se evaluó nada, y decir
     // `evaluada: true` le mentiría a la app sobre lo que pasó con su lote.
-    return { evaluada: false, notificadas: [] };
+    return SIN_EVALUAR;
   }
 
   // La permanencia se mide contra el reloj del servidor, no contra el del
   // teléfono: un equipo de gama baja que estuvo desenchufado arranca con la hora
   // corrida, y una hora corrida haría creer que la unidad lleva media hora en la
   // parada apenas llega.
-  const acciones = decidirAcciones(filas.map(aEstado), new Date(), umbrales);
+  const ahora = new Date();
+  const acciones = decidirAcciones(filas.map(aEstado), ahora, umbrales);
 
   await aplicar(admin, acciones, { unidadId, viajeId });
+
+  // Los avisos se deciden sobre el mismo estado leído antes de aplicar las
+  // acciones. Una salida que se anota en esta llamada todavía no está
+  // confirmada, así que no hay nada que se pierda por no releer.
+  const avisos = decidirAvisos(
+    filas.map(aEstadoParaAvisos),
+    ahora,
+    umbrales.histeresisSalidaS,
+  );
 
   return {
     evaluada: true,
     notificadas: nombresNotificados(acciones, filas),
+    avisos: await aplicarAvisos(admin, avisos, { unidadId, viajeId, filas }),
   };
 }
 
@@ -114,6 +136,15 @@ function aEstado(fila: FilaEstado): EstadoDeParada {
     entroAt: fila.entro_at,
     notificadoAt: fila.notificado_at,
     salioAt: fila.salio_at,
+  };
+}
+
+function aEstadoParaAvisos(fila: FilaEstado): EstadoParaAvisos {
+  return {
+    ...aEstado(fila),
+    dentroAproximacion: fila.dentro_aproximacion,
+    avisadoAcercamiento: fila.avisado_acercamiento,
+    avisadoPaso: fila.avisado_paso,
   };
 }
 
