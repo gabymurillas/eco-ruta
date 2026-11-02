@@ -590,7 +590,11 @@ cualquier marcador de unidad.
 - Prototipos visuales de las 9 pantallas
 - Respuesta a la revisión técnica del tutor, con correcciones integradas
 - Admin: rutas, paradas y trazado sobre el mapa; unidades; monitoreo
-- Web del ciudadano, desplegada en Vercel
+- Web del ciudadano, desplegada en Vercel. Sin cuenta: «mi parada» sale de la ubicación
+  (la más cercana preseleccionada, se puede cambiar), se recuerda en `localStorage` del
+  navegador y recibe los avisos «se acerca» y «ya pasó» por Realtime. Sin ubicación solo se
+  muestra un mensaje; no hay elección manual de ruta. Las limitaciones (avisos solo con la
+  página abierta) se explican una vez al ciudadano.
 - Backend de vinculación: Edge Function `vincular-dispositivo` + RLS del dispositivo,
   probado de punta a punta (ver `docs/contrato-vinculacion.md`)
 - Evaluación de geocercas: `registrar-posicion`, con los 5 pasos verificados contra la
@@ -605,10 +609,9 @@ cualquier marcador de unidad.
 2. Prueba de campo de precisión GPS → calibra `exactitud_maxima_m` y los radios de geocerca.
    El algoritmo ya está construido, pero **sus números no son de fiar hasta esta prueba**.
    Todos salen de `parametros`, así que calibrar es correr `update`, no tocar código.
-3. Realtime: entregar los avisos al ciudadano y mover el mapa del admin sin recargar.
-   El backend ya los escribe en `avisos_parada`; falta la web: el flujo por ubicación con
-   «mi parada» preseleccionada, cambiable y recordada en el navegador (una sola parada),
-   el mensaje cuando no hay ubicación y el aviso de las limitaciones (solo con la web abierta).
+3. Realtime: mover el mapa del admin sin recargar. Los avisos al ciudadano ya llegan: la
+   web escucha `avisos_parada` de «mi parada» (`useAvisosDeParada`). Falta verlos de punta
+   a punta con la app transmitiendo un recorrido real.
 4. Admin: históricos
 
 > El orden 1 y 2 estaba invertido: la prueba de campo iba primero. Se construyó el algoritmo

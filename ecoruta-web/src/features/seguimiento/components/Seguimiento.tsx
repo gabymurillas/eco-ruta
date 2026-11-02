@@ -1,41 +1,25 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useSeguimiento } from "../hooks/useSeguimiento";
+import { Boton } from "@/components/ui/Boton";
+import { evaluarLlegada } from "@/domain/llegadas";
+import type { LlegadaRow } from "@/services/llegadas.service";
+import { useLlegadas } from "../hooks/useLlegadas";
+import { useMiParada, type Fase } from "../hooks/useMiParada";
+import { Bienvenida } from "./Bienvenida";
 import { EstadoSinUbicacion } from "./EstadoSinUbicacion";
-import { ListaLlegadas } from "./ListaLlegadas";
-import { ParadaCercana } from "./ParadaCercana";
-
-/**
- * Leaflet toca `window` al importarse, asi que el lienzo queda fuera del render del
- * servidor. En Next 16 `ssr: false` solo se permite dentro de un componente cliente,
- * y este lo es.
- */
-const LienzoSeguimiento = dynamic(
-  () => import("./LienzoSeguimiento").then((modulo) => modulo.LienzoSeguimiento),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex h-56 items-center justify-center rounded-2xl border-[0.5px] border-borde bg-fondo">
-        <p className="text-sm text-tinta-media">Cargando el mapa…</p>
-      </div>
-    ),
-  },
-);
+import { SelectorDeParada } from "./SelectorDeParada";
+import { VistaParada } from "./VistaParada";
 
 type Props = {
   umbralSinSenalS: number;
+  radioAproximacionM: number;
 };
 
-export function Seguimiento({ umbralSinSenalS }: Props) {
-  const { ubicacion, carga, error, paradaMasCercana, paradasCercanas, llegadas } =
-    useSeguimiento({ umbralSinSenalS });
-
-  const hayUnidadEnVivo = llegadas.some(
-    (llegada) =>
-      llegada.viaje_id !== null &&
-      llegada.segundos_sin_senal !== null &&
-      llegada.segundos_sin_senal <= umbralSinSenalS,
+export function Seguimiento({ umbralSinSenalS, radioAproximacionM }: Props) {
+  const miParada = useMiParada();
+  const { fase } = miParada;
+  const llegadas = useLlegadas(
+    fase.tipo === "parada" ? fase.parada.paradaId : null,
   );
 
   return (
@@ -50,97 +34,144 @@ export function Seguimiento({ umbralSinSenalS }: Props) {
           </span>
         </div>
 
-        {hayUnidadEnVivo && (
-          <span className="flex h-9 items-center gap-2 rounded-full border-[0.5px] border-borde bg-superficie px-4">
-            {/* "En vivo" es un estado, no identidad: por regla del sistema usa verde. */}
-            <span
-              aria-hidden="true"
-              className="pulso-en-vivo size-[7px] rounded-full bg-exito"
-            />
-            <span className="text-[13px] font-bold">En vivo</span>
-          </span>
-        )}
+        {fase.tipo === "parada" &&
+          hayUnidadEnVivo(llegadas, umbralSinSenalS) && (
+            <span className="flex h-9 items-center gap-2 rounded-full border-[0.5px] border-borde bg-superficie px-4">
+              {/* "En vivo" es un estado, no identidad: por regla del sistema usa verde. */}
+              <span
+                aria-hidden="true"
+                className="pulso-en-vivo size-[7px] rounded-full bg-exito"
+              />
+              <span className="text-[13px] font-bold">En vivo</span>
+            </span>
+          )}
       </header>
 
       <main className="flex flex-1 flex-col gap-4 rounded-t-[20px] border-t-[0.5px] border-borde bg-superficie px-5 pb-8 pt-6">
-        {carga === "cargando" && (
-          <p className="text-sm text-tinta-media">Buscando paradas cerca de ti…</p>
-        )}
-
-        {carga === "error" && error && (
-          <p className="text-sm text-error" role="alert">
-            {error}
-          </p>
-        )}
-
-        {carga === "listo" && ubicacion.estado === "negada" && (
-          <EstadoSinUbicacion motivo="negada" />
-        )}
-
-        {carga === "listo" && ubicacion.estado === "no_disponible" && (
-          <EstadoSinUbicacion motivo="no_disponible" />
-        )}
-
-        {carga === "listo" &&
-          ubicacion.estado === "concedida" &&
-          !paradaMasCercana && <EstadoSinUbicacion motivo="sin_paradas" />}
-
-        {carga === "listo" && paradaMasCercana && (
-          <>
-            <span className="text-xs font-bold tracking-wide text-tinta-suave">
-              Tu parada más cercana
-            </span>
-
-            <ParadaCercana parada={paradaMasCercana} />
-
-            <div className="h-56 overflow-hidden rounded-2xl border-[0.5px] border-borde">
-              <LienzoSeguimiento
-                ubicacion={
-                  ubicacion.estado === "concedida"
-                    ? {
-                        lat: ubicacion.ubicacion.lat,
-                        lng: ubicacion.ubicacion.lng,
-                        exactitudM: ubicacion.ubicacion.exactitudM,
-                      }
-                    : null
-                }
-                paradas={paradasCercanas.map((parada) => ({
-                  id: parada.paradaId,
-                  nombre: parada.nombre,
-                  lat: parada.lat,
-                  lng: parada.lng,
-                  color: parada.rutas[0]?.color ?? null,
-                  destacada: parada.paradaId === paradaMasCercana.paradaId,
-                }))}
-                unidades={llegadas
-                  .filter(
-                    (llegada) =>
-                      llegada.unidad_lat !== null && llegada.unidad_lng !== null,
-                  )
-                  .map((llegada) => ({
-                    id: llegada.unidad_id,
-                    nombre: llegada.unidad_nombre,
-                    lat: llegada.unidad_lat,
-                    lng: llegada.unidad_lng,
-                    rutaNombre: llegada.ruta_nombre,
-                    color: llegada.ruta_color,
-                    icono: llegada.ruta_icono,
-                    transmitiendo:
-                      llegada.viaje_id !== null &&
-                      llegada.segundos_sin_senal !== null &&
-                      llegada.segundos_sin_senal <= umbralSinSenalS,
-                  }))}
-              />
-            </div>
-
-            <span className="pt-1 text-xs font-bold tracking-wide text-tinta-suave">
-              Próximas llegadas a esta parada
-            </span>
-
-            <ListaLlegadas llegadas={llegadas} umbralSinSenalS={umbralSinSenalS} />
-          </>
-        )}
+        <Contenido
+          miParada={miParada}
+          llegadas={llegadas}
+          umbralSinSenalS={umbralSinSenalS}
+          radioAproximacionM={radioAproximacionM}
+        />
       </main>
     </div>
+  );
+}
+
+type PropsContenido = {
+  miParada: ReturnType<typeof useMiParada>;
+  llegadas: readonly LlegadaRow[];
+  umbralSinSenalS: number;
+  radioAproximacionM: number;
+};
+
+function Contenido({
+  miParada,
+  llegadas,
+  umbralSinSenalS,
+  radioAproximacionM,
+}: PropsContenido) {
+  const { fase, ubicacion, cercanas, elegida } = miParada;
+
+  // Si el ciudadano ya tiene parada, cualquier pantalla intermedia (buscar,
+  // elegir, ubicación negada) le deja volver a ella.
+  const volver = elegida ? miParada.cerrarSelector : null;
+
+  switch (fase.tipo) {
+    case "cargando":
+      return null;
+
+    case "bienvenida":
+    case "buscando":
+      return elegida ? (
+        <p className="text-sm text-tinta-media">
+          Buscando paradas cerca de ti…
+        </p>
+      ) : (
+        <Bienvenida
+          buscando={fase.tipo === "buscando"}
+          radioAproximacionM={radioAproximacionM}
+          alUsarUbicacion={miParada.pedirUbicacion}
+        />
+      );
+
+    case "sin_ubicacion":
+    case "sin_paradas":
+    case "error":
+      return <Contratiempo fase={fase} alVolver={volver} />;
+
+    case "selector":
+      return (
+        <SelectorDeParada
+          paradas={fase.paradas}
+          elegidaId={elegida?.paradaId ?? null}
+          alElegir={miParada.elegir}
+          alCancelar={volver}
+        />
+      );
+
+    case "parada":
+      return (
+        <VistaParada
+          parada={fase.parada}
+          otrasParadas={cercanas?.ok ? cercanas.datos : []}
+          ubicacion={
+            ubicacion.estado === "concedida" ? ubicacion.ubicacion : null
+          }
+          llegadas={llegadas}
+          umbralSinSenalS={umbralSinSenalS}
+          radioAproximacionM={radioAproximacionM}
+          alCambiar={miParada.abrirSelector}
+        />
+      );
+  }
+}
+
+type FaseContratiempo = Extract<
+  Fase,
+  { tipo: "sin_ubicacion" | "sin_paradas" | "error" }
+>;
+
+/** Lo que impide mostrar paradas. Si ya tenía una, puede volver a ella. */
+function Contratiempo({
+  fase,
+  alVolver,
+}: {
+  fase: FaseContratiempo;
+  alVolver: (() => void) | null;
+}) {
+  return (
+    <>
+      {fase.tipo === "error" ? (
+        <p className="text-sm text-error" role="alert">
+          {fase.mensaje}
+        </p>
+      ) : (
+        <EstadoSinUbicacion
+          motivo={fase.tipo === "sin_paradas" ? "sin_paradas" : fase.motivo}
+        />
+      )}
+
+      {alVolver && (
+        <Boton variante="fantasma" onClick={alVolver} className="self-start">
+          Volver a mi parada
+        </Boton>
+      )}
+    </>
+  );
+}
+
+function hayUnidadEnVivo(
+  llegadas: readonly LlegadaRow[],
+  umbralSinSenalS: number,
+): boolean {
+  return llegadas.some(
+    (llegada) =>
+      evaluarLlegada({
+        enViaje: llegada.viaje_id !== null,
+        segundosSinSenal: llegada.segundos_sin_senal,
+        umbralSinSenalS,
+      }).tipo === "en_camino",
   );
 }

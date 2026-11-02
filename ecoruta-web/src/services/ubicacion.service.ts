@@ -28,3 +28,20 @@ export function obtenerUbicacionActual(): Promise<EstadoUbicacion> {
     );
   });
 }
+
+/**
+ * Si el ciudadano ya dio permiso en una visita anterior, la ubicación se puede
+ * leer sin volver a preguntar. Sin esto, quien vuelve con su parada guardada
+ * vería la parada sin la distancia caminando.
+ *
+ * Safari viejo no tiene `permissions.query` para geolocalización: ahí se
+ * responde que no, y la parada se muestra sin distancia.
+ */
+export async function ubicacionYaPermitida(): Promise<boolean> {
+  try {
+    const permiso = await navigator.permissions.query({ name: "geolocation" });
+    return permiso.state === "granted";
+  } catch {
+    return false;
+  }
+}

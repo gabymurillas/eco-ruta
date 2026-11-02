@@ -31,3 +31,13 @@ export function formatearMinutos(minutos: number): string {
 export function estimarCaminataMinutos(metros: number): number {
   return Math.max(1, Math.round(metros / VELOCIDAD_CAMINATA_M_POR_MINUTO));
 }
+
+const FORMATO_HORA = new Intl.DateTimeFormat("es-VE", {
+  hour: "numeric",
+  minute: "2-digit",
+});
+
+/** «3:42 p. m.»: la hora en que pasó algo, en el formato de Venezuela. */
+export function formatearHora(fechaIso: string): string {
+  return FORMATO_HORA.format(new Date(fechaIso));
+}

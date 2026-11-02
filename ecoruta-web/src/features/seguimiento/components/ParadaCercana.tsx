@@ -1,13 +1,13 @@
+import { Boton } from "@/components/ui/Boton";
 import { estimarCaminataMinutos, formatearDistancia } from "@/domain/formato";
-import type { ParadaConRutas } from "../types";
+import type { ParadaElegida } from "../types";
 
 type Props = {
-  parada: ParadaConRutas;
+  parada: ParadaElegida;
+  alCambiar: () => void;
 };
 
-export function ParadaCercana({ parada }: Props) {
-  const caminata = estimarCaminataMinutos(parada.distanciaM);
-
+export function ParadaCercana({ parada, alCambiar }: Props) {
   return (
     <div className="flex items-center gap-4 rounded-[18px] border-[0.5px] border-borde bg-marca-tenue p-4">
       <div className="flex size-11 shrink-0 items-center justify-center rounded-full border-[0.5px] border-borde bg-superficie text-marca-profundo">
@@ -31,11 +31,17 @@ export function ParadaCercana({ parada }: Props) {
         <span className="font-serif text-[17px] font-bold leading-tight">
           {parada.nombre}
         </span>
-        <span className="text-[13px] font-semibold text-tinta-suave">
-          A {formatearDistancia(parada.distanciaM)} de ti · {caminata} min
-          caminando
-        </span>
+        {parada.distanciaM !== null && (
+          <span className="text-[13px] font-semibold text-tinta-suave">
+            A {formatearDistancia(parada.distanciaM)} de ti ·{" "}
+            {estimarCaminataMinutos(parada.distanciaM)} min caminando
+          </span>
+        )}
       </div>
+
+      <Boton variante="fantasma" onClick={alCambiar} className="shrink-0 px-3">
+        Cambiar
+      </Boton>
     </div>
   );
 }

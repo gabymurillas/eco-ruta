@@ -10,10 +10,59 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
+      avisos_parada: {
+        Row: {
+          creado_at: string
+          id: string
+          parada_id: string
+          tipo: string
+          unidad_id: string
+          viaje_id: string
+        }
+        Insert: {
+          creado_at?: string
+          id?: string
+          parada_id: string
+          tipo: string
+          unidad_id: string
+          viaje_id: string
+        }
+        Update: {
+          creado_at?: string
+          id?: string
+          parada_id?: string
+          tipo?: string
+          unidad_id?: string
+          viaje_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avisos_parada_parada_id_fkey"
+            columns: ["parada_id"]
+            isOneToOne: false
+            referencedRelation: "paradas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avisos_parada_unidad_id_fkey"
+            columns: ["unidad_id"]
+            isOneToOne: false
+            referencedRelation: "unidades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avisos_parada_viaje_id_fkey"
+            columns: ["viaje_id"]
+            isOneToOne: false
+            referencedRelation: "viajes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dispositivos: {
         Row: {
           auth_user_id: string | null
@@ -626,6 +675,26 @@ export type Database = {
       enablelongtransactions: { Args: never; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       es_admin: { Args: never; Returns: boolean }
+      estado_de_geocercas: {
+        Args: {
+          lat: number
+          lng: number
+          radio_aproximacion_m: number
+          viaje: string
+        }
+        Returns: {
+          avisado_acercamiento: boolean
+          avisado_paso: boolean
+          dentro: boolean
+          dentro_aproximacion: boolean
+          entro_at: string
+          notifica: boolean
+          notificado_at: string
+          parada_id: string
+          parada_nombre: string
+          salio_at: string
+        }[]
+      }
       estado_flota: {
         Args: never
         Returns: {
@@ -809,6 +878,15 @@ export type Database = {
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
         | { Args: { use_typmod?: boolean }; Returns: string }
+      posiciones_para_suavizar: {
+        Args: { limite: number; viaje: string }
+        Returns: {
+          capturado_at: string
+          exactitud_m: number
+          lat: number
+          lng: number
+        }[]
+      }
       postgis_constraint_dims: {
         Args: { geomcolumn: string; geomschema: string; geomtable: string }
         Returns: number

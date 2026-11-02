@@ -6,12 +6,12 @@ const MENSAJES: Record<Props["motivo"], { titulo: string; detalle: string }> = {
   negada: {
     titulo: "Necesitamos tu ubicación",
     detalle:
-      "Para mostrarte la parada más cercana hace falta permiso de ubicación. Puedes activarlo desde los ajustes del navegador.",
+      "Sin tu ubicación no podemos saber qué paradas tienes cerca. Actívala en los ajustes del navegador, en los permisos de este sitio, y vuelve a cargar la página.",
   },
   no_disponible: {
     titulo: "Tu navegador no comparte ubicación",
     detalle:
-      "Este navegador no permite obtener tu ubicación. Prueba desde otro navegador o busca la ruta manualmente.",
+      "Este navegador no permite obtener tu ubicación. Prueba desde otro navegador, como Chrome.",
   },
   sin_paradas: {
     titulo: "No hay paradas cerca de ti",

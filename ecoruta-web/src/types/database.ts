@@ -20,6 +20,7 @@ export type Dispositivo = Tables<"dispositivos">;
 export type Viaje = Tables<"viajes">;
 export type Posicion = Tables<"posiciones">;
 export type EventoGeocerca = Tables<"eventos_geocerca">;
+export type AvisoParada = Tables<"avisos_parada">;
 export type Incidencia = Tables<"incidencias">;
 export type Parametro = Tables<"parametros">;
 

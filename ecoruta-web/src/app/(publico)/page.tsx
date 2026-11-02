@@ -4,22 +4,30 @@ import { obtenerParametros } from "@/services/parametros.service";
 export const metadata = {
   title: "EcoRuta San Juan",
   description:
-    "Mira dónde está tu unidad y cuánto falta para que llegue a tu parada, en San Juan de los Morros.",
+    "Mira dónde está tu unidad y recibe un aviso cuando se acerque a tu parada, en San Juan de los Morros.",
 };
 
-/** Valor de respaldo si los parámetros no cargan: coincide con el del esquema. */
+/** Valores de respaldo si los parámetros no cargan: coinciden con los del esquema. */
 const UMBRAL_SIN_SENAL_POR_DEFECTO_S = 300;
+const RADIO_APROXIMACION_POR_DEFECTO_M = 500;
 
 /** Las rutas solo componen features: la lógica y los datos viven en la feature. */
 export default async function SeguimientoPage() {
   const parametros = await obtenerParametros();
+  const valores = new Map(
+    parametros.ok
+      ? parametros.datos.map((p) => [p.clave, Number(p.valor)])
+      : [],
+  );
 
-  const umbralSinSenalS = parametros.ok
-    ? Number(
-        parametros.datos.find((p) => p.clave === "sin_senal_umbral_s")?.valor ??
-          UMBRAL_SIN_SENAL_POR_DEFECTO_S,
-      )
-    : UMBRAL_SIN_SENAL_POR_DEFECTO_S;
-
-  return <Seguimiento umbralSinSenalS={umbralSinSenalS} />;
+  return (
+    <Seguimiento
+      umbralSinSenalS={
+        valores.get("sin_senal_umbral_s") ?? UMBRAL_SIN_SENAL_POR_DEFECTO_S
+      }
+      radioAproximacionM={
+        valores.get("radio_aproximacion_m") ?? RADIO_APROXIMACION_POR_DEFECTO_M
+      }
+    />
+  );
 }

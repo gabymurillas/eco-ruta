@@ -22,6 +22,15 @@ export type ParadaConRutas = {
   rutas: RutaEnParada[];
 };
 
+/**
+ * Lo que se recuerda de «mi parada» en el navegador. Sin distancia: la
+ * distancia depende de dónde esté el ciudadano en cada visita.
+ */
+export type ParadaGuardada = Omit<ParadaConRutas, "distanciaM">;
+
+/** La parada que se muestra. La distancia falta si esta vez no compartió ubicación. */
+export type ParadaElegida = ParadaGuardada & { distanciaM: number | null };
+
 export type RutaEnParada = {
   rutaId: string;
   nombre: string;
@@ -64,4 +73,15 @@ function aRutaEnParada(fila: ParadaCercanaRow): RutaEnParada {
     icono: fila.ruta_icono,
     color: fila.ruta_color,
   };
+}
+
+/** Lo que se guarda de una parada: todo menos la distancia, que cambia en cada visita. */
+export function sinDistancia({
+  paradaId,
+  nombre,
+  lat,
+  lng,
+  rutas,
+}: ParadaConRutas): ParadaGuardada {
+  return { paradaId, nombre, lat, lng, rutas };
 }

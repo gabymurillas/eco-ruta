@@ -39,6 +39,16 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
       "Segundos continuos fuera antes de dar por terminada la estadía. Si la unidad reentra antes, se considera que nunca salió.",
   },
   {
+    clave: "radio_aproximacion_m",
+    titulo: "Aviso de aproximación",
+    unidad: "m",
+    minimo: 100,
+    maximo: 2000,
+    grupo: "geocercas",
+    explicacion:
+      "Distancia a la parada a la que se avisa al ciudadano que su unidad se acerca. Más grande le da más tiempo para caminar, pero avisa de buses que aún tardan.",
+  },
+  {
     clave: "exactitud_maxima_m",
     titulo: "Exactitud máxima",
     unidad: "m",
