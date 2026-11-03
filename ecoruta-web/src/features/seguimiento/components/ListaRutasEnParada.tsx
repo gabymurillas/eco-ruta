@@ -7,6 +7,14 @@ type Props = {
 };
 
 export function ListaRutasEnParada({ rutas }: Props) {
+  if (rutas.length === 0) {
+    return (
+      <p className="text-sm leading-relaxed text-tinta-media">
+        Todavía no pasa ninguna ruta por esta parada.
+      </p>
+    );
+  }
+
   return (
     <ul className="flex flex-col gap-[10px]">
       {rutas.map((ruta) => (

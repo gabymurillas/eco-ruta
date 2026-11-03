@@ -24,25 +24,32 @@ type FilaRuta = {
   horario: string | null;
   activa: boolean;
   trazado: unknown;
-  paradas: { count: number }[];
   unidades: { count: number }[];
 };
 
 export async function obtenerRutas(): Promise<Resultado<RutaConResumen[]>> {
   const supabase = await crearClienteServidor();
 
-  const { data, error } = await supabase
-    .from("rutas")
-    .select(
-      `id, nombre, tipo, icono, color, horario, activa, trazado,
-       paradas ( count ),
-       unidades ( count )`,
-    )
-    .order("nombre");
+  // Las paradas no tienen llave hacia la ruta: se cuentan desde la vista que
+  // las calcula con el trazado, en una segunda consulta.
+  const [rutas, paradasPorRuta] = await Promise.all([
+    supabase
+      .from("rutas")
+      .select(
+        `id, nombre, tipo, icono, color, horario, activa, trazado,
+         unidades ( count )`,
+      )
+      .order("nombre"),
+    supabase.from("paradas_por_ruta").select("ruta_id"),
+  ]);
 
-  if (error) {
+  if (rutas.error || paradasPorRuta.error) {
     return fallo("No se pudieron cargar las rutas.");
   }
+
+  const data = rutas.data;
+  const paradasDe = (rutaId: string) =>
+    paradasPorRuta.data.filter((fila) => fila.ruta_id === rutaId).length;
 
   return exito(
     (data as unknown as FilaRuta[]).map((fila) => ({
@@ -55,7 +62,7 @@ export async function obtenerRutas(): Promise<Resultado<RutaConResumen[]>> {
       activa: fila.activa,
       // Sin trazado no hay tiempo estimado: la distancia no puede seguir el recorrido.
       tieneTrazado: fila.trazado !== null,
-      cantidadParadas: fila.paradas[0]?.count ?? 0,
+      cantidadParadas: paradasDe(fila.id),
       cantidadUnidades: fila.unidades[0]?.count ?? 0,
     })),
   );
@@ -103,7 +110,8 @@ export async function actualizarRuta(
 //
 // Estas funciones viven aquí y no en `paradas.service.ts` porque ese módulo lo importa
 // un hook de cliente: meterle `crearClienteServidor` arrastraría `next/headers` al
-// bundle del navegador y el build fallaría.
+// bundle del navegador y el build fallaría. Por lo mismo, las paradas del admin
+// están en `catalogo-paradas.service.ts`.
 
 export type RutaDeMapa =
   Database["public"]["Functions"]["rutas_para_mapa"]["Returns"][number];
@@ -137,80 +145,6 @@ export async function obtenerParadasDeRuta(
   return exito(data ?? []);
 }
 
-type NuevaParada = {
-  rutaId: string;
-  nombre: string;
-  lat: number;
-  lng: number;
-  radioM: number;
-};
-
-export async function agregarParadaARuta({
-  rutaId,
-  nombre,
-  lat,
-  lng,
-  radioM,
-}: NuevaParada): Promise<Resultado<string>> {
-  const supabase = await crearClienteServidor();
-
-  const { data, error } = await supabase.rpc("crear_parada", {
-    ruta: rutaId,
-    nombre_parada: nombre,
-    lat,
-    lng,
-    radio_m: radioM,
-  });
-
-  if (error) {
-    return fallo("No se pudo crear la parada.");
-  }
-
-  return exito(data);
-}
-
-type CambioDeParada = {
-  paradaId: string;
-  lat: number;
-  lng: number;
-  radioM: number;
-};
-
-export async function moverParadaDeRuta({
-  paradaId,
-  lat,
-  lng,
-  radioM,
-}: CambioDeParada): Promise<Resultado<null>> {
-  const supabase = await crearClienteServidor();
-
-  const { error } = await supabase.rpc("mover_parada", {
-    parada: paradaId,
-    lat,
-    lng,
-    radio_m: radioM,
-  });
-
-  if (error) {
-    return fallo("No se pudo mover la parada.");
-  }
-
-  return exito(null);
-}
-
-export async function eliminarParadaDeRuta(
-  paradaId: string,
-): Promise<Resultado<null>> {
-  const supabase = await crearClienteServidor();
-  const { error } = await supabase.from("paradas").delete().eq("id", paradaId);
-
-  if (error) {
-    return fallo("No se pudo eliminar la parada.");
-  }
-
-  return exito(null);
-}
-
 /**
  * El trazado llega en orden GeoJSON [lng, lat]: la conversión desde Leaflet la hace
  * `domain/mapa`, y la geometría la arma PostGIS. Menos de dos puntos borra el trazado.
@@ -229,23 +163,6 @@ export async function guardarTrazado(
 
   if (error) {
     return fallo("No se pudo guardar el trazado.");
-  }
-
-  return exito(null);
-}
-
-export async function renombrarParadaDeRuta(
-  paradaId: string,
-  nombre: string,
-): Promise<Resultado<null>> {
-  const supabase = await crearClienteServidor();
-  const { error } = await supabase
-    .from("paradas")
-    .update({ nombre })
-    .eq("id", paradaId);
-
-  if (error) {
-    return fallo("No se pudo renombrar la parada.");
   }
 
   return exito(null);

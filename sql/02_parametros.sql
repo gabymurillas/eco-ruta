@@ -18,4 +18,5 @@ insert into parametros (clave, valor, descripcion) values
   ('bateria_alerta_pct',   15,  'Porcentaje de bateria que dispara alerta en el admin'),
   ('emision_movimiento_s', 5,   'Intervalo de emision con vehiculo en movimiento'),
   ('emision_detenido_s',   30,  'Intervalo de emision con vehiculo detenido'),
-  ('radio_aproximacion_m', 500, 'Distancia a la parada a la que se avisa que la unidad se acerca');
+  ('radio_aproximacion_m', 500, 'Distancia a la parada a la que se avisa que la unidad se acerca'),
+  ('distancia_parada_trazado_m', 40, 'Distancia maxima entre una parada y el trazado para que la ruta pase por ella');

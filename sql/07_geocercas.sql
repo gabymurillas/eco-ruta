@@ -55,7 +55,7 @@ grant execute on function posiciones_para_suavizar(uuid, integer) to service_rol
 
 -- ── ESTADO DE CADA PARADA DEL VIAJE ──
 --
--- Por cada parada de la ruta del viaje: si el punto suavizado cae dentro de SU
+-- Por cada parada por la que pasa la ruta del viaje (la que toca su trazado): si el punto suavizado cae dentro de SU
 -- radio —cada parada tiene el suyo, una esquina angosta no necesita el mismo que
 -- un terminal— y el evento que ya tenga en este viaje, si lo tiene.
 --
@@ -118,13 +118,14 @@ as $$
     )
   from viajes v
   cross join punto
-  join paradas p on p.ruta_id = v.ruta_id
+  join paradas_por_ruta pr on pr.ruta_id = v.ruta_id
+  join paradas p on p.id = pr.parada_id
   left join eventos_geocerca e
     on e.viaje_id = v.id
    and e.parada_id = p.id
   where v.id = estado_de_geocercas.viaje
     and v.finalizado_at is null
-  order by p.orden;
+  order by pr.avance;
 $$;
 
 revoke execute on function estado_de_geocercas(uuid, double precision, double precision, integer)

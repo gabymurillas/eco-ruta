@@ -2,9 +2,10 @@
 
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
-import type { useEditorDeRuta } from "../hooks/useEditorDeRuta";
+import { colorDeRuta } from "@/domain/colores";
+import type { useEditorDeParadas } from "../hooks/useEditorDeParadas";
 
-type Editor = ReturnType<typeof useEditorDeRuta>;
+type Editor = ReturnType<typeof useEditorDeParadas>;
 
 type Props = {
   editor: Editor;
@@ -31,7 +32,7 @@ export function FichaDeParada({ editor, radioMinimoM }: Props) {
   return (
     <section
       aria-label={nueva ? "Nueva parada" : `Editar ${ficha.nombre}`}
-      className="flex w-[340px] max-w-full flex-col gap-3 rounded-xl border-[0.5px] border-borde bg-superficie p-4"
+      className="flex flex-col gap-3 rounded-xl border-[0.5px] border-borde bg-superficie p-4"
     >
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="font-serif text-[15px] font-bold">
@@ -45,6 +46,8 @@ export function FichaDeParada({ editor, radioMinimoM }: Props) {
       <p className="text-xs leading-relaxed text-tinta-media">
         Arrastra el pin o toca otro punto del mapa para moverla.
       </p>
+
+      {!nueva && <RutasQuePasan rutas={editor.original?.rutas ?? []} />}
 
       <Campo
         etiqueta="Nombre de la parada"
@@ -157,6 +160,38 @@ function ConfirmarEliminar({ editor, nombre }: { editor: Editor; nombre: string 
           No
         </Boton>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Las rutas no se asignan aquí: salen del trazado. Si falta una, hay que
+ * corregir su recorrido en el editor de la ruta o mover la parada.
+ */
+function RutasQuePasan({ rutas }: { rutas: Editor["paradas"][number]["rutas"] }) {
+  if (rutas.length === 0) {
+    return (
+      <p className="text-xs leading-relaxed text-tinta-media">
+        Todavía no pasa ninguna ruta: ningún trazado queda cerca de esta parada.
+      </p>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-xs font-bold tracking-wide text-tinta-suave">Pasan por aquí</span>
+      <ul className="flex flex-wrap gap-x-3 gap-y-1">
+        {rutas.map((ruta) => (
+          <li key={ruta.id} className="flex items-center gap-1.5 text-[13px] font-semibold">
+            <span
+              aria-hidden="true"
+              className="size-2 rounded-full"
+              style={{ backgroundColor: colorDeRuta(ruta.color) }}
+            />
+            {ruta.nombre}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

@@ -47,7 +47,7 @@ export default async function NuevaRutaPage() {
         <div className="flex flex-col gap-px">
           <h1 className="font-serif text-[19px] font-black tracking-tight">Nueva ruta</h1>
           <p className="text-xs font-semibold text-tinta-suave">
-            Rutas y paradas · Crear
+            Rutas · Crear
           </p>
         </div>
       </header>

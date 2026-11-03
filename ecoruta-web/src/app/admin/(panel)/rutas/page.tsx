@@ -30,7 +30,7 @@ export default async function RutasPage() {
       <header className="flex h-18 shrink-0 items-center justify-between gap-6 border-b-[0.5px] border-borde bg-superficie px-7">
         <div className="flex flex-col gap-px">
           <h1 className="font-serif text-[19px] font-black tracking-tight">
-            Rutas y paradas
+            Rutas
           </h1>
           <p className="text-xs font-semibold text-tinta-suave">
             {rutas.length} rutas registradas

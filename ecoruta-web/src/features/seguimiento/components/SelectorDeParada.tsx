@@ -67,6 +67,14 @@ export function SelectorDeParada({
 
 /** Punto del color de la ruta más su nombre: nunca el punto solo. */
 function ChipsDeRuta({ parada }: { parada: ParadaConRutas }) {
+  if (parada.rutas.length === 0) {
+    return (
+      <span className="text-[13px] font-semibold text-tinta-suave">
+        Todavía no pasa ninguna ruta
+      </span>
+    );
+  }
+
   return (
     <span className="flex flex-wrap gap-x-3 gap-y-1">
       {parada.rutas.map((ruta) => (

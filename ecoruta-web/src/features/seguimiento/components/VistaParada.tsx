@@ -72,13 +72,20 @@ export function VistaParada(props: Props) {
         Próximas llegadas a esta parada
       </span>
 
-      <ListaLlegadas llegadas={llegadas} umbralSinSenalS={umbralSinSenalS} />
+      {parada.rutas.length === 0 ? (
+        <p className="text-sm leading-relaxed text-tinta-media">
+          Todavía no pasa ninguna ruta por esta parada. Cuando la alcaldía
+          agregue una, aquí verás cuándo llega.
+        </p>
+      ) : (
+        <ListaLlegadas llegadas={llegadas} umbralSinSenalS={umbralSinSenalS} />
+      )}
 
       {aviso && (
         <AvisoDeParada
           aviso={aviso}
           parada={parada}
-          unidadNombre={nombreDeUnidad(llegadas, aviso.unidadId)}
+          {...unidadDelAviso(llegadas, aviso.unidadId, parada)}
           radioAproximacionM={props.radioAproximacionM}
           alDescartar={() => descartar(aviso.id)}
         />
@@ -87,14 +94,26 @@ export function VistaParada(props: Props) {
   );
 }
 
-function nombreDeUnidad(
+/**
+ * La ruta sale de la unidad que generó el aviso, no de la parada: por una
+ * parada pueden pasar varias rutas. Si la unidad ya no está entre las llegadas
+ * y por la parada pasa una sola ruta, tiene que ser esa.
+ */
+function unidadDelAviso(
   llegadas: readonly LlegadaRow[],
   unidadId: string,
-): string | null {
-  return (
-    llegadas.find((llegada) => llegada.unidad_id === unidadId)?.unidad_nombre ??
-    null
-  );
+  parada: ParadaElegida,
+) {
+  const llegada = llegadas.find((fila) => fila.unidad_id === unidadId);
+
+  if (llegada) {
+    return {
+      unidadNombre: llegada.unidad_nombre,
+      ruta: { nombre: llegada.ruta_nombre, color: llegada.ruta_color, icono: llegada.ruta_icono },
+    };
+  }
+
+  return { unidadNombre: null, ruta: parada.rutas.length === 1 ? parada.rutas[0] : null };
 }
 
 function paradasDelMapa(

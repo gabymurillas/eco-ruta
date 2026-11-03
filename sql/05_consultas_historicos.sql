@@ -7,7 +7,8 @@
 --
 -- Definición: paradas efectivamente visitadas sobre paradas planificadas.
 --
---   Planificada: cada parada de la ruta del viaje, contada una vez por viaje.
+--   Planificada: cada parada que toca el trazado de la ruta del viaje
+--                (vista paradas_por_ruta), contada una vez por viaje.
 --                Si una ruta tiene 3 paradas y hubo 10 viajes, son 30 planificadas.
 --   Visitada:    existe un evento de geocerca de ese viaje en esa parada.
 --                `eventos_geocerca` tiene unique (viaje_id, parada_id), así que
@@ -22,9 +23,9 @@
 -- servicio haya empeorado. Al comparar períodos hay que verificar que los
 -- parámetros no cambiaron entre uno y otro.
 with planificadas as (
-  select v.id as viaje_id, p.id as parada_id
+  select v.id as viaje_id, pr.parada_id
   from viajes v
-  join paradas p on p.ruta_id = v.ruta_id
+  join paradas_por_ruta pr on pr.ruta_id = v.ruta_id
   where v.iniciado_at >= now() - interval '7 days'
 ),
 visitadas as (
@@ -73,13 +74,13 @@ order by 1, 2;
 with pasos as (
   select
     e.viaje_id,
-    p.ruta_id,
-    p.orden,
     p.nombre as parada,
     e.entro_at,
-    lag(e.entro_at) over (partition by e.viaje_id order by p.orden) as entro_anterior,
-    lag(p.nombre)   over (partition by e.viaje_id order by p.orden) as parada_anterior
+    lag(e.entro_at) over (partition by e.viaje_id order by pr.avance) as entro_anterior,
+    lag(p.nombre)   over (partition by e.viaje_id order by pr.avance) as parada_anterior
   from eventos_geocerca e
+  join viajes v on v.id = e.viaje_id
+  join paradas_por_ruta pr on pr.ruta_id = v.ruta_id and pr.parada_id = e.parada_id
   join paradas p on p.id = e.parada_id
 ),
 tramos as (

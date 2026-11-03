@@ -1,4 +1,4 @@
-import type { Aviso } from "../hooks/useEditorDeRuta";
+export type Aviso = { tipo: "exito" | "error"; texto: string; id: number };
 
 type Props = {
   aviso: Aviso | null;
@@ -6,11 +6,11 @@ type Props = {
 };
 
 /**
- * Confirma lo que acaba de pasar sobre el mapa, donde el admin está mirando.
+ * Confirma lo que acaba de pasar, donde el admin está mirando.
  * La región `status` existe siempre: los lectores de pantalla solo anuncian
  * cambios dentro de una región que ya estaba en la página.
  */
-export function AvisoDelEditor({ aviso, alCerrar }: Props) {
+export function AvisoFlotante({ aviso, alCerrar }: Props) {
   return (
     <div role="status" aria-live="polite" className="pointer-events-none flex justify-center">
       {aviso && (

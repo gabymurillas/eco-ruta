@@ -26,19 +26,18 @@ create index rutas_trazado_gix on rutas using gist (trazado);
 
 
 -- ── PARADAS Y GEOCERCAS ──
+-- Las paradas son de la ciudad, no de una ruta: una parada donde paran tres
+-- rutas se registra una sola vez. Qué rutas pasan por ella no se guarda: lo
+-- calcula la vista `paradas_por_ruta` (04_funciones.sql) a partir del trazado.
 create table paradas (
   id               uuid primary key default gen_random_uuid(),
-  ruta_id          uuid not null references rutas(id) on delete cascade,
   nombre           text not null,
-  orden            int  not null,
   ubicacion        geography(Point, 4326) not null,
   radio_geocerca_m int not null default 150,
-  notifica         boolean not null default true,
-  unique (ruta_id, orden)
+  notifica         boolean not null default true
 );
 
 create index paradas_ubicacion_gix on paradas using gist (ubicacion);
-create index paradas_ruta_idx on paradas (ruta_id);
 
 
 -- ── UNIDADES ──

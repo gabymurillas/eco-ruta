@@ -24,6 +24,18 @@ export type AvisoParada = Tables<"avisos_parada">;
 export type Incidencia = Tables<"incidencias">;
 export type Parametro = Tables<"parametros">;
 
-/** Fila que devuelve la función PostGIS `paradas_cercanas`. */
-export type ParadaCercanaRow =
+type FilaParadaCercana =
   Database["public"]["Functions"]["paradas_cercanas"]["Returns"][number];
+
+type ColumnasDeRuta = "ruta_id" | "ruta_nombre" | "ruta_tipo" | "ruta_icono" | "ruta_color";
+
+/**
+ * Fila que devuelve la función PostGIS `paradas_cercanas`.
+ *
+ * El generador declara las columnas de ruta como obligatorias porque no lee el
+ * `left join`, pero una parada por la que todavía no pasa ninguna ruta llega con
+ * ellas en null. Se corrigen aquí para que el compilador obligue a tratar ese caso.
+ */
+export type ParadaCercanaRow = Omit<FilaParadaCercana, ColumnasDeRuta> & {
+  [Columna in ColumnasDeRuta]: FilaParadaCercana[Columna] | null;
+};

@@ -49,6 +49,16 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
       "Distancia a la parada a la que se avisa al ciudadano que su unidad se acerca. Más grande le da más tiempo para caminar, pero avisa de buses que aún tardan.",
   },
   {
+    clave: "distancia_parada_trazado_m",
+    titulo: "Distancia parada–trazado",
+    unidad: "m",
+    minimo: 10,
+    maximo: 150,
+    grupo: "geocercas",
+    explicacion:
+      "Una ruta pasa por las paradas que quedan a menos de esta distancia de su trazado. Más grande perdona un trazado dibujado a mano alzada, pero puede sumar paradas de una calle paralela.",
+  },
+  {
     clave: "exactitud_maxima_m",
     titulo: "Exactitud máxima",
     unidad: "m",

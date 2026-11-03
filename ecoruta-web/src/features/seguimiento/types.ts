@@ -45,10 +45,11 @@ export function agruparPorParada(
   const paradas = new Map<string, ParadaConRutas>();
 
   for (const fila of filas) {
+    const ruta = aRutaEnParada(fila);
     const existente = paradas.get(fila.parada_id);
 
     if (existente) {
-      existente.rutas.push(aRutaEnParada(fila));
+      existente.rutas.push(...ruta);
       continue;
     }
 
@@ -58,21 +59,28 @@ export function agruparPorParada(
       lat: fila.parada_lat,
       lng: fila.parada_lng,
       distanciaM: fila.distancia_m,
-      rutas: [aRutaEnParada(fila)],
+      rutas: ruta,
     });
   }
 
   return [...paradas.values()];
 }
 
-function aRutaEnParada(fila: ParadaCercanaRow): RutaEnParada {
-  return {
-    rutaId: fila.ruta_id,
-    nombre: fila.ruta_nombre,
-    tipo: fila.ruta_tipo,
-    icono: fila.ruta_icono,
-    color: fila.ruta_color,
-  };
+/** Una parada por la que todavía no pasa ninguna ruta llega sin columnas de ruta. */
+function aRutaEnParada(fila: ParadaCercanaRow): RutaEnParada[] {
+  if (fila.ruta_id === null) {
+    return [];
+  }
+
+  return [
+    {
+      rutaId: fila.ruta_id,
+      nombre: fila.ruta_nombre ?? "Ruta sin nombre",
+      tipo: fila.ruta_tipo,
+      icono: fila.ruta_icono,
+      color: fila.ruta_color ?? "",
+    },
+  ];
 }
 
 /** Lo que se guarda de una parada: todo menos la distancia, que cambia en cada visita. */

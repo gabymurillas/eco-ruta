@@ -1,44 +1,34 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { radioMinimoSugeridoM } from "@/domain/parametros";
 import { trazadoALatLng } from "@/domain/mapa";
 import { EditorDeRuta } from "@/features/rutas/components/EditorDeRuta";
-import { obtenerParametros } from "@/services/parametros.service";
+import { obtenerParadasDeLaCiudad } from "@/services/catalogo-paradas.service";
 import { obtenerParadasDeRuta, obtenerRutaDeMapa } from "@/services/rutas.service";
 
 export const dynamic = "force-dynamic";
 
-const EXACTITUD_POR_DEFECTO_M = 50;
-
 export default async function EditorDeRutaPage({ params }: PageProps<"/admin/rutas/[id]">) {
   const { id } = await params;
 
-  const [ruta, paradas, parametros] = await Promise.all([
+  const [ruta, paradas, ciudad] = await Promise.all([
     obtenerRutaDeMapa(id),
     obtenerParadasDeRuta(id),
-    obtenerParametros(),
+    obtenerParadasDeLaCiudad(),
   ]);
 
   if (!ruta.ok || !ruta.datos) {
     notFound();
   }
 
-  if (!paradas.ok) {
+  if (!paradas.ok || !ciudad.ok) {
     return (
       <main className="flex flex-1 items-center justify-center p-7">
         <p role="alert" className="font-serif text-lg font-bold text-error">
-          {paradas.error}
+          {paradas.ok ? (ciudad.ok ? null : ciudad.error) : paradas.error}
         </p>
       </main>
     );
   }
-
-  const exactitudMaximaM = parametros.ok
-    ? Number(
-        parametros.datos.find((p) => p.clave === "exactitud_maxima_m")?.valor ??
-          EXACTITUD_POR_DEFECTO_M,
-      )
-    : EXACTITUD_POR_DEFECTO_M;
 
   return (
     <>
@@ -68,7 +58,7 @@ export default async function EditorDeRutaPage({ params }: PageProps<"/admin/rut
             {ruta.datos.ruta_nombre}
           </h1>
           <p className="text-xs font-semibold text-tinta-suave">
-            Trazado y paradas · {paradas.datos.length} paradas
+            Trazado · pasa por {paradas.datos.length} paradas
           </p>
         </div>
 
@@ -84,16 +74,14 @@ export default async function EditorDeRutaPage({ params }: PageProps<"/admin/rut
         <EditorDeRuta
           rutaId={id}
           color={ruta.datos.ruta_color}
-          paradasIniciales={paradas.datos.map((parada) => ({
-            id: parada.parada_id,
-            nombre: parada.parada_nombre,
-            lat: parada.parada_lat,
-            lng: parada.parada_lng,
-            radioM: parada.radio_geocerca_m,
-          }))}
           trazadoInicial={trazadoALatLng(ruta.datos.trazado_geojson)}
-          radioPorDefectoM={radioMinimoSugeridoM(exactitudMaximaM)}
-          radioMinimoM={radioMinimoSugeridoM(exactitudMaximaM)}
+          paradasDeRuta={paradas.datos}
+          paradasDeLaCiudad={ciudad.datos.map(({ id: paradaId, nombre, lat, lng }) => ({
+            id: paradaId,
+            nombre,
+            lat,
+            lng,
+          }))}
         />
       </main>
     </>

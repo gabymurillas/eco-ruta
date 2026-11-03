@@ -48,6 +48,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "avisos_parada_parada_id_fkey"
+            columns: ["parada_id"]
+            isOneToOne: false
+            referencedRelation: "paradas_por_ruta"
+            referencedColumns: ["parada_id"]
+          },
+          {
             foreignKeyName: "avisos_parada_unidad_id_fkey"
             columns: ["unidad_id"]
             isOneToOne: false
@@ -147,6 +154,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "eventos_geocerca_parada_id_fkey"
+            columns: ["parada_id"]
+            isOneToOne: false
+            referencedRelation: "paradas_por_ruta"
+            referencedColumns: ["parada_id"]
+          },
+          {
             foreignKeyName: "eventos_geocerca_unidad_id_fkey"
             columns: ["unidad_id"]
             isOneToOne: false
@@ -201,6 +215,13 @@ export type Database = {
             foreignKeyName: "incidencias_ruta_id_fkey"
             columns: ["ruta_id"]
             isOneToOne: false
+            referencedRelation: "paradas_por_ruta"
+            referencedColumns: ["ruta_id"]
+          },
+          {
+            foreignKeyName: "incidencias_ruta_id_fkey"
+            columns: ["ruta_id"]
+            isOneToOne: false
             referencedRelation: "rutas"
             referencedColumns: ["id"]
           },
@@ -218,38 +239,24 @@ export type Database = {
           id: string
           nombre: string
           notifica: boolean
-          orden: number
           radio_geocerca_m: number
-          ruta_id: string
           ubicacion: unknown
         }
         Insert: {
           id?: string
           nombre: string
           notifica?: boolean
-          orden: number
           radio_geocerca_m?: number
-          ruta_id: string
           ubicacion: unknown
         }
         Update: {
           id?: string
           nombre?: string
           notifica?: boolean
-          orden?: number
           radio_geocerca_m?: number
-          ruta_id?: string
           ubicacion?: unknown
         }
-        Relationships: [
-          {
-            foreignKeyName: "paradas_ruta_id_fkey"
-            columns: ["ruta_id"]
-            isOneToOne: false
-            referencedRelation: "rutas"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       parametros: {
         Row: {
@@ -404,6 +411,13 @@ export type Database = {
             foreignKeyName: "unidades_ruta_id_fkey"
             columns: ["ruta_id"]
             isOneToOne: false
+            referencedRelation: "paradas_por_ruta"
+            referencedColumns: ["ruta_id"]
+          },
+          {
+            foreignKeyName: "unidades_ruta_id_fkey"
+            columns: ["ruta_id"]
+            isOneToOne: false
             referencedRelation: "rutas"
             referencedColumns: ["id"]
           },
@@ -432,6 +446,13 @@ export type Database = {
           unidad_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "viajes_ruta_id_fkey"
+            columns: ["ruta_id"]
+            isOneToOne: false
+            referencedRelation: "paradas_por_ruta"
+            referencedColumns: ["ruta_id"]
+          },
           {
             foreignKeyName: "viajes_ruta_id_fkey"
             columns: ["ruta_id"]
@@ -489,6 +510,14 @@ export type Database = {
           f_table_schema?: unknown
           srid?: number | null
           type?: string | null
+        }
+        Relationships: []
+      }
+      paradas_por_ruta: {
+        Row: {
+          avance: number | null
+          parada_id: string | null
+          ruta_id: string | null
         }
         Relationships: []
       }
@@ -637,7 +666,6 @@ export type Database = {
           lng: number
           nombre_parada: string
           radio_m: number
-          ruta: string
         }
         Returns: string
       }
@@ -861,6 +889,17 @@ export type Database = {
           ruta_id: string
           ruta_nombre: string
           ruta_tipo: string
+        }[]
+      }
+      paradas_de_la_ciudad: {
+        Args: never
+        Returns: {
+          parada_id: string
+          parada_lat: number
+          parada_lng: number
+          parada_nombre: string
+          radio_geocerca_m: number
+          rutas: Json
         }[]
       }
       paradas_de_ruta: {

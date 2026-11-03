@@ -8,6 +8,42 @@
 -- pantalla.
 -- ============================================================
 
+-- ── QUÉ RUTAS PASAN POR CADA PARADA ──
+--
+-- No se guarda: se calcula desde el trazado. Una ruta pasa por una parada si su
+-- trazado queda a menos de `distancia_parada_trazado_m` de ella. Así el admin
+-- solo dibuja el recorrido y nunca asigna paradas a mano, y una parada donde
+-- paran tres rutas se registra una sola vez.
+--
+-- `avance` es la fracción del trazado (0 al inicio, 1 al final) en la que cae la
+-- parada: ordena las paradas en el sentido del recorrido sin guardar un orden.
+-- Una ruta circular que pasa dos veces por la misma parada la cuenta una vez, en
+-- el punto del trazado más cercano.
+--
+-- Una ruta sin trazado no pasa por ninguna parada: sin recorrido no hay forma de
+-- saber por dónde va.
+--
+-- security_invoker: respeta el RLS de quien consulta. El ciudadano ve solo las
+-- rutas activas, igual que si leyera las tablas directamente.
+create or replace view paradas_por_ruta
+with (security_invoker = true) as
+  select
+    r.id as ruta_id,
+    p.id as parada_id,
+    ST_LineLocatePoint(r.trazado::geometry, p.ubicacion::geometry) as avance
+  from rutas r
+  join paradas p
+    on ST_DWithin(
+         r.trazado,
+         p.ubicacion,
+         coalesce(
+           (select valor from parametros where clave = 'distancia_parada_trazado_m'),
+           40
+         )
+       )
+  where r.trazado is not null;
+
+
 -- ── PARADAS CERCANAS AL CIUDADANO ──
 --
 -- La cercanía la resuelve PostGIS con el índice GiST sobre paradas.ubicacion: el
@@ -17,6 +53,10 @@
 -- security invoker: respeta las políticas RLS de lectura pública, así que el
 -- ciudadano la llama sin autenticarse y no ve nada que no pudiera ver
 -- consultando las tablas directamente.
+--
+-- Devuelve una fila por cada ruta que pasa por la parada. Una parada por la que
+-- todavía no pasa ninguna ruta sale igual, con las columnas de ruta en null: el
+-- ciudadano la ve y sabe que existe, aunque no tenga servicio todavía.
 create or replace function paradas_cercanas(
   lat            double precision,
   lng            double precision,
@@ -54,14 +94,17 @@ as $$
     r.icono,
     r.color
   from paradas p
-  join rutas r on r.id = p.ruta_id
-  where r.activa
-    and ST_DWithin(
+  left join (
+    select pr.parada_id, ra.*
+    from paradas_por_ruta pr
+    join rutas ra on ra.id = pr.ruta_id and ra.activa
+  ) r on r.parada_id = p.id
+  where ST_DWithin(
           p.ubicacion,
           ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography,
           radio_max_m
         )
-  order by p.ubicacion <-> ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography
+  order by p.ubicacion <-> ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography, r.nombre
   limit limite;
 $$;
 
@@ -97,7 +140,7 @@ security invoker
 set search_path = public
 as $$
   with objetivo as (
-    select p.id, p.ubicacion, p.ruta_id
+    select p.id, p.ubicacion
     from paradas p
     where p.id = parada
   )
@@ -122,7 +165,8 @@ as $$
     r.icono,
     r.trazado is not null
   from objetivo o
-  join rutas r on r.id = o.ruta_id and r.activa
+  join paradas_por_ruta pr on pr.parada_id = o.id
+  join rutas r on r.id = pr.ruta_id and r.activa
   join unidades u on u.ruta_id = r.id and u.activa
   left join viajes v on v.unidad_id = u.id and v.finalizado_at is null
   left join lateral (
@@ -261,6 +305,8 @@ $$;
 
 
 -- ── PARADAS DE UNA RUTA (editor y detalle) ──
+--
+-- Las que toca su trazado, numeradas en el sentido del recorrido.
 create or replace function paradas_de_ruta(ruta uuid)
 returns table (
   parada_id        uuid,
@@ -279,14 +325,54 @@ as $$
   select
     p.id,
     p.nombre,
-    p.orden,
+    (row_number() over (order by pr.avance))::integer,
     ST_Y(p.ubicacion::geometry),
     ST_X(p.ubicacion::geometry),
     p.radio_geocerca_m,
     p.notifica
+  from paradas_por_ruta pr
+  join paradas p on p.id = pr.parada_id
+  where pr.ruta_id = ruta
+  order by pr.avance;
+$$;
+
+
+-- ── TODAS LAS PARADAS, CON LAS RUTAS QUE PASAN (catálogo del admin) ──
+--
+-- Las rutas van como arreglo JSON y no una fila por ruta: el admin edita la
+-- parada, no la combinación parada–ruta, y así cada parada llega una sola vez.
+create or replace function paradas_de_la_ciudad()
+returns table (
+  parada_id        uuid,
+  parada_nombre    text,
+  parada_lat       double precision,
+  parada_lng       double precision,
+  radio_geocerca_m integer,
+  rutas            jsonb
+)
+language sql
+stable
+security invoker
+set search_path = public
+as $$
+  select
+    p.id,
+    p.nombre,
+    ST_Y(p.ubicacion::geometry),
+    ST_X(p.ubicacion::geometry),
+    p.radio_geocerca_m,
+    coalesce(
+      jsonb_agg(
+        jsonb_build_object('id', r.id, 'nombre', r.nombre, 'color', r.color)
+        order by r.nombre
+      ) filter (where r.id is not null),
+      '[]'::jsonb
+    )
   from paradas p
-  where p.ruta_id = ruta
-  order by p.orden;
+  left join paradas_por_ruta pr on pr.parada_id = p.id
+  left join rutas r on r.id = pr.ruta_id
+  group by p.id
+  order by p.nombre;
 $$;
 
 
@@ -329,10 +415,12 @@ as $$
 $$;
 
 
--- El parametro lleva sufijo para no chocar con la columna homonima: `nombre` a secas
--- se resolvia como paradas.nombre y, al haber un max(), Postgres exigia un GROUP BY.
+-- La parada ya no pertenece a una ruta: la versión con `ruta` se borra para que
+-- el archivo se pueda volver a correr sobre una base vieja.
+-- El parámetro lleva sufijo para no chocar con la columna homónima.
+drop function if exists crear_parada(uuid, text, double precision, double precision, integer);
+
 create or replace function crear_parada(
-  ruta           uuid,
   nombre_parada  text,
   lat            double precision,
   lng            double precision,
@@ -344,11 +432,9 @@ volatile
 security invoker
 set search_path = public
 as $$
-  insert into paradas (ruta_id, nombre, orden, ubicacion, radio_geocerca_m)
+  insert into paradas (nombre, ubicacion, radio_geocerca_m)
   values (
-    ruta,
     nombre_parada,
-    (select coalesce(max(p.orden), 0) + 1 from paradas p where p.ruta_id = ruta),
     ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography,
     radio_m
   )
@@ -372,4 +458,52 @@ as $$
   set ubicacion = ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography,
       radio_geocerca_m = radio_m
   where id = parada;
+$$;
+
+
+-- ── RESUMEN DE HISTÓRICOS ──
+--
+-- La definición de cada indicador está explicada en 05_consultas_historicos.sql.
+-- Las paradas planificadas de un viaje son las que toca hoy el trazado de su
+-- ruta: si el trazado cambió después del viaje, la cobertura se mide contra el
+-- recorrido nuevo.
+create or replace function resumen_historicos(dias integer default 7)
+returns table (
+  viajes_completados    integer,
+  duracion_promedio_min numeric,
+  paradas_planificadas  integer,
+  paradas_visitadas     integer,
+  cobertura_pct         numeric,
+  incidencias           integer
+)
+language sql
+stable
+set search_path = public
+as $$
+  with rango as (
+    select now() - make_interval(days => dias) as desde
+  ),
+  viajes_periodo as (
+    select v.* from viajes v, rango where v.iniciado_at >= rango.desde
+  ),
+  planificadas as (
+    select v.id as viaje_id, pr.parada_id
+    from viajes_periodo v
+    join paradas_por_ruta pr on pr.ruta_id = v.ruta_id
+  ),
+  visitadas as (
+    select e.viaje_id, e.parada_id
+    from eventos_geocerca e
+    join planificadas pl
+      on pl.viaje_id = e.viaje_id and pl.parada_id = e.parada_id
+  )
+  select
+    (select count(*) from viajes_periodo where finalizado_at is not null)::integer,
+    (select round(avg(extract(epoch from (finalizado_at - iniciado_at)) / 60)::numeric, 1)
+     from viajes_periodo where finalizado_at is not null),
+    (select count(*) from planificadas)::integer,
+    (select count(*) from visitadas)::integer,
+    (select round(100.0 * (select count(*) from visitadas)
+                  / nullif((select count(*) from planificadas), 0), 1)),
+    (select count(*) from incidencias i, rango where i.creada_at >= rango.desde)::integer;
 $$;

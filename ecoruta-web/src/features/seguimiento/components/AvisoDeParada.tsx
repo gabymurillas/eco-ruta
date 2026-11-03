@@ -7,12 +7,14 @@ import {
   formatearDistancia,
   formatearHora,
 } from "@/domain/formato";
-import type { ParadaElegida } from "../types";
+import type { ParadaElegida, RutaEnParada } from "../types";
 
 type Props = {
   aviso: Aviso;
   parada: ParadaElegida;
   unidadNombre: string | null;
+  /** La ruta del viaje que generó el aviso: por una parada pueden pasar varias. */
+  ruta: Pick<RutaEnParada, "nombre" | "color" | "icono"> | null;
   radioAproximacionM: number;
   alDescartar: () => void;
 };
@@ -29,10 +31,8 @@ type Props = {
  * del mapa, no debajo.
  */
 export function AvisoDeParada(props: Props) {
-  const { aviso, parada, alDescartar } = props;
+  const { aviso, parada, ruta, alDescartar } = props;
   const viene = aviso.tipo === "acercandose";
-  // Una parada pertenece a una sola ruta (paradas.ruta_id).
-  const ruta = parada.rutas[0] ?? null;
 
   return (
     <div

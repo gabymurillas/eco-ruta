@@ -68,7 +68,8 @@ ecoruta/
 │   ├── 06_vinculacion.sql        ← canje del código (security definer)
 │   ├── 07_geocercas.sql          ← soporte PostGIS de la evaluación
 │   ├── 08_incidencia_otro.sql    ← tipo 'otro': observación libre del conductor
-│   └── 09_avisos_parada.sql      ← avisos al ciudadano (base ya existente; luego re-correr 07)
+│   ├── 09_avisos_parada.sql      ← avisos al ciudadano (base ya existente; luego re-correr 07)
+│   └── 10_paradas_de_ciudad.sql  ← paradas sin ruta (base ya existente; luego re-correr 04 y 07)
 ├── supabase/functions/
 │   ├── _dominio/                 ← reglas puras: telemetría, geocercas y avisos
 │   ├── vincular-dispositivo/     ← canje del código
@@ -135,7 +136,7 @@ cualquier consulta**.
 | Tabla | Rol |
 |---|---|
 | `rutas` | Recorrido, tipo de servicio, color, trazado (LineString) |
-| `paradas` | Puntos de la ruta + radio de geocerca |
+| `paradas` | Paradas de la ciudad + radio de geocerca. No pertenecen a una ruta |
 | `unidades` | Vehículos. Su servicio lo define la ruta a la que pertenecen |
 | `dispositivos` | Teléfono-baliza vinculado a una unidad; salud del equipo |
 | `viajes` | Un recorrido, de "iniciar" a "finalizar" |
@@ -153,6 +154,10 @@ cualquier consulta**.
   en la tabla `parametros`, **nunca hardcodeados**. Se ajustan tras la prueba de campo de GPS.
 - `eventos_geocerca` tiene `unique (viaje_id, parada_id)`. Esa restricción es la garantía final
   contra notificaciones duplicadas: aunque la lógica fallara, la base de datos la rechaza.
+- **Las paradas son de la ciudad, no de una ruta.** El admin las coloca una vez; qué rutas
+  pasan por cada una lo calcula la vista `paradas_por_ruta` desde el trazado (a menos de
+  `distancia_parada_trazado_m`, de `parametros`). No hay asignación manual. Una ruta sin
+  trazado no pasa por ninguna parada.
 - `rutas.tipo` es **texto libre a propósito**. El ente gestor registra el servicio que sea
   (transporte, aseo, agua, gas) sin que haya que tocar el esquema. La unidad no declara su tipo:
   lo hereda de su ruta.
