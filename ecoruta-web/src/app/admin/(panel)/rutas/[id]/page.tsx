@@ -3,17 +3,24 @@ import { notFound } from "next/navigation";
 import { trazadoALatLng } from "@/domain/mapa";
 import { EditorDeRuta } from "@/features/rutas/components/EditorDeRuta";
 import { obtenerParadasDeLaCiudad } from "@/services/catalogo-paradas.service";
-import { obtenerParadasDeRuta, obtenerRutaDeMapa } from "@/services/rutas.service";
+import {
+  obtenerParadasDeRuta,
+  obtenerPuntosClave,
+  obtenerRutaDeMapa,
+  obtenerViajesGrabados,
+} from "@/services/rutas.service";
 
 export const dynamic = "force-dynamic";
 
 export default async function EditorDeRutaPage({ params }: PageProps<"/admin/rutas/[id]">) {
   const { id } = await params;
 
-  const [ruta, paradas, ciudad] = await Promise.all([
+  const [ruta, paradas, ciudad, puntosClave, viajes] = await Promise.all([
     obtenerRutaDeMapa(id),
     obtenerParadasDeRuta(id),
     obtenerParadasDeLaCiudad(),
+    obtenerPuntosClave(id),
+    obtenerViajesGrabados(id),
   ]);
 
   if (!ruta.ok || !ruta.datos) {
@@ -75,6 +82,8 @@ export default async function EditorDeRutaPage({ params }: PageProps<"/admin/rut
           rutaId={id}
           color={ruta.datos.ruta_color}
           trazadoInicial={trazadoALatLng(ruta.datos.trazado_geojson)}
+          puntosClave={puntosClave.ok ? puntosClave.datos : []}
+          viajes={viajes.ok ? viajes.datos : []}
           paradasDeRuta={paradas.datos}
           paradasDeLaCiudad={ciudad.datos.map(({ id: paradaId, nombre, lat, lng }) => ({
             id: paradaId,

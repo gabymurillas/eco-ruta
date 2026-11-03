@@ -1,9 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import type { Punto } from "@/domain/mapa";
+import type { PuntoClave } from "@/domain/trazado";
 import {
   guardarTrazado,
   obtenerParadasDeRuta,
+  obtenerRecorridoDeViaje,
   type ParadaDeRuta,
 } from "@/services/rutas.service";
 
@@ -21,12 +24,13 @@ export type ResultadoTrazado =
 export async function guardarTrazadoDeRuta(
   rutaId: string,
   coordenadas: [number, number][],
+  puntosClave: PuntoClave[],
 ): Promise<ResultadoTrazado> {
   if (coordenadas.length === 1) {
     return { ok: false, error: "Un trazado necesita al menos dos puntos." };
   }
 
-  const guardado = await guardarTrazado(rutaId, coordenadas);
+  const guardado = await guardarTrazado(rutaId, coordenadas, puntosClave);
 
   if (!guardado.ok) {
     return { ok: false, error: guardado.error };
@@ -43,4 +47,12 @@ export async function guardarTrazadoDeRuta(
   return paradas.ok
     ? { ok: true, paradasDeRuta: paradas.datos }
     : { ok: false, error: "El trazado se guardó, pero no se pudieron cargar sus paradas. Recarga la página." };
+}
+
+/** Las posiciones de un viaje, para sacar de ellas el trazado. */
+export async function cargarRecorridoDeViaje(
+  viajeId: string,
+): Promise<{ ok: true; gps: Punto[] } | { ok: false; error: string }> {
+  const recorrido = await obtenerRecorridoDeViaje(viajeId);
+  return recorrido.ok ? { ok: true, gps: recorrido.datos } : { ok: false, error: recorrido.error };
 }

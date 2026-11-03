@@ -1,13 +1,19 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Link from "next/link";
+import { useState } from "react";
 import { AvisoFlotante } from "@/components/ui/AvisoFlotante";
 import { Boton } from "@/components/ui/Boton";
-import { Tarjeta } from "@/components/ui/Tarjeta";
 import type { Punto } from "@/domain/mapa";
-import { useEditorDeRuta, type ParadaDeRuta } from "../hooks/useEditorDeRuta";
+import {
+  useEditorDeRuta,
+  type ParadaDeRuta,
+  type PuntoClave,
+  type ViajeGrabado,
+} from "../hooks/useEditorDeRuta";
 import type { ParadaEnMapa } from "./LienzoEditor";
+import { PanelPuntosClave, ParadasQueToca } from "./PanelPuntosClave";
+import { PanelViajes } from "./PanelViajes";
 
 /** Leaflet toca `window` al importarse: el lienzo queda fuera del render del servidor. */
 const Lienzo = dynamic(
@@ -26,35 +32,75 @@ type Props = {
   rutaId: string;
   color: string | null;
   trazadoInicial: readonly Punto[];
+  puntosClave: readonly PuntoClave[];
   paradasDeRuta: readonly ParadaDeRuta[];
   /** Todas las de la ciudad: las que la ruta no toca se ven en gris. */
   paradasDeLaCiudad: readonly Omit<ParadaEnMapa, "orden">[];
+  viajes: readonly ViajeGrabado[];
 };
 
-export function EditorDeRuta({ rutaId, color, trazadoInicial, paradasDeRuta, paradasDeLaCiudad }: Props) {
-  const editor = useEditorDeRuta({ rutaId, trazadoInicial, paradasDeRutaIniciales: paradasDeRuta });
+type Modo = "puntos" | "viaje";
+
+export function EditorDeRuta(props: Props) {
+  const editor = useEditorDeRuta({
+    rutaId: props.rutaId,
+    trazadoInicial: props.trazadoInicial,
+    puntosClaveIniciales: props.puntosClave,
+    paradasDeRutaIniciales: props.paradasDeRuta,
+  });
+  const [modo, setModo] = useState<Modo>("puntos");
 
   const orden = new Map(editor.paradasDeRuta.map((p) => [p.parada_id, p.orden]));
-  const paradas = paradasDeLaCiudad.map((p) => ({ ...p, orden: orden.get(p.id) ?? null }));
+  const paradas = props.paradasDeLaCiudad.map((p) => ({ ...p, orden: orden.get(p.id) ?? null }));
+  const puedeGuardar =
+    editor.sinGuardar && editor.ocupado === "libre" && !editor.errorCamino && editor.puntos.length !== 1;
 
   return (
     <div className="flex h-full flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[13px] font-bold text-tinta-media">
-          Haz clic en el mapa para ir marcando el recorrido, calle por calle.
-        </span>
-        <div className="ml-auto">
+      <div className="flex flex-wrap items-center gap-3">
+        <EstadoDelTrazado editor={editor} />
+        <div className="ml-auto flex items-center gap-3">
           <AvisoFlotante aviso={editor.aviso} alCerrar={editor.cerrarAviso} />
+          <Boton onClick={editor.guardar} disabled={!puedeGuardar}>
+            {editor.ocupado === "guardando" ? "Guardando…" : "Guardar trazado"}
+          </Boton>
         </div>
       </div>
 
       <div className="flex min-h-0 flex-1 gap-5">
         <div className="min-w-0 flex-1 overflow-hidden rounded-2xl border-[0.5px] border-borde">
-          <Lienzo color={color} trazado={editor.trazado} paradas={paradas} onClicEnMapa={editor.agregarPunto} />
+          <Lienzo
+            color={props.color}
+            linea={editor.linea}
+            puntos={editor.puntos}
+            paradas={paradas}
+            onClicEnMapa={editor.agregarPunto}
+            onMoverPunto={editor.moverPunto}
+            onQuitarPunto={editor.quitarPunto}
+            onAlternarRecto={editor.alternarRecto}
+          />
         </div>
 
         <aside className="flex w-80 shrink-0 flex-col gap-4 overflow-y-auto">
-          <PanelTrazado editor={editor} />
+          <div
+            role="group"
+            aria-label="Cómo armar el trazado"
+            className="flex gap-1 rounded-full border-[0.5px] border-borde bg-superficie p-1"
+          >
+            <BotonModo activo={modo === "puntos"} onClick={() => setModo("puntos")}>
+              Puntos clave
+            </BotonModo>
+            <BotonModo activo={modo === "viaje"} onClick={() => setModo("viaje")}>
+              Desde un viaje
+            </BotonModo>
+          </div>
+
+          {modo === "puntos" ? (
+            <PanelPuntosClave editor={editor} />
+          ) : (
+            <PanelViajes viajes={props.viajes} editor={editor} alUsar={() => setModo("puntos")} />
+          )}
+
           <ParadasQueToca paradas={editor.paradasDeRuta} sinGuardar={editor.sinGuardar} />
         </aside>
       </div>
@@ -62,69 +108,40 @@ export function EditorDeRuta({ rutaId, color, trazadoInicial, paradasDeRuta, par
   );
 }
 
-type Editor = ReturnType<typeof useEditorDeRuta>;
-
-function PanelTrazado({ editor }: { editor: Editor }) {
-  return (
-    <Tarjeta className="flex flex-col gap-3">
-      <div className="flex items-baseline justify-between">
-        <h2 className="font-serif text-[15px] font-bold">Trazado</h2>
-        <span className="text-[13px] font-semibold text-tinta-media">{editor.trazado.length} puntos</span>
-      </div>
-
-      <p className="text-xs leading-relaxed text-tinta-media">
-        El trazado decide por qué paradas pasa la ruta y permite calcular el tiempo estimado.
-        No se guarda hasta que lo confirmes.
+function EstadoDelTrazado({ editor }: { editor: ReturnType<typeof useEditorDeRuta> }) {
+  if (editor.errorCamino) {
+    return (
+      <p role="alert" className="text-[13px] font-semibold text-error">
+        {editor.errorCamino}
       </p>
+    );
+  }
 
-      <div className="flex flex-col gap-2">
-        <Boton variante="secundario" onClick={editor.deshacerUltimoPunto} disabled={editor.trazado.length === 0}>
-          Deshacer último punto
-        </Boton>
-        <Boton variante="secundario" onClick={editor.limpiar} disabled={editor.trazado.length === 0}>
-          Borrar todo
-        </Boton>
-        <Boton onClick={editor.guardar} disabled={editor.guardando || !editor.sinGuardar}>
-          {editor.guardando ? "Guardando…" : "Guardar trazado"}
-        </Boton>
-      </div>
-    </Tarjeta>
+  const textos = {
+    calculando: "Calculando el camino por las calles…",
+    cargando_viaje: "Sacando el trazado del viaje…",
+    guardando: "Guardando…",
+    libre: editor.sinGuardar ? "Hay cambios sin guardar." : "Toca el mapa para agregar un punto. Arrastra un punto para moverlo.",
+  };
+
+  return (
+    <p role="status" className="text-[13px] font-bold text-tinta-media">
+      {textos[editor.ocupado]}
+    </p>
   );
 }
 
-function ParadasQueToca({ paradas, sinGuardar }: { paradas: readonly ParadaDeRuta[]; sinGuardar: boolean }) {
+function BotonModo({ activo, onClick, children }: { activo: boolean; onClick: () => void; children: string }) {
   return (
-    <Tarjeta className="flex flex-col gap-3">
-      <div className="flex items-baseline justify-between">
-        <h2 className="font-serif text-[15px] font-bold">Paradas por donde pasa</h2>
-        <span className="text-[13px] font-semibold text-tinta-media">{paradas.length}</span>
-      </div>
-
-      {sinGuardar && (
-        <p className="text-xs font-semibold text-advertencia-tinta">
-          Guarda el trazado para recalcular esta lista.
-        </p>
-      )}
-
-      {paradas.length === 0 ? (
-        <p className="text-xs leading-relaxed text-tinta-media">
-          El trazado no pasa cerca de ninguna parada. Llévalo por las calles donde están, o
-          agrega las paradas que faltan en{" "}
-          <Link href="/admin/paradas" className="font-bold text-marca-profundo underline">
-            Paradas
-          </Link>
-          .
-        </p>
-      ) : (
-        <ol className="flex flex-col gap-1">
-          {paradas.map((parada) => (
-            <li key={parada.parada_id} className="flex items-center gap-3 px-1 py-1">
-              <span className="w-5 text-xs font-bold text-tinta-suave">{parada.orden}</span>
-              <span className="flex-1 truncate text-[13px] font-semibold">{parada.parada_nombre}</span>
-            </li>
-          ))}
-        </ol>
-      )}
-    </Tarjeta>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={activo}
+      className={`h-9 flex-1 rounded-full text-[13px] font-bold transition-colors duration-300 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo ${
+        activo ? "bg-marca-profundo text-superficie" : "text-tinta-media hover:bg-marca-tenue"
+      }`}
+    >
+      {children}
+    </button>
   );
 }

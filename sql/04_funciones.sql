@@ -384,9 +384,18 @@ $$;
 --
 -- Sin `with check` explícito la política de admin de RLS ya rechaza la escritura
 -- a quien no tenga el rol, porque estas funciones son security invoker.
+-- `puntos` son los puntos clave del editor (ver rutas.puntos_clave). La línea la
+-- calcula el cliente con OSRM; aquí se guardan las dos cosas juntas para que
+-- nunca queden desparejadas.
+--
+-- La versión de dos argumentos se borra: sin ella, una llamada vieja guardaría
+-- la línea y dejaría puntos clave de otro recorrido.
+drop function if exists guardar_trazado_de_ruta(uuid, jsonb);
+
 create or replace function guardar_trazado_de_ruta(
   ruta         uuid,
-  coordenadas  jsonb
+  coordenadas  jsonb,
+  puntos       jsonb
 )
 returns void
 language sql
@@ -410,6 +419,10 @@ as $$
            ),
            4326
          )::geography
+  end,
+  puntos_clave = case
+    when jsonb_array_length(coordenadas) < 2 then null
+    else puntos
   end
   where id = ruta;
 $$;
@@ -506,4 +519,71 @@ as $$
     (select round(100.0 * (select count(*) from visitadas)
                   / nullif((select count(*) from planificadas), 0), 1)),
     (select count(*) from incidencias i, rango where i.creada_at >= rango.desde)::integer;
+$$;
+
+
+-- ── VIAJES GRABADOS DE UNA RUTA (trazado desde un viaje real) ──
+--
+-- Candidatos para sacar el trazado de lo que la unidad recorrió de verdad.
+-- `extension_m` es la distancia entre los dos puntos más alejados: un teléfono
+-- quieto acumula cientos de metros de deriva en `recorrido_m`, pero no se aleja
+-- de donde está. Es lo que delata una prueba de escritorio.
+create or replace function viajes_grabados(ruta uuid)
+returns table (
+  viaje_id      uuid,
+  iniciado_at   timestamptz,
+  finalizado_at timestamptz,
+  posiciones    integer,
+  recorrido_m   double precision,
+  extension_m   double precision
+)
+language sql
+stable
+security invoker
+set search_path = public
+as $$
+  select
+    v.id,
+    v.iniciado_at,
+    v.finalizado_at,
+    count(*)::integer,
+    ST_Length(ST_MakeLine(p.ubicacion::geometry order by p.capturado_at)::geography),
+    ST_Length(
+      ST_LongestLine(ST_Collect(p.ubicacion::geometry), ST_Collect(p.ubicacion::geometry))::geography
+    )
+  from viajes v
+  join posiciones p on p.viaje_id = v.id and p.usable
+  where v.ruta_id = viajes_grabados.ruta
+  group by v.id
+  having count(*) >= 2
+  order by v.iniciado_at desc
+  limit 20;
+$$;
+
+
+-- ── LO QUE RECORRIÓ UN VIAJE ──
+--
+-- Las posiciones usables en orden. Las malas ya quedaron fuera por el filtro de
+-- exactitud: dibujarlas metería saltos de cientos de metros.
+create or replace function recorrido_de_viaje(viaje uuid)
+returns table (
+  lat          double precision,
+  lng          double precision,
+  exactitud_m  numeric,
+  capturado_at timestamptz
+)
+language sql
+stable
+security invoker
+set search_path = public
+as $$
+  select
+    ST_Y(p.ubicacion::geometry),
+    ST_X(p.ubicacion::geometry),
+    p.exactitud_m,
+    p.capturado_at
+  from posiciones p
+  where p.viaje_id = recorrido_de_viaje.viaje
+    and p.usable
+  order by p.capturado_at;
 $$;

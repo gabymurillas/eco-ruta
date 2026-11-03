@@ -336,6 +336,7 @@ export type Database = {
           icono: string | null
           id: string
           nombre: string
+          puntos_clave: Json | null
           tipo: string | null
           trazado: unknown
         }
@@ -347,6 +348,7 @@ export type Database = {
           icono?: string | null
           id?: string
           nombre: string
+          puntos_clave?: Json | null
           tipo?: string | null
           trazado?: unknown
         }
@@ -358,6 +360,7 @@ export type Database = {
           icono?: string | null
           id?: string
           nombre?: string
+          puntos_clave?: Json | null
           tipo?: string | null
           trazado?: unknown
         }
@@ -844,7 +847,7 @@ export type Database = {
       geomfromewkt: { Args: { "": string }; Returns: unknown }
       gettransactionid: { Args: never; Returns: unknown }
       guardar_trazado_de_ruta: {
-        Args: { coordenadas: Json; ruta: string }
+        Args: { coordenadas: Json; puntos: Json; ruta: string }
         Returns: undefined
       }
       llegadas_a_parada: {
@@ -963,6 +966,15 @@ export type Database = {
       }
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
+      recorrido_de_viaje: {
+        Args: { viaje: string }
+        Returns: {
+          capturado_at: string
+          exactitud_m: number
+          lat: number
+          lng: number
+        }[]
+      }
       registrar_auth_de_dispositivo: {
         Args: { unidad: string; usuario: string }
         Returns: undefined
@@ -1584,6 +1596,17 @@ export type Database = {
           table_name: string
         }
         Returns: string
+      }
+      viajes_grabados: {
+        Args: { ruta: string }
+        Returns: {
+          extension_m: number
+          finalizado_at: string
+          iniciado_at: string
+          posiciones: number
+          recorrido_m: number
+          viaje_id: string
+        }[]
       }
       viajes_por_dia: {
         Args: { dias?: number }

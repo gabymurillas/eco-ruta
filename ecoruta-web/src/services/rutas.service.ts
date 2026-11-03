@@ -1,4 +1,6 @@
 import { crearClienteServidor } from "@/lib/supabase/server";
+import type { Punto } from "@/domain/mapa";
+import type { PuntoClave } from "@/domain/trazado";
 import type { Database } from "@/types/database";
 import { exito, fallo, type Resultado } from "./resultado";
 
@@ -148,17 +150,21 @@ export async function obtenerParadasDeRuta(
 /**
  * El trazado llega en orden GeoJSON [lng, lat]: la conversión desde Leaflet la hace
  * `domain/mapa`, y la geometría la arma PostGIS. Menos de dos puntos borra el trazado.
+ * Los puntos clave se guardan en la misma llamada: si no, una línea nueva podría
+ * quedar con los puntos de la anterior.
  */
 export async function guardarTrazado(
   rutaId: string,
   coordenadas: readonly [number, number][],
+  puntosClave: readonly PuntoClave[],
 ): Promise<Resultado<null>> {
   const supabase = await crearClienteServidor();
 
   const { error } = await supabase.rpc("guardar_trazado_de_ruta", {
     ruta: rutaId,
-    // Se copia porque el tipo generado del RPC espera un arreglo mutable (Json).
+    // Se copian porque el tipo generado del RPC espera arreglos mutables (Json).
     coordenadas: coordenadas.map(([lng, lat]) => [lng, lat]),
+    puntos: puntosClave.map(({ lat, lng, recto }) => ({ lat, lng, recto })),
   });
 
   if (error) {
@@ -166,4 +172,58 @@ export async function guardarTrazado(
   }
 
   return exito(null);
+}
+
+export async function obtenerPuntosClave(rutaId: string): Promise<Resultado<PuntoClave[]>> {
+  const supabase = await crearClienteServidor();
+  const { data, error } = await supabase
+    .from("rutas")
+    .select("puntos_clave")
+    .eq("id", rutaId)
+    .single();
+
+  if (error) {
+    return fallo("No se pudieron cargar los puntos del trazado.");
+  }
+
+  // jsonb llega sin tipo: la forma la fija `guardar_trazado_de_ruta`.
+  return exito((data.puntos_clave as PuntoClave[] | null) ?? []);
+}
+
+export type ViajeGrabado = {
+  id: string;
+  iniciadoAt: string;
+  finalizadoAt: string | null;
+  posiciones: number;
+  extensionM: number;
+};
+
+export async function obtenerViajesGrabados(rutaId: string): Promise<Resultado<ViajeGrabado[]>> {
+  const supabase = await crearClienteServidor();
+  const { data, error } = await supabase.rpc("viajes_grabados", { ruta: rutaId });
+
+  if (error) {
+    return fallo("No se pudieron cargar los viajes de la ruta.");
+  }
+
+  return exito(
+    (data ?? []).map((fila) => ({
+      id: fila.viaje_id,
+      iniciadoAt: fila.iniciado_at,
+      finalizadoAt: fila.finalizado_at,
+      posiciones: fila.posiciones,
+      extensionM: fila.extension_m,
+    })),
+  );
+}
+
+export async function obtenerRecorridoDeViaje(viajeId: string): Promise<Resultado<Punto[]>> {
+  const supabase = await crearClienteServidor();
+  const { data, error } = await supabase.rpc("recorrido_de_viaje", { viaje: viajeId });
+
+  if (error) {
+    return fallo("No se pudo cargar el recorrido del viaje.");
+  }
+
+  return exito((data ?? []).map(({ lat, lng }) => ({ lat, lng })));
 }

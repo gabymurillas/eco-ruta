@@ -69,7 +69,8 @@ ecoruta/
 │   ├── 07_geocercas.sql          ← soporte PostGIS de la evaluación
 │   ├── 08_incidencia_otro.sql    ← tipo 'otro': observación libre del conductor
 │   ├── 09_avisos_parada.sql      ← avisos al ciudadano (base ya existente; luego re-correr 07)
-│   └── 10_paradas_de_ciudad.sql  ← paradas sin ruta (base ya existente; luego re-correr 04 y 07)
+│   ├── 10_paradas_de_ciudad.sql  ← paradas sin ruta (base ya existente; luego re-correr 04 y 07)
+│   └── 11_trazado_asistido.sql   ← puntos clave del trazado (base ya existente; luego re-correr 04)
 ├── supabase/functions/
 │   ├── _dominio/                 ← reglas puras: telemetría, geocercas y avisos
 │   ├── vincular-dispositivo/     ← canje del código

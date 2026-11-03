@@ -17,6 +17,11 @@ create table rutas (
   icono         text,
   color         text not null,
   trazado       geography(LineString, 4326),
+  -- Los puntos que marcó el admin para que el trazado siga las calles solo:
+  -- [{lat, lng, recto}]. Guardarlos permite mover uno y recalcular, en vez de
+  -- redibujar la ruta. `recto` marca el tramo que llega a ese punto en línea
+  -- recta, para calles que el mapa no conoce. Nulo en un trazado sin puntos.
+  puntos_clave  jsonb,
   horario       text,
   activa        boolean not null default true,
   creada_at     timestamptz not null default now()
