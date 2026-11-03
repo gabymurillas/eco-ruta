@@ -19,7 +19,7 @@ export type Fase =
   | { tipo: "buscando" }
   | { tipo: "sin_ubicacion"; motivo: "negada" | "no_disponible" }
   | { tipo: "error"; mensaje: string }
-  | { tipo: "sin_paradas" }
+  | { tipo: "sin_paradas"; masCercana: ParadaConRutas | null }
   | { tipo: "selector"; paradas: ParadaConRutas[] }
   | { tipo: "parada"; parada: ParadaElegida };
 
@@ -32,7 +32,7 @@ export type Fase =
  * lee en silencio para mostrarle cuánto le toma caminar.
  */
 export function useMiParada() {
-  const { ubicacion, cercanas, pedirUbicacion } = useCercanas();
+  const { ubicacion, cercanas, masCercana, pedirUbicacion } = useCercanas();
   const [iniciado, setIniciado] = useState(false);
   const [guardada, setGuardada] = useState<ParadaGuardada | null>(null);
   const [cambiando, setCambiando] = useState(false);
@@ -69,7 +69,14 @@ export function useMiParada() {
   const elegida = conDistancia(guardada ?? paradas[0] ?? null, paradas);
 
   return {
-    fase: derivarFase({ iniciado, ubicacion, cercanas, elegida, cambiando }),
+    fase: derivarFase({
+      iniciado,
+      ubicacion,
+      cercanas,
+      masCercana,
+      elegida,
+      cambiando,
+    }),
     ubicacion,
     cercanas,
     elegida,
@@ -99,6 +106,7 @@ type Estado = {
   iniciado: boolean;
   ubicacion: EstadoDePedido;
   cercanas: Resultado<ParadaConRutas[]> | null;
+  masCercana: ParadaConRutas | null;
   elegida: ParadaElegida | null;
   cambiando: boolean;
 };
@@ -107,6 +115,7 @@ function derivarFase({
   iniciado,
   ubicacion,
   cercanas,
+  masCercana,
   elegida,
   cambiando,
 }: Estado): Fase {
@@ -126,10 +135,13 @@ function derivarFase({
     return { tipo: "sin_ubicacion", motivo: ubicacion.estado };
   }
 
-  return faseDeLaBusqueda(cercanas);
+  return faseDeLaBusqueda(cercanas, masCercana);
 }
 
-function faseDeLaBusqueda(cercanas: Resultado<ParadaConRutas[]> | null): Fase {
+function faseDeLaBusqueda(
+  cercanas: Resultado<ParadaConRutas[]> | null,
+  masCercana: ParadaConRutas | null,
+): Fase {
   if (cercanas === null) {
     return { tipo: "buscando" };
   }
@@ -139,6 +151,6 @@ function faseDeLaBusqueda(cercanas: Resultado<ParadaConRutas[]> | null): Fase {
   }
 
   return cercanas.datos.length === 0
-    ? { tipo: "sin_paradas" }
+    ? { tipo: "sin_paradas", masCercana }
     : { tipo: "selector", paradas: cercanas.datos };
 }

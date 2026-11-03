@@ -39,3 +39,20 @@ export async function buscarParadasCercanas({
 
   return exito(data ?? []);
 }
+
+/** Media vuelta al mundo: ninguna parada queda fuera, la busque donde la busque. */
+const RADIO_SIN_LIMITE_M = 20_000_000;
+
+/**
+ * La parada más cercana a cualquier distancia, para cuando no hay ninguna en el
+ * radio normal: decirle al ciudadano «la más cercana está a 4 km» le sirve más
+ * que un «no hay nada». Pide varias filas porque cada ruta de la parada es una.
+ */
+export function buscarParadaMasCercana(
+  coordenadas: Coordenadas,
+): Promise<Resultado<ParadaCercanaRow[]>> {
+  return buscarParadasCercanas({
+    ...coordenadas,
+    radioMaximoM: RADIO_SIN_LIMITE_M,
+  });
+}

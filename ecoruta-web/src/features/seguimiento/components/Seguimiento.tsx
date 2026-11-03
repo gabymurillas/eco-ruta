@@ -5,8 +5,10 @@ import { evaluarLlegada } from "@/domain/llegadas";
 import type { LlegadaRow } from "@/services/llegadas.service";
 import { useLlegadas } from "../hooks/useLlegadas";
 import { useMiParada, type Fase } from "../hooks/useMiParada";
+import type { ParadaConRutas } from "../types";
 import { Bienvenida } from "./Bienvenida";
 import { EstadoSinUbicacion } from "./EstadoSinUbicacion";
+import { ParadaMasLejos } from "./ParadaMasLejos";
 import { SelectorDeParada } from "./SelectorDeParada";
 import { VistaParada } from "./VistaParada";
 
@@ -99,7 +101,13 @@ function Contenido({
     case "sin_ubicacion":
     case "sin_paradas":
     case "error":
-      return <Contratiempo fase={fase} alVolver={volver} />;
+      return (
+        <Contratiempo
+          fase={fase}
+          alVolver={volver}
+          alElegir={miParada.elegir}
+        />
+      );
 
     case "selector":
       return (
@@ -137,9 +145,11 @@ type FaseContratiempo = Extract<
 function Contratiempo({
   fase,
   alVolver,
+  alElegir,
 }: {
   fase: FaseContratiempo;
   alVolver: (() => void) | null;
+  alElegir: (parada: ParadaConRutas) => void;
 }) {
   return (
     <>
@@ -151,6 +161,10 @@ function Contratiempo({
         <EstadoSinUbicacion
           motivo={fase.tipo === "sin_paradas" ? "sin_paradas" : fase.motivo}
         />
+      )}
+
+      {fase.tipo === "sin_paradas" && fase.masCercana && (
+        <ParadaMasLejos parada={fase.masCercana} alElegir={alElegir} />
       )}
 
       {alVolver && (
