@@ -1,11 +1,12 @@
 "use client";
 
-import { Circle, CircleMarker, Marker, Polyline, Tooltip, useMapEvents } from "react-leaflet";
+import { Circle, CircleMarker, Marker, Polyline, Tooltip, useMap, useMapEvents } from "react-leaflet";
 import { DivIcon, type LeafletMouseEvent } from "leaflet";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Mapa } from "@/components/mapa/Mapa";
 import { colorDeRuta } from "@/domain/colores";
-import type { Punto } from "@/domain/mapa";
+import { ZOOM_PARADA, type Punto } from "@/domain/mapa";
+import type { Destino, Ficha } from "../hooks/useEditorDeRuta";
 
 export type ParadaEditable = {
   id: string;
@@ -22,10 +23,12 @@ type Props = {
   paradas: readonly ParadaEditable[];
   trazado: readonly Punto[];
   modo: Modo;
-  paradaSeleccionada: string | null;
+  /** La parada abierta en la ficha: la única que se puede arrastrar. */
+  ficha: Ficha | null;
+  destino: Destino | null;
   onClicEnMapa: (punto: Punto) => void;
   onSeleccionarParada: (paradaId: string) => void;
-  onMoverParada: (paradaId: string, punto: Punto) => void;
+  onMoverFicha: (punto: Punto) => void;
 };
 
 export function LienzoEditor({
@@ -33,10 +36,11 @@ export function LienzoEditor({
   paradas,
   trazado,
   modo,
-  paradaSeleccionada,
+  ficha,
+  destino,
   onClicEnMapa,
   onSeleccionarParada,
-  onMoverParada,
+  onMoverFicha,
 }: Props) {
   const tono = colorDeRuta(color);
 
@@ -48,6 +52,7 @@ export function LienzoEditor({
   return (
     <Mapa encuadrar={encuadrar} className="size-full">
       <CapturarClics onClic={onClicEnMapa} />
+      <VolarA destino={destino} />
 
       {trazado.length >= 2 && (
         <Polyline
@@ -75,19 +80,54 @@ export function LienzoEditor({
           </CircleMarker>
         ))}
 
-      {paradas.map((parada) => (
+      {paradas
+        .filter((parada) => parada.id !== ficha?.paradaId)
+        .map((parada) => (
+          <ParadaEnEdicion
+            key={parada.id}
+            parada={parada}
+            tono={tono}
+            seleccionada={false}
+            arrastrable={false}
+            onSeleccionar={() => onSeleccionarParada(parada.id)}
+            onMover={() => undefined}
+          />
+        ))}
+
+      {ficha && (
         <ParadaEnEdicion
-          key={parada.id}
-          parada={parada}
+          parada={{ ...ficha, id: ficha.paradaId ?? "borrador" }}
           tono={tono}
-          seleccionada={parada.id === paradaSeleccionada}
-          arrastrable={modo === "paradas"}
-          onSeleccionar={() => onSeleccionarParada(parada.id)}
-          onMover={(punto) => onMoverParada(parada.id, punto)}
+          seleccionada
+          arrastrable
+          onSeleccionar={() => undefined}
+          onMover={onMoverFicha}
         />
-      ))}
+      )}
     </Mapa>
   );
+}
+
+/** Lleva el mapa al lugar elegido en el buscador o en la lista de paradas. */
+function VolarA({ destino }: { destino: Destino | null }) {
+  const mapa = useMap();
+
+  useEffect(() => {
+    if (!destino) {
+      return;
+    }
+
+    const zoom = Math.max(mapa.getZoom(), ZOOM_PARADA);
+    const sinMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (sinMovimiento) {
+      mapa.setView([destino.lat, destino.lng], zoom);
+    } else {
+      mapa.flyTo([destino.lat, destino.lng], zoom, { duration: 0.5 });
+    }
+  }, [destino, mapa]);
+
+  return null;
 }
 
 function CapturarClics({ onClic }: { onClic: (punto: Punto) => void }) {

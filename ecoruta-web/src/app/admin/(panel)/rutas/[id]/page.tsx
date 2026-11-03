@@ -93,7 +93,7 @@ export default async function EditorDeRutaPage({ params }: PageProps<"/admin/rut
           }))}
           trazadoInicial={trazadoALatLng(ruta.datos.trazado_geojson)}
           radioPorDefectoM={radioMinimoSugeridoM(exactitudMaximaM)}
-          exactitudMaximaM={exactitudMaximaM}
+          radioMinimoM={radioMinimoSugeridoM(exactitudMaximaM)}
         />
       </main>
     </>

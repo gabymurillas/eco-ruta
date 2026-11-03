@@ -27,18 +27,10 @@ type NuevaParada = {
 
 export async function agregarParada(datos: NuevaParada): Promise<ResultadoAccion> {
   const nombre = datos.nombre.trim();
+  const invalida = await validarParada(nombre, datos.radioM);
 
-  if (!nombre) {
-    return { ok: false, error: "La parada necesita un nombre." };
-  }
-
-  const minimo = await radioMinimoDelSistema();
-
-  if (datos.radioM < minimo) {
-    return {
-      ok: false,
-      error: `El radio no puede ser menor que ${minimo} m, el mínimo sugerido por la exactitud del GPS.`,
-    };
+  if (invalida) {
+    return invalida;
   }
 
   const resultado = await agregarParadaARuta({ ...datos, nombre });
@@ -51,47 +43,61 @@ export async function agregarParada(datos: NuevaParada): Promise<ResultadoAccion
   return { ok: true, paradaId: resultado.datos };
 }
 
-type CambioDeParada = {
-  rutaId: string;
+type ParadaEditada = NuevaParada & {
   paradaId: string;
-  lat: number;
-  lng: number;
-  radioM: number;
 };
 
-export async function moverParada({
+/**
+ * Guarda de una vez lo que el admin confirmó en la ficha: posición, radio y nombre.
+ * Son dos escrituras; si la segunda falla, la primera ya quedó y el admin reintenta
+ * con los mismos datos, así que repetirla no hace daño.
+ */
+export async function guardarParada({
   rutaId,
-  ...cambio
-}: CambioDeParada): Promise<ResultadoAccion> {
-  const resultado = await moverParadaDeRuta(cambio);
+  paradaId,
+  ...datos
+}: ParadaEditada): Promise<ResultadoAccion> {
+  const nombre = datos.nombre.trim();
+  const invalida = await validarParada(nombre, datos.radioM);
 
-  if (!resultado.ok) {
-    return { ok: false, error: resultado.error };
+  if (invalida) {
+    return invalida;
+  }
+
+  const movida = await moverParadaDeRuta({ paradaId, ...datos });
+
+  if (!movida.ok) {
+    return { ok: false, error: movida.error };
+  }
+
+  const renombrada = await renombrarParadaDeRuta(paradaId, nombre);
+
+  if (!renombrada.ok) {
+    return { ok: false, error: renombrada.error };
   }
 
   revalidarRuta(rutaId);
-  return { ok: true };
+  return { ok: true, paradaId };
 }
 
-export async function renombrarParada(
-  rutaId: string,
-  paradaId: string,
+async function validarParada(
   nombre: string,
-): Promise<ResultadoAccion> {
-  const limpio = nombre.trim();
-
-  if (!limpio) {
+  radioM: number,
+): Promise<ResultadoAccion | null> {
+  if (!nombre) {
     return { ok: false, error: "La parada necesita un nombre." };
   }
 
-  const resultado = await renombrarParadaDeRuta(paradaId, limpio);
+  const minimo = await radioMinimoDelSistema();
 
-  if (!resultado.ok) {
-    return { ok: false, error: resultado.error };
+  if (radioM < minimo) {
+    return {
+      ok: false,
+      error: `El radio no puede ser menor que ${minimo} m, el mínimo sugerido por la exactitud del GPS.`,
+    };
   }
 
-  revalidarRuta(rutaId);
-  return { ok: true };
+  return null;
 }
 
 export async function eliminarParada(
