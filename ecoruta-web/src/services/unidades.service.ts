@@ -4,7 +4,7 @@ import {
   construirCodigo,
   LONGITUD_CODIGO,
 } from "@/domain/vinculacion";
-import { exito, fallo, type Resultado } from "./resultado";
+import { exito, fallo, falloRegistrado, type Resultado } from "./resultado";
 
 export type UnidadConRuta = {
   id: string;
@@ -107,6 +107,24 @@ export async function generarCodigoDeVinculacion(
   }
 
   return exito({ codigo, expiraEn });
+}
+
+/**
+ * Borra la unidad y revoca la sesión de su teléfono en la misma transacción
+ * (`eliminar_unidad`, en sql/06_vinculacion.sql). Se hace en la base y no con dos
+ * llamadas desde aquí porque borrar la cuenta de Auth exige privilegios que la
+ * web no tiene, y porque a medias quedaría un teléfono con sesión apuntando a una
+ * unidad que ya no existe.
+ */
+export async function eliminarUnidad(unidadId: string): Promise<Resultado<null>> {
+  const supabase = await crearClienteServidor();
+  const { error } = await supabase.rpc("eliminar_unidad", { unidad: unidadId });
+
+  if (error) {
+    return falloRegistrado("eliminar_unidad", error, "No se pudo eliminar la unidad.");
+  }
+
+  return exito(null);
 }
 
 function aUnidadConRuta(fila: FilaUnidad): UnidadConRuta {

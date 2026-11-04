@@ -1,7 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { crearUnidad, generarCodigoDeVinculacion } from "@/services/unidades.service";
+import {
+  crearUnidad,
+  eliminarUnidad,
+  generarCodigoDeVinculacion,
+} from "@/services/unidades.service";
 
 export type EstadoUnidades = {
   error?: string;
@@ -41,6 +45,17 @@ export async function agregarUnidad(
   }
 
   const resultado = await crearUnidad(nombre, rutaId);
+
+  if (!resultado.ok) {
+    return { error: resultado.error };
+  }
+
+  revalidatePath("/admin/unidades");
+  return {};
+}
+
+export async function eliminar(unidadId: string): Promise<{ error?: string }> {
+  const resultado = await eliminarUnidad(unidadId);
 
   if (!resultado.ok) {
     return { error: resultado.error };

@@ -101,7 +101,8 @@ códigos por fuerza bruta.
    Si eso puede pasar en el despliegue real, léelo en vivo al iniciar recorrido
    (`GET unidades?id=eq.<id>&select=ruta_id`, lectura pública) y usa el del canje
    solo como respaldo sin red.
-4. La vinculación es **única y permanente** salvo que el admin genere un código nuevo.
+4. La vinculación es **única y permanente** salvo que el admin genere un código nuevo
+   o elimine la unidad (ver «Cuando el admin elimina la unidad»).
    No hay pantalla de «cerrar sesión»: el teléfono pertenece a la unidad, no a una persona.
 
 El código **se consume al canjearse**. Reintentar con el mismo código devuelve 401.
@@ -206,6 +207,23 @@ cuando la vinculación se completó pero el teléfono no llegó a levantar.
 
 Cadencia sugerida: la misma de `emision_detenido_s`. El umbral con el que el
 panel da por caído un equipo es `sin_senal_umbral_s`.
+
+### Cuando el admin elimina la unidad: 401 y fin de la vinculación
+
+Al eliminar una unidad desde el panel se borra también la cuenta de Auth del
+teléfono, con sus sesiones y su refresh token. Desde ese momento:
+
+- **El latido responde 401**
+  (`{"code":"dispositivo_revocado","message":"La unidad de este dispositivo ya no existe."}`).
+  Es lo primero que se entera, porque corre aunque no haya viaje.
+  `registrar-posicion` también responde 401.
+- **La renovación del token falla** con 400 o 401: la cuenta ya no existe.
+
+La app no necesita nada nuevo para esto. El `SessionAuthenticator` ya trata el
+401 renovando el token, y cuando Auth rechaza la renovación borra las
+credenciales y vuelve a la pantalla de vinculación con el aviso de sesión
+terminada. Lo que cambió es que antes el latido de una unidad borrada respondía
+204 sin tocar nada, y el teléfono seguía hasta una hora creyendo que transmitía.
 
 ### Las incidencias van por insert directo
 

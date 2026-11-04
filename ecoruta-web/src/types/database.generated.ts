@@ -703,6 +703,7 @@ export type Database = {
           }
         | { Args: { schema_name: string; table_name: string }; Returns: string }
         | { Args: { table_name: string }; Returns: string }
+      eliminar_unidad: { Args: { unidad: string }; Returns: undefined }
       enablelongtransactions: { Args: never; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       es_admin: { Args: never; Returns: boolean }

@@ -6,6 +6,7 @@ import { estaVigente } from "@/domain/vinculacion";
 import { IconoRuta } from "@/components/ui/IconoRuta";
 import type { UnidadConRuta } from "@/services/unidades.service";
 import { vincular, type EstadoUnidades } from "../acciones";
+import { ConfirmarEliminarUnidad } from "./ConfirmarEliminarUnidad";
 import { PanelVinculacion } from "./PanelVinculacion";
 
 type Props = {
@@ -17,11 +18,13 @@ const ESTADO_INICIAL: EstadoUnidades = {};
 export function TablaUnidades({ unidades }: Props) {
   const [estado, enviar, enviando] = useActionState(vincular, ESTADO_INICIAL);
   const [unidadElegida, setUnidadElegida] = useState<string | null>(null);
+  const [idAEliminar, setIdAEliminar] = useState<string | null>(null);
 
   const codigoActivo = estado.codigo;
   const unidadDelPanel = unidades.find(
     (unidad) => unidad.id === (codigoActivo?.unidadId ?? unidadElegida),
   );
+  const unidadAEliminar = unidades.find((unidad) => unidad.id === idAEliminar);
 
   return (
     <div className="flex flex-1 gap-6 overflow-hidden">
@@ -36,7 +39,7 @@ export function TablaUnidades({ unidades }: Props) {
               <Th>Ruta asignada</Th>
               <Th className="w-44">Dispositivo</Th>
               <Th className="w-32">Batería</Th>
-              <Th className="w-28 text-right">Acción</Th>
+              <Th className="w-48 text-right">Acción</Th>
             </tr>
           </thead>
 
@@ -79,10 +82,13 @@ export function TablaUnidades({ unidades }: Props) {
                   </span>
                 </Td>
 
-                <Td className="text-right">
+                <Td className="whitespace-nowrap text-right">
                   <form
                     action={enviar}
-                    onSubmit={() => setUnidadElegida(unidad.id)}
+                    onSubmit={() => {
+                      setIdAEliminar(null);
+                      setUnidadElegida(unidad.id);
+                    }}
                     className="inline"
                   >
                     <input type="hidden" name="unidadId" value={unidad.id} />
@@ -94,6 +100,14 @@ export function TablaUnidades({ unidades }: Props) {
                       {unidad.vinculado ? "Revincular" : "Vincular"}
                     </button>
                   </form>
+                  <button
+                    type="button"
+                    onClick={() => setIdAEliminar(unidad.id)}
+                    aria-label={`Eliminar ${unidad.nombre}`}
+                    className="ml-1 rounded-full px-2 py-1 text-[13px] font-bold text-error transition-colors duration-300 ease-out hover:bg-error/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error"
+                  >
+                    Eliminar
+                  </button>
                 </Td>
               </tr>
             ))}
@@ -114,7 +128,13 @@ export function TablaUnidades({ unidades }: Props) {
           </p>
         )}
 
-        {codigoActivo && unidadDelPanel ? (
+        {unidadAEliminar ? (
+          <ConfirmarEliminarUnidad
+            key={unidadAEliminar.id}
+            unidad={unidadAEliminar}
+            onTerminar={() => setIdAEliminar(null)}
+          />
+        ) : codigoActivo && unidadDelPanel ? (
           <form action={enviar}>
             <input type="hidden" name="unidadId" value={codigoActivo.unidadId} />
             <PanelVinculacion
