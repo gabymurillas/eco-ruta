@@ -1,5 +1,6 @@
 import { IndicadorKpi } from "@/components/ui/IndicadorKpi";
 import { bateriaEnAlerta, evaluarSalud } from "@/domain/flota";
+import { IndicadorEnVivo } from "@/features/monitoreo/components/IndicadorEnVivo";
 import { MapaFlota } from "@/features/monitoreo/components/MapaFlota";
 import { TarjetaIncidencia } from "@/features/monitoreo/components/TarjetaIncidencia";
 import { TarjetaUnidad } from "@/features/monitoreo/components/TarjetaUnidad";
@@ -76,6 +77,7 @@ export default async function MonitoreoPage() {
             {unidades.length} unidades registradas
           </p>
         </div>
+        <IndicadorEnVivo />
       </header>
 
       <div className="flex flex-1 flex-col gap-5 overflow-hidden p-7">

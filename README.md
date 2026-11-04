@@ -44,6 +44,7 @@ sql/04_funciones.sql
 sql/06_vinculacion.sql
 sql/07_geocercas.sql
 sql/08_incidencia_otro.sql
+sql/12_realtime_monitoreo.sql
 ```
 
 `sql/05_consultas_historicos.sql` no crea nada: documenta cómo se calcula cada indicador

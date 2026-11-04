@@ -59,11 +59,14 @@ export function LienzoFlota({
     puntos: trazadoALatLng(ruta.trazado),
   }));
 
-  const encuadrar: Punto[] = [
-    ...unidades.map(({ lat, lng }) => ({ lat, lng })),
+  // El encuadre sale de lo que no se mueve. Con las unidades dentro, cada
+  // posición nueva cambiaría el encuadre y el mapa saltaría cada pocos segundos
+  // mientras el gestor lo explora. Solo sin rutas ni paradas se encuadra la flota.
+  const fijos: Punto[] = [
     ...paradas.map(({ lat, lng }) => ({ lat, lng })),
     ...trazados.flatMap((ruta) => ruta.puntos),
   ];
+  const encuadrar = fijos.length > 0 ? fijos : unidades.map(({ lat, lng }) => ({ lat, lng }));
 
   return (
     <Mapa encuadrar={encuadrar} className="size-full">
