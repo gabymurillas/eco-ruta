@@ -22,3 +22,6 @@ ios/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Sesión del simulador de viajes (scripts/simular-viaje.mjs)
+.simulador.local.json
