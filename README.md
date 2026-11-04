@@ -5,16 +5,18 @@ recolección de desechos en San Juan de los Morros, Venezuela.
 
 Proyecto de grado — UNERG, Ingeniería en Informática.
 
-La documentación completa (arquitectura, modelo de datos, convenciones de código, estado del
-proyecto) vive en [`CLAUDE.md`](./CLAUDE.md). Este README es solo la guía rápida para arrancar.
+La documentación completa (visión, producto, diseño, arquitectura, trust & safety y legal) vive
+en [`docs/`](./docs/README.md). [`CLAUDE.md`](./CLAUDE.md) contiene las reglas para agentes de IA.
+Este README es solo la guía rápida para arrancar.
 
 ## Estructura
 
 ```
 ecoruta/
-├── CLAUDE.md            ← arquitectura y decisiones del proyecto
+├── CLAUDE.md            ← reglas para agentes de IA
+├── PRODUCT.md · DESIGN.md ← producto y sistema de diseño (impeccable)
 ├── sql/                 ← esquema, parámetros y RLS de Supabase
-├── docs/                ← contrato de vinculación con la app
+├── docs/                ← documentación del proyecto (fuente de verdad)
 ├── supabase/functions/  ← Edge Functions (Deno)
 └── ecoruta-web/         ← Next.js: seguimiento del ciudadano (público) + admin (/admin)
 ```

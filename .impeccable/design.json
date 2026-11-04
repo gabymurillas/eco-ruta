@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-04T20:00:00Z",
+  "title": "Design System: EcoRuta San Juan",
+  "extensions": {
+    "colorMeta": {
+      "terracota-morros": { "role": "primary", "displayName": "Terracota de los Morros", "canonical": "oklch(58% 0.17 35)", "tonalRamp": ["oklch(20% 0.06 35)", "oklch(30% 0.10 35)", "oklch(40% 0.13 35)", "oklch(48% 0.15 35)", "oklch(58% 0.17 35)", "oklch(70% 0.12 35)", "oklch(84% 0.06 35)", "oklch(95% 0.03 35)"] },
+      "crema-base": { "role": "neutral", "displayName": "Crema base", "canonical": "oklch(97% 0.015 75)", "tonalRamp": ["oklch(25% 0.02 60)", "oklch(48% 0.02 60)", "oklch(62% 0.02 60)", "oklch(85% 0.02 60)", "oklch(90% 0.015 60)", "oklch(95% 0.015 75)", "oklch(97% 0.015 75)", "oklch(99% 0.008 75)"] },
+      "ruta-teal": { "role": "secondary", "displayName": "Teal de río", "canonical": "oklch(52% 0.11 195)" },
+      "ruta-mostaza": { "role": "secondary", "displayName": "Mostaza de mercado", "canonical": "oklch(70% 0.14 75)" },
+      "ruta-ciruela": { "role": "secondary", "displayName": "Ciruela", "canonical": "oklch(48% 0.13 340)" },
+      "ruta-oliva": { "role": "secondary", "displayName": "Oliva de sabana", "canonical": "oklch(50% 0.1 145)" },
+      "ruta-indigo": { "role": "secondary", "displayName": "Índigo nocturno", "canonical": "oklch(48% 0.12 265)" },
+      "estado-en-vivo": { "role": "tertiary", "displayName": "Verde en vivo", "canonical": "oklch(52% 0.13 155)" },
+      "estado-error": { "role": "tertiary", "displayName": "Rojo profundo", "canonical": "oklch(48% 0.19 25)" },
+      "ubicacion-ciudadano": { "role": "tertiary", "displayName": "Azul ubicación", "canonical": "oklch(55% 0.15 250)" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Cifra de tiempo estimado y KPIs." },
+      "title": { "displayName": "Title", "purpose": "Nombre de ruta o unidad en tarjetas." },
+      "body": { "displayName": "Body", "purpose": "Texto de interfaz y datos." },
+      "label": { "displayName": "Label", "purpose": "Etiquetas de campo, sentence case." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease-estandar", "value": "300ms ease-out", "purpose": "Transiciones de estado; nunca rebote." },
+      { "name": "pulso-en-vivo", "value": "2s ease-out infinite (opacidad 1 → 0.35)", "purpose": "Halo de unidad transmitiendo. Desactivado con prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón primario",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal; terracota profundo para cumplir AA con texto claro.",
+      "html": "<button class=\"ds-btn-primario\">Iniciar sesión</button>",
+      "css": ".ds-btn-primario { display:inline-flex; align-items:center; justify-content:center; height:48px; min-width:48px; padding:0 20px; border:none; border-radius:999px; background:oklch(48% 0.15 35); color:oklch(99% 0.008 75); font:700 15px 'Source Sans 3', system-ui, sans-serif; transition:filter 300ms ease-out; cursor:pointer; } .ds-btn-primario:hover { filter:brightness(1.1); } .ds-btn-primario:focus-visible { outline:2px solid oklch(48% 0.15 35); outline-offset:2px; }"
+    },
+    {
+      "name": "Botón secundario",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Acción secundaria sobre crema.",
+      "html": "<button class=\"ds-btn-secundario\">Cambiar parada</button>",
+      "css": ".ds-btn-secundario { display:inline-flex; align-items:center; justify-content:center; height:48px; padding:0 20px; border:0.5px solid oklch(85% 0.02 60); border-radius:999px; background:oklch(99% 0.008 75); color:oklch(25% 0.02 60); font:700 15px 'Source Sans 3', system-ui, sans-serif; transition:background-color 300ms ease-out; cursor:pointer; } .ds-btn-secundario:hover { background:oklch(95% 0.03 35); } .ds-btn-secundario:focus-visible { outline:2px solid oklch(48% 0.15 35); outline-offset:2px; }"
+    },
+    {
+      "name": "Campo",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo con etiqueta real asociada.",
+      "html": "<label class=\"ds-campo\"><span>Nombre de la ruta</span><input placeholder=\"Centro – UNERG\"></label>",
+      "css": ".ds-campo { display:flex; flex-direction:column; gap:8px; font-family:'Source Sans 3', system-ui, sans-serif; } .ds-campo span { font-size:12px; font-weight:700; letter-spacing:0.025em; color:oklch(62% 0.02 60); } .ds-campo input { height:48px; padding:0 14px; border:0.5px solid oklch(85% 0.02 60); border-radius:10px; background:oklch(99% 0.008 75); color:oklch(25% 0.02 60); font:600 15px 'Source Sans 3', system-ui, sans-serif; } .ds-campo input:focus-visible { outline:2px solid oklch(48% 0.15 35); outline-offset:1px; }"
+    },
+    {
+      "name": "Chip de ruta",
+      "kind": "chip",
+      "description": "Punto del color de la ruta más su nombre; nunca el punto solo.",
+      "html": "<span class=\"ds-chip-ruta\"><i></i>Centro – UNERG</span>",
+      "css": ".ds-chip-ruta { display:inline-flex; align-items:center; gap:8px; height:32px; padding:0 12px; border-radius:999px; background:oklch(95% 0.03 195); color:oklch(25% 0.02 60); font:600 13px 'Source Sans 3', system-ui, sans-serif; } .ds-chip-ruta i { width:10px; height:10px; border-radius:999px; background:oklch(52% 0.11 195); }"
+    },
+    {
+      "name": "Tarjeta",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Superficie plana: el borde de 0.5 px define el contorno.",
+      "html": "<div class=\"ds-tarjeta\"><strong>Unidad 12</strong><p>Llega en ~6 min · tiempo estimado</p></div>",
+      "css": ".ds-tarjeta { padding:16px; border:0.5px solid oklch(85% 0.02 60); border-radius:12px; background:oklch(99% 0.008 75); color:oklch(25% 0.02 60); font-family:'Source Sans 3', system-ui, sans-serif; } .ds-tarjeta strong { font:900 19px Merriweather, Georgia, serif; letter-spacing:-0.025em; } .ds-tarjeta p { margin:4px 0 0; font-size:13px; color:oklch(48% 0.02 60); }"
+    },
+    {
+      "name": "Marcador de unidad",
+      "kind": "custom",
+      "refersTo": "unit-marker",
+      "description": "Círculo del color de la ruta con ícono; halo pulsante si transmite.",
+      "html": "<span class=\"ds-marcador\"><span class=\"ds-halo\"></span><span class=\"ds-nucleo\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"4\" y=\"3\" width=\"16\" height=\"14\" rx=\"3\"/><path d=\"M4 11h16M8 21v-4M16 21v-4\"/></svg></span></span>",
+      "css": ".ds-marcador { position:relative; display:inline-flex; width:40px; height:40px; } .ds-halo { position:absolute; inset:-6px; border-radius:999px; background:oklch(52% 0.11 195); opacity:.25; animation:ds-pulso 2s ease-out infinite; } .ds-nucleo { position:relative; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:999px; background:oklch(52% 0.11 195); border:3px solid oklch(99% 0.008 75); color:#fff; box-sizing:border-box; } @keyframes ds-pulso { 0%,100% { opacity:.25 } 50% { opacity:.08 } } @media (prefers-reduced-motion: reduce) { .ds-halo { animation:none; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "El mapa de la ciudad al atardecer",
+    "overview": "EcoRuta se ve como San Juan de los Morros a última hora de la tarde: crema cálido, terracota de los Morros y un mapa que ocupa el escenario mientras todo lo demás se retira. El carácter es cálido, local y sobrio; los componentes, suaves y amables.",
+    "keyCharacteristics": [
+      "Mapa protagonista; la interfaz flota sobre él en superficies crema planas.",
+      "Tres paletas con funciones que no se mezclan: marca, ruta y estado.",
+      "Serif Merriweather para nombres de ruta y cifras; Source Sans 3 para todo lo demás.",
+      "Plano por defecto: borde de 0.5 px, sin sombras.",
+      "Pensado para teléfonos de gama baja, con sol y con prisa: 48 px táctiles y contraste AA."
+    ],
+    "rules": [
+      { "name": "The Three Palettes Rule", "body": "El color de marca nunca es color de ruta ni de estado.", "section": "colors" },
+      { "name": "The Never Alone Rule", "body": "El color nunca es el único portador de significado.", "section": "colors" },
+      { "name": "The Deep Fill Rule", "body": "Todo relleno con texto blanco usa terracota profundo.", "section": "colors" },
+      { "name": "The Sentence Case Rule", "body": "Todo texto visible va en sentence case.", "section": "typography" },
+      { "name": "The Flat Rule", "body": "Si algo necesita destacar, sube de tono o gana un borde de estado; nunca una sombra.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do usar terracota profundo (oklch(48% 0.15 35)) en todo relleno con texto blanco.",
+      "Do acompañar cada color de ruta con su nombre y cada marcador con su ícono.",
+      "Do mantener objetivos táctiles de 48 px como mínimo y foco visible en todo control.",
+      "Do usar ease-out de 300–500 ms y desactivar la animación con prefers-reduced-motion.",
+      "Do colocar la foto de los Morros solo en zonas de identidad (ingreso del admin, Open Graph, portada) y el texto a su lado, nunca encima."
+    ],
+    "donts": [
+      "Don't usar el terracota para representar una ruta o un estado.",
+      "Don't agregar sombras, degradados ni glassmorphism en la web.",
+      "Don't poner la foto detrás de mapas, monitoreo, tablas, alertas ni estados vacíos.",
+      "Don't usar Inter, Roboto, Open Sans ni fuentes por defecto del sistema.",
+      "Don't escribir textos en TODO MAYÚSCULAS ni usar rebote en las animaciones.",
+      "Don't usar el azul de ubicación para nada que no sea el ciudadano."
+    ]
+  }
+}
