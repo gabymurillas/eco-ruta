@@ -17,7 +17,7 @@ anterior como «Reemplazado por ADR-XXXX».
 | [0009](0009-vinculacion-por-codigo.md) | Vinculación por código; claims en `app_metadata` | Aceptado |
 | [0010](0010-ciudadano-anonimo.md) | Ciudadano anónimo; preferencias en el navegador | Aceptado |
 | [0011](0011-eta-estimado-con-historial.md) | Tiempo estimado con historial por franja (versión mínima) | Propuesto |
-| [0012](0012-visibilidad-solo-en-servicio.md) | Unidades visibles solo durante un viaje activo | Aceptado, implementación pendiente |
+| [0012](0012-visibilidad-solo-en-servicio.md) | Unidades visibles solo durante un viaje activo | Aceptado e implementado |
 | [0013](0013-retencion-de-telemetria.md) | Retención de 90 días de la telemetría cruda | Aceptado, implementación pendiente |
 
 Plantilla para un ADR nuevo: copiar cualquiera, numerar en orden y agregarlo a esta tabla.

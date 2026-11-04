@@ -6,7 +6,7 @@ referencia (`TS-XX`) y su verificación.
 
 | ID | Brecha | Severidad | Requisito | Remediación propuesta | Estado |
 |---|---|---|---|---|---|
-| TS-01 | `publico_lee_posiciones` (`using (usable)`) y `publico_lee_viajes` (`using (true)`) exponen recorridos terminados. `recorrido_de_viaje` (invoker) permite reconstruir cualquier viaje desde la API pública | **Alta** | CIU-18 | Políticas: posiciones `usable and exists (viaje abierto)`; viajes `finalizado_at is null`. Verificar antes qué consume la web pública. Probar en un clúster desechable | Abierta |
+| TS-01 | `publico_lee_posiciones` (`using (usable)`) y `publico_lee_viajes` (`using (true)`) exponen recorridos terminados. `recorrido_de_viaje` (invoker) permite reconstruir cualquier viaje desde la API pública | **Alta** | CIU-18 | Políticas: posiciones `usable and exists (viaje abierto)`; viajes `finalizado_at is null`. Verificar antes qué consume la web pública. Probar en un clúster desechable | **Cerrada** (2026-11-04): `sql/13_exposicion_solo_en_servicio.sql`, probada en un clúster desechable |
 | TS-02 | No existe un borrado de posiciones con más de 90 días | Media | SIS-06 | Job con pg_cron después del agregado de velocidades; parámetro `retencion_posiciones_dias` | Abierta |
 | TS-03 | `incidencias.descripcion` (texto libre) es legible por `anon` aunque la web no la muestre | Media | — | Lectura pública por una vista sin `descripcion`, o un `grant` de columnas | Abierta |
 | TS-04 | Revocar un teléfono exige eliminar la unidad y su historial | Media | ADM-12 | Función `desvincular_dispositivo`: borra el usuario Auth y limpia `dispositivos` sin tocar la unidad | Abierta |

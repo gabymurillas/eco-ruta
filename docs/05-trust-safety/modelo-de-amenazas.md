@@ -33,7 +33,7 @@
 
 | ID | STRIDE | Amenaza | Control existente | Brecha |
 |---|---|---|---|---|
-| A1 | Information disclosure | Seguir unidades y reconstruir patrones de recorrido | Política de exposición (ADR-0012) | **TS-01**: la RLS pública no filtra por viaje activo |
+| A1 | Information disclosure | Seguir unidades y reconstruir patrones de recorrido | Política de exposición (ADR-0012); RLS pública limitada a viajes abiertos (`sql/13`) | — (TS-01 cerrada) |
 | A2 | Spoofing | Enviar telemetría falsa en nombre de una unidad | RLS por `app_metadata.unidad_id`; canje en el servidor; `service_role` fuera del APK | — |
 | A3 | Spoofing | Adivinar un código de vinculación | 5 caracteres, 10 minutos, un solo uso | Considerar un límite de intentos en `vincular-dispositivo` (TS-10) |
 | A4 | Elevation of privilege | Autonombrarse admin | El rol vive en `app_metadata` (solo servidor) | — |

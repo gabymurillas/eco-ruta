@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | Aceptado (implementación pendiente: brecha TS-01) |
+| Estado | Aceptado e implementado (`sql/13_exposicion_solo_en_servicio.sql`, cierra TS-01) |
 | Registrado | 2026-11-04 |
 | Responsable | Gabrieli Murillas Ramírez |
 
@@ -17,7 +17,8 @@ El público solo ve posiciones de viajes **abiertos** (`finalizado_at is null`) 
 ## Consecuencias
 
 - Hay que reescribir las políticas `publico_lee_posiciones` y `publico_lee_viajes` y revisar `recorrido_de_viaje` y Realtime (que respeta RLS).
-- Hay que verificar que la web pública no dependa de posiciones fuera de un viaje (por ejemplo, «última posición conocida» de una unidad detenida) antes de aplicar el cambio.
+- La web pública dibujaba unidades fuera de servicio en su última posición; con la política nueva `llegadas_a_parada` devuelve sus coordenadas nulas, la web las omite del mapa y las lista como «sin recorrido». No hizo falta cambiar la interfaz.
+- `registrar-posicion` inserta sin `RETURNING`: un lote atrasado que llega tras «finalizar» se sigue guardando.
 
 ## Alternativas descartadas
 

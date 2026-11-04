@@ -179,7 +179,7 @@ revoca la sesión del teléfono.
 | CIU-15 | **Portada (landing)** con la foto de los Morros: qué es, cómo funciona y botón para ver mi parada | P1 | ⬜ |
 | CIU-16 | **Detalle de ruta** `/ruta/[id]`: trazado, paradas, unidades en vivo y horario | P1 | ⬜ (maqueta `RutaDetalle`) |
 | CIU-17 | Vista previa al compartir (Open Graph) | P2 | ✅ |
-| CIU-18 | Mostrar al público solo unidades en viaje activo; sin recorridos pasados | P0 | ⬜ (brecha TS-01; ver [registro](../05-trust-safety/registro-de-brechas.md)) |
+| CIU-18 | Mostrar al público solo unidades en viaje activo; sin recorridos pasados | P0 | ✅ (cierra TS-01; `sql/13`) |
 
 ### 6.2 Web de administración (`ADM`)
 
@@ -298,7 +298,7 @@ al cálculo simple.
 | R2 | Sin datos reales antes de la defensa | Alta | Alto (CIU-09, métricas) | Simulador; prueba de campo planificada; respaldo al cálculo simple |
 | R3 | Sin respaldo institucional | Alta | Alto en H2 | Demostración y documentación para la alcaldía |
 | R4 | Costos recurrentes sin financiamiento | Alta | Medio | Planes gratuitos; alternativa de autoalojamiento documentada |
-| R5 | Exposición de unidades o choferes | Media | Alto | Política de exposición; brecha TS-01 priorizada |
+| R5 | Exposición de unidades o choferes | Media | Alto | Política de exposición; RLS limitada a viajes abiertos (TS-01 cerrada) |
 | R6 | Bloqueo por servicios públicos de terceros (OSM, OSRM, Photon) | Baja | Medio | Volumen bajo; URLs configurables |
 | R7 | Avisos limitados a la página abierta | Cierta | Medio | Explicación al ciudadano; push como trabajo futuro |
 | R8 | El chofer no inicia o no finaliza el viaje | Media | Alto | Dos botones; latido; monitoreo de unidades caídas |

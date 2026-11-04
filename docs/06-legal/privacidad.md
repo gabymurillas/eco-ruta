@@ -52,7 +52,7 @@ La posición publicada es la de un **vehículo de servicio público**, no la de 
 sistema no registra quién conduce. Aun así, como la posición de un vehículo puede revelar la de
 quien lo maneja:
 
-- Solo se muestra al público **mientras la unidad está en un viaje activo** (pendiente: TS-01).
+- Solo se muestra al público **mientras la unidad está en un viaje activo**.
 - Los recorridos pasados solo los ve el ente gestor.
 - No se usa para evaluar ni sancionar a los choferes.
 

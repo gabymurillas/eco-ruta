@@ -26,13 +26,26 @@ create policy publico_lee_paradas on paradas
 create policy publico_lee_unidades on unidades
   for select using (activa);
 
+-- Solo lo que circula ahora (ADR-0012, brecha TS-01): fuera de servicio una unidad
+-- desaparece del mapa publico, y los recorridos terminados no se pueden reconstruir.
+-- Publicar donde estuvo un vehiculo ayer revela patrones de quien lo maneja y no le
+-- sirve de nada a quien espera en la parada. El admin lo sigue viendo todo por
+-- admin_total_*.
 create policy publico_lee_posiciones on posiciones
-  for select using (usable);
+  for select using (
+    usable
+    and exists (
+      select 1 from viajes v
+      where v.id = posiciones.viaje_id
+        and v.finalizado_at is null
+    )
+  );
 
 -- Sin esto el ciudadano no distingue "va en camino" de "no hay recorrido activo":
--- el join a viajes le devuelve vacio y toda unidad parece detenida.
+-- el join a viajes le devuelve vacio y toda unidad parece detenida. Basta con los
+-- viajes abiertos: son los unicos que responden esa pregunta.
 create policy publico_lee_viajes on viajes
-  for select using (true);
+  for select using (finalizado_at is null);
 
 create policy publico_lee_incidencias on incidencias
   for select using (activa);

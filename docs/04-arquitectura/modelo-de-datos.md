@@ -70,15 +70,13 @@ Parámetros previstos por el PRD (todavía no existen): `eta_historico_min_viaje
 
 | Actor | Cómo se identifica | Puede |
 |---|---|---|
-| Público (`anon`) | Sin sesión | Leer rutas y unidades activas, paradas, posiciones usables, viajes, incidencias activas, avisos y parámetros |
+| Público (`anon`) | Sin sesión | Leer rutas y unidades activas, paradas, posiciones usables **de viajes abiertos**, viajes abiertos, incidencias activas, avisos y parámetros |
 | Dispositivo | JWT con `app_metadata.unidad_id` | Insertar posiciones e incidencias de **su** unidad; gestionar **sus** viajes |
 | Admin | JWT con `app_metadata.rol = 'admin'` | Todo |
 
 `app_metadata` solo se escribe desde el servidor; `user_metadata` nunca autoriza nada.
 
-> ⚠️ **Brecha TS-01.** La lectura pública de `posiciones` y `viajes` no se limita a los viajes
-> activos, lo que contradice la [política de exposición](../05-trust-safety/politica-de-exposicion.md).
-> Ver el [registro de brechas](../05-trust-safety/registro-de-brechas.md).
+La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 
 ## 5. Funciones y vistas
 
@@ -100,5 +98,5 @@ Parámetros previstos por el PRD (todavía no existen): `eta_historico_min_viaje
 
 `01_schema` → `02_parametros` → `03_rls` → `04_funciones` → `06_vinculacion` → `07_geocercas`
 → `08_incidencia_otro` → `09_avisos_parada` → `10_paradas_de_ciudad` → `11_trazado_asistido` →
-`12_realtime_monitoreo`. `05_consultas_historicos` es documentación. Se aplican a mano en
+`12_realtime_monitoreo` → `13_exposicion_solo_en_servicio`. `05_consultas_historicos` es documentación. Se aplican a mano en
 Supabase.
