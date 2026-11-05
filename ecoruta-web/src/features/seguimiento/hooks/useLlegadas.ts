@@ -9,8 +9,24 @@ import { obtenerLlegadas, type LlegadaRow } from "@/services/llegadas.service";
  */
 const SEGUNDOS_ENTRE_REFRESCOS = 15;
 
-export function useLlegadas(paradaId: string | null): LlegadaRow[] {
-  const [llegadas, setLlegadas] = useState<LlegadaRow[]>([]);
+export type EstadoLlegadas = {
+  /** Null hasta la primera respuesta buena: «cargando» no es «no hay unidades». */
+  llegadas: LlegadaRow[] | null;
+  /**
+   * Mensaje del último refresco fallido. Las llegadas anteriores se conservan:
+   * con mala señal es mejor un dato de hace 15 s, avisado, que una pantalla vacía.
+   * El refresco periódico ya es el reintento.
+   */
+  falla: string | null;
+};
+
+const SIN_DATOS: EstadoLlegadas = { llegadas: null, falla: null };
+
+export function useLlegadas(paradaId: string | null): EstadoLlegadas {
+  const [estado, setEstado] = useState<EstadoLlegadas & { paradaId: string | null }>({
+    ...SIN_DATOS,
+    paradaId,
+  });
 
   useEffect(() => {
     if (!paradaId) {
@@ -21,9 +37,18 @@ export function useLlegadas(paradaId: string | null): LlegadaRow[] {
 
     const refrescar = () => {
       obtenerLlegadas(paradaId).then((resultado) => {
-        if (vigente && resultado.ok) {
-          setLlegadas(resultado.datos);
+        if (!vigente) {
+          return;
         }
+
+        setEstado((anterior) => {
+          const llegadasPrevias =
+            anterior.paradaId === paradaId ? anterior.llegadas : null;
+
+          return resultado.ok
+            ? { llegadas: resultado.datos, falla: null, paradaId }
+            : { llegadas: llegadasPrevias, falla: resultado.error, paradaId };
+        });
       });
     };
 
@@ -36,5 +61,6 @@ export function useLlegadas(paradaId: string | null): LlegadaRow[] {
     };
   }, [paradaId]);
 
-  return llegadas;
+  // Al cambiar de parada, lo de la anterior no se muestra ni un instante.
+  return estado.paradaId === paradaId ? estado : SIN_DATOS;
 }

@@ -5,6 +5,7 @@ import { evaluarLlegada } from "@/domain/llegadas";
 import type { LlegadaRow } from "@/services/llegadas.service";
 import { useAvisoLimitaciones } from "../hooks/useAvisoLimitaciones";
 import { useAvisosDeParada } from "../hooks/useAvisosDeParada";
+import type { EstadoLlegadas } from "../hooks/useLlegadas";
 import type { ParadaConRutas, ParadaElegida, Ubicacion } from "../types";
 import { AvisoDeParada } from "./AvisoDeParada";
 import { AvisoLimitaciones } from "./AvisoLimitaciones";
@@ -34,7 +35,7 @@ type Props = {
   /** Las de alrededor se dibujan en el mapa para que el ciudadano se ubique. */
   otrasParadas: readonly ParadaConRutas[];
   ubicacion: Ubicacion | null;
-  llegadas: readonly LlegadaRow[];
+  llegadas: EstadoLlegadas;
   umbralSinSenalS: number;
   radioAproximacionM: number;
   penalizacionIncidenciaPct: number;
@@ -42,7 +43,8 @@ type Props = {
 };
 
 export function VistaParada(props: Props) {
-  const { parada, llegadas, umbralSinSenalS, alCambiar } = props;
+  const { parada, umbralSinSenalS, alCambiar } = props;
+  const llegadas = props.llegadas.llegadas ?? [];
   const { avisos, descartar } = useAvisosDeParada(parada.paradaId);
   const limitaciones = useAvisoLimitaciones();
 
@@ -80,7 +82,7 @@ export function VistaParada(props: Props) {
         </p>
       ) : (
         <ListaLlegadas
-          llegadas={llegadas}
+          estado={props.llegadas}
           umbralSinSenalS={umbralSinSenalS}
           penalizacionIncidenciaPct={props.penalizacionIncidenciaPct}
         />

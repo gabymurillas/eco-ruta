@@ -1,3 +1,4 @@
+import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import Link from "next/link";
 import { IconoRuta } from "@/components/ui/IconoRuta";
 import { colorDeRuta, tintaSobreColorDeRuta } from "@/domain/colores";
@@ -13,13 +14,7 @@ export default async function RutasPage() {
   const resultado = await obtenerRutas();
 
   if (!resultado.ok) {
-    return (
-      <main className="flex flex-1 items-center justify-center p-7">
-        <p role="alert" className="font-serif text-lg font-bold text-error">
-          {resultado.error}
-        </p>
-      </main>
-    );
+    return <FallaDeCarga mensaje={resultado.error} />;
   }
 
   const rutas = resultado.datos;

@@ -1,3 +1,4 @@
+import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import { FormularioUnidad } from "@/features/unidades/components/FormularioUnidad";
 import { TablaUnidades } from "@/features/unidades/components/TablaUnidades";
 import { obtenerRutas } from "@/services/rutas.service";
@@ -13,13 +14,7 @@ export default async function UnidadesPage() {
   const [resultado, rutas] = await Promise.all([obtenerUnidades(), obtenerRutas()]);
 
   if (!resultado.ok) {
-    return (
-      <main className="flex flex-1 items-center justify-center p-7">
-        <p role="alert" className="font-serif text-lg font-bold text-error">
-          {resultado.error}
-        </p>
-      </main>
-    );
+    return <FallaDeCarga mensaje={resultado.error} />;
   }
 
   const unidades = resultado.datos;

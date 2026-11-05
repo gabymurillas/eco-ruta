@@ -1,3 +1,4 @@
+import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import { trazadoALatLng } from "@/domain/mapa";
 import { radioMinimoSugeridoM } from "@/domain/parametros";
 import { EditorDeParadas } from "@/features/paradas/components/EditorDeParadas";
@@ -21,13 +22,7 @@ export default async function ParadasPage() {
   ]);
 
   if (!paradas.ok) {
-    return (
-      <main className="flex flex-1 items-center justify-center p-7">
-        <p role="alert" className="font-serif text-lg font-bold text-error">
-          {paradas.error}
-        </p>
-      </main>
-    );
+    return <FallaDeCarga mensaje={paradas.error} />;
   }
 
   const exactitudMaximaM = parametros.ok

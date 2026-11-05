@@ -1,3 +1,4 @@
+import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { radioMinimoSugeridoM } from "@/domain/parametros";
@@ -16,13 +17,7 @@ export default async function DatosDeRutaPage({
   const [rutas, parametros] = await Promise.all([obtenerRutas(), obtenerParametros()]);
 
   if (!rutas.ok) {
-    return (
-      <main className="flex flex-1 items-center justify-center p-7">
-        <p role="alert" className="font-serif text-lg font-bold text-error">
-          {rutas.error}
-        </p>
-      </main>
-    );
+    return <FallaDeCarga mensaje={rutas.error} />;
   }
 
   const ruta = rutas.datos.find((candidata) => candidata.id === id);

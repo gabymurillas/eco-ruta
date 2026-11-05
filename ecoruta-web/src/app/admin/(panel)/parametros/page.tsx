@@ -1,3 +1,4 @@
+import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import { FormularioParametros } from "@/features/parametros/components/FormularioParametros";
 import { obtenerParametros } from "@/services/parametros.service";
 
@@ -9,12 +10,7 @@ export default async function ParametrosPage() {
   const resultado = await obtenerParametros();
 
   if (!resultado.ok) {
-    return (
-      <EncabezadoConMensaje
-        mensaje={resultado.error}
-        detalle="Vuelve a cargar la página. Si persiste, revisa la conexión con Supabase."
-      />
-    );
+    return <FallaDeCarga mensaje={resultado.error} />;
   }
 
   const valores = Object.fromEntries(
@@ -40,24 +36,5 @@ export default async function ParametrosPage() {
         </div>
       </main>
     </>
-  );
-}
-
-function EncabezadoConMensaje({
-  mensaje,
-  detalle,
-}: {
-  mensaje: string;
-  detalle: string;
-}) {
-  return (
-    <main className="flex flex-1 items-center justify-center p-7">
-      <div className="flex max-w-md flex-col gap-2 text-center">
-        <p role="alert" className="font-serif text-lg font-bold text-error">
-          {mensaje}
-        </p>
-        <p className="text-sm text-tinta-media">{detalle}</p>
-      </div>
-    </main>
   );
 }

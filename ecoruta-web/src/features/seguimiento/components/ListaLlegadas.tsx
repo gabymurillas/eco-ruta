@@ -9,16 +9,47 @@ import {
   type TiempoLlegada,
 } from "@/domain/llegadas";
 import type { LlegadaRow } from "@/services/llegadas.service";
+import type { EstadoLlegadas } from "../hooks/useLlegadas";
 
-type Props = {
-  llegadas: readonly LlegadaRow[];
+type Ajustes = {
   umbralSinSenalS: number;
   penalizacionIncidenciaPct: number;
 };
 
-type PropsFila = Omit<Props, "llegadas"> & { llegada: LlegadaRow };
+type Props = Ajustes & { estado: EstadoLlegadas };
 
-export function ListaLlegadas({ llegadas, ...ajustes }: Props) {
+type PropsFila = Ajustes & { llegada: LlegadaRow };
+
+export function ListaLlegadas({ estado, ...ajustes }: Props) {
+  const { llegadas, falla } = estado;
+
+  if (llegadas === null) {
+    return falla ? (
+      <p className="text-sm leading-relaxed text-error" role="alert">
+        No pudimos cargar las llegadas. Lo volvemos a intentar solo en unos
+        segundos; revisa tu conexión.
+      </p>
+    ) : (
+      <p className="text-sm text-tinta-media" role="status">
+        Buscando unidades en camino…
+      </p>
+    );
+  }
+
+  return (
+    <>
+      {falla && (
+        <p className="text-xs font-semibold text-advertencia-tinta" role="status">
+          No pudimos actualizar. Lo que ves puede estar atrasado; seguimos
+          intentando.
+        </p>
+      )}
+      <Filas llegadas={llegadas} {...ajustes} />
+    </>
+  );
+}
+
+function Filas({ llegadas, ...ajustes }: Ajustes & { llegadas: readonly LlegadaRow[] }) {
   if (llegadas.length === 0) {
     return (
       <p className="text-sm leading-relaxed text-tinta-media">

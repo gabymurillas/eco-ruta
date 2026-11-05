@@ -1,3 +1,4 @@
+import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import { IndicadorKpi } from "@/components/ui/IndicadorKpi";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { GraficoViajesPorDia } from "@/features/historicos/components/GraficoViajesPorDia";
@@ -18,13 +19,7 @@ export default async function HistoricosPage() {
   ]);
 
   if (!resumen.ok) {
-    return (
-      <main className="flex flex-1 items-center justify-center p-7">
-        <p role="alert" className="font-serif text-lg font-bold text-error">
-          {resumen.error}
-        </p>
-      </main>
-    );
+    return <FallaDeCarga mensaje={resumen.error} />;
   }
 
   const datos = resumen.datos;

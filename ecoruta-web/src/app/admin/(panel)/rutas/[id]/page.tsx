@@ -1,3 +1,4 @@
+import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { trazadoALatLng } from "@/domain/mapa";
@@ -28,13 +29,7 @@ export default async function EditorDeRutaPage({ params }: PageProps<"/admin/rut
   }
 
   if (!paradas.ok || !ciudad.ok) {
-    return (
-      <main className="flex flex-1 items-center justify-center p-7">
-        <p role="alert" className="font-serif text-lg font-bold text-error">
-          {paradas.ok ? (ciudad.ok ? null : ciudad.error) : paradas.error}
-        </p>
-      </main>
-    );
+    return <FallaDeCarga mensaje={paradas.ok ? (ciudad.ok ? "" : ciudad.error) : paradas.error} />;
   }
 
   return (

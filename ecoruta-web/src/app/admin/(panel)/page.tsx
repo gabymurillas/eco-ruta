@@ -1,3 +1,4 @@
+import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import { IndicadorKpi } from "@/components/ui/IndicadorKpi";
 import { bateriaEnAlerta, evaluarSalud } from "@/domain/flota";
 import { IndicadorEnVivo } from "@/features/monitoreo/components/IndicadorEnVivo";
@@ -26,13 +27,7 @@ export default async function MonitoreoPage() {
   ]);
 
   if (!flota.ok) {
-    return (
-      <main className="flex flex-1 items-center justify-center p-7">
-        <p role="alert" className="font-serif text-lg font-bold text-error">
-          {flota.error}
-        </p>
-      </main>
-    );
+    return <FallaDeCarga mensaje={flota.error} />;
   }
 
   const valores = parametros.ok

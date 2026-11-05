@@ -2,8 +2,7 @@
 
 import { Boton } from "@/components/ui/Boton";
 import { evaluarLlegada } from "@/domain/llegadas";
-import type { LlegadaRow } from "@/services/llegadas.service";
-import { useLlegadas } from "../hooks/useLlegadas";
+import { useLlegadas, type EstadoLlegadas } from "../hooks/useLlegadas";
 import { useMiParada, type Fase } from "../hooks/useMiParada";
 import type { ParadaConRutas } from "../types";
 import { Bienvenida } from "./Bienvenida";
@@ -69,7 +68,7 @@ export function Seguimiento({
 
 type PropsContenido = {
   miParada: ReturnType<typeof useMiParada>;
-  llegadas: readonly LlegadaRow[];
+  llegadas: EstadoLlegadas;
   umbralSinSenalS: number;
   radioAproximacionM: number;
   penalizacionIncidenciaPct: number;
@@ -89,8 +88,14 @@ function Contenido({
   const volver = elegida ? miParada.cerrarSelector : null;
 
   switch (fase.tipo) {
+    // Es lo que llega en el HTML del servidor: con mala señal se ve hasta que
+    // termina de bajar el JavaScript, así que no puede ser una hoja en blanco.
     case "cargando":
-      return null;
+      return (
+        <p className="text-sm text-tinta-media" role="status">
+          Cargando tu parada…
+        </p>
+      );
 
     case "bienvenida":
     case "buscando":
@@ -114,6 +119,7 @@ function Contenido({
           fase={fase}
           alVolver={volver}
           alElegir={miParada.elegir}
+          alReintentar={miParada.pedirUbicacion}
         />
       );
 
@@ -155,10 +161,12 @@ function Contratiempo({
   fase,
   alVolver,
   alElegir,
+  alReintentar,
 }: {
   fase: FaseContratiempo;
   alVolver: (() => void) | null;
   alElegir: (parada: ParadaConRutas) => void;
+  alReintentar: () => void;
 }) {
   return (
     <>
@@ -176,6 +184,12 @@ function Contratiempo({
         <ParadaMasLejos parada={fase.masCercana} alElegir={alElegir} />
       )}
 
+      {fase.tipo === "error" && (
+        <Boton onClick={alReintentar} className="self-start">
+          Intentar de nuevo
+        </Boton>
+      )}
+
       {alVolver && (
         <Boton variante="fantasma" onClick={alVolver} className="self-start">
           Volver a mi parada
@@ -185,10 +199,15 @@ function Contratiempo({
   );
 }
 
+/** Con el último refresco fallido no se puede afirmar «en vivo». */
 function hayUnidadEnVivo(
-  llegadas: readonly LlegadaRow[],
+  { llegadas, falla }: EstadoLlegadas,
   umbralSinSenalS: number,
 ): boolean {
+  if (falla || !llegadas) {
+    return false;
+  }
+
   return llegadas.some(
     (llegada) =>
       evaluarLlegada({
