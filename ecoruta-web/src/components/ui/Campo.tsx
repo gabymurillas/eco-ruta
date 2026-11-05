@@ -29,7 +29,7 @@ export function Campo({ etiqueta, ayuda, error, id, className = "", ...props }: 
         aria-describedby={[idAyuda, idError].filter(Boolean).join(" ") || undefined}
         aria-invalid={error ? true : undefined}
         className={`h-12 rounded-[10px] border-[0.5px] bg-superficie px-3.5 text-[15px] font-semibold text-tinta transition-colors duration-300 ease-out placeholder:font-normal placeholder:text-tinta-suave focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-marca-profundo ${
-          error ? "border-error" : "border-borde"
+          error ? "border-error" : "border-borde-campo"
         } ${className}`}
         {...props}
       />

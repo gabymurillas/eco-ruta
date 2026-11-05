@@ -51,7 +51,7 @@ export function FormularioUnidad({ rutas }: Props) {
             id="rutaId"
             name="rutaId"
             defaultValue=""
-            className="h-12 rounded-[10px] border-[0.5px] border-borde bg-superficie px-3 text-[15px] font-semibold text-tinta focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-marca-profundo"
+            className="h-12 rounded-[10px] border-[0.5px] border-borde-campo bg-superficie px-3 text-[15px] font-semibold text-tinta focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-marca-profundo"
           >
             <option value="">Sin asignar</option>
             {rutas.map((ruta) => (

@@ -6,9 +6,10 @@ colors:
   crema-elevada: "oklch(99% 0.008 75)"
   borde-arena: "oklch(85% 0.02 60)"
   borde-arena-suave: "oklch(90% 0.015 60)"
+  borde-campo: "oklch(63% 0.02 60)"
   tinta-tierra: "oklch(25% 0.02 60)"
   tinta-tierra-media: "oklch(48% 0.02 60)"
-  tinta-tierra-suave: "oklch(62% 0.02 60)"
+  tinta-tierra-suave: "oklch(53% 0.02 60)"
   terracota-morros: "oklch(58% 0.17 35)"
   terracota-profundo: "oklch(48% 0.15 35)"
   terracota-tenue: "oklch(95% 0.03 35)"
@@ -179,10 +180,13 @@ El admin asigna uno por ruta. Se distinguen **por tono, no por saturación**.
 - **Crema base** (oklch(97% 0.015 75)): fondo de toda página.
 - **Crema elevada** (oklch(99% 0.008 75)): tarjetas, campos y paneles sobre el mapa.
 - **Borde arena** (oklch(85% 0.02 60)) y **arena suave** (oklch(90% 0.015 60)): contornos y
-  divisores, siempre de 0.5 px.
+  divisores, siempre de 0.5 px. Son decorativos: no tienen que cumplir contraste.
+- **Borde de campo** (oklch(63% 0.02 60)): solo el contorno de campos de formulario. Es lo que
+  dice «aquí se escribe», así que llega a 3:1 sobre crema (WCAG 1.4.11).
 - **Tinta tierra** (oklch(25% 0.02 60)), **media** (oklch(48% 0.02 60)) y **suave**
-  (oklch(62% 0.02 60)): texto principal, secundario y etiquetas. La tinta suave se reserva para
-  etiquetas cortas y placeholders.
+  (oklch(53% 0.02 60)): texto principal, secundario y etiquetas. La tinta suave se reserva para
+  etiquetas cortas y placeholders, y cumple 4,5:1 sobre todos los fondos claros del sistema
+  (el peor es el terracota tenue: 4,52:1). Antes era 62 % y se quedaba en 3,1–3,55:1.
 
 ### Named Rules
 **The Three Palettes Rule.** El color de marca nunca es color de ruta ni de estado. Si se

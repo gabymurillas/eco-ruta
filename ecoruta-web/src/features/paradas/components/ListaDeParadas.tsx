@@ -43,7 +43,7 @@ export function ListaDeParadas({ editor }: { editor: Editor }) {
             value={filtro}
             onChange={(evento) => setFiltro(evento.target.value)}
             placeholder="Filtrar por nombre"
-            className="h-10 rounded-[10px] border-[0.5px] border-borde bg-superficie px-3 text-sm font-semibold placeholder:font-normal placeholder:text-tinta-suave focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-marca-profundo"
+            className="h-10 rounded-[10px] border-[0.5px] border-borde-campo bg-superficie px-3 text-sm font-semibold placeholder:font-normal placeholder:text-tinta-suave focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-marca-profundo"
           />
 
           <ul className="flex flex-col overflow-y-auto">

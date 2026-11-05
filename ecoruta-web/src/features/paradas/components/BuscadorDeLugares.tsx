@@ -47,7 +47,7 @@ export function BuscadorDeLugares({ alElegir }: Props) {
 
   return (
     <div className="relative w-full max-w-[380px]">
-      <div className="flex h-12 items-center gap-2 rounded-full border-[0.5px] border-borde bg-superficie pl-4 pr-1.5 focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-marca-profundo">
+      <div className="flex h-12 items-center gap-2 rounded-full border-[0.5px] border-borde-campo bg-superficie pl-4 pr-1.5 focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-marca-profundo">
         <IconoLupa />
         <input
           type="search"
