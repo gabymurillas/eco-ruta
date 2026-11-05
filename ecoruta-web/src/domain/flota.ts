@@ -65,6 +65,41 @@ export function bateriaEnAlerta(
   return bateriaPct !== null && bateriaPct <= umbralPct;
 }
 
+/**
+ * Una unidad pide revisión cuando perdió la señal en recorrido, su teléfono dejó
+ * de reportar o tiene la batería baja. Es la misma regla para el indicador
+ * «Alertas de equipo» y para el filtro «Con alertas» de la lista.
+ */
+export function requiereRevision(
+  salud: SaludUnidad,
+  bateriaPct: number | null,
+  umbralBateriaPct: number,
+): boolean {
+  return (
+    salud === "sin_senal" ||
+    salud === "equipo_caido" ||
+    bateriaEnAlerta(bateriaPct, umbralBateriaPct)
+  );
+}
+
+export type FiltroFlota = "todas" | "en_servicio" | "con_alertas";
+
+export function pasaFiltroFlota(
+  filtro: FiltroFlota,
+  salud: SaludUnidad,
+  conAlerta: boolean,
+): boolean {
+  if (filtro === "en_servicio") {
+    return salud === "transmitiendo";
+  }
+
+  if (filtro === "con_alertas") {
+    return conAlerta;
+  }
+
+  return true;
+}
+
 /** "hace 4 s", "hace 12 min", "hace 2 h". Sin señal reciente devuelve null. */
 export function describirUltimaSenal(segundos: number | null): string | null {
   if (segundos === null) {

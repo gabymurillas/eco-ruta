@@ -43,6 +43,11 @@
   /* Identidad del panel de administración: azul petróleo del menú y amarillo del logo. */
   --color-noche: #0e2a33;
   --color-sol: #f2b33d;
+  /* Menú lateral del admin: siempre oscuro, en los dos temas. */
+  --color-menu: #0e2a33;
+  --color-menu-activo: #21505e;
+  --color-menu-texto: #cfe0e4;
+  --color-menu-grupo: #8fb0b9;
 
   --font-sans: var(--font-source-sans), system-ui, sans-serif;
   --font-serif: var(--font-merriweather), Georgia, serif;
@@ -124,6 +129,10 @@ body {
   --color-advertencia-tinta: #e4edef;
   --color-error: #f28b82;
 
+  /* En oscuro el menú baja un tono para no competir con el mapa. */
+  --color-menu: #06141a;
+  --color-menu-activo: #173a44;
+
   color-scheme: dark;
 }
 
@@ -171,5 +180,43 @@ body:has(.tema-admin[data-tema="oscuro"]) {
   height: 48px;
   line-height: 48px;
   font-size: 22px;
+  color: var(--color-tinta);
+}
+
+/*
+ * Mapa en el tema oscuro del admin. Las teselas de OpenStreetMap solo existen en
+ * claro: se invierten con un filtro para no encandilar. El filtro va solo en la
+ * capa de teselas; marcadores y trazados de ruta conservan sus colores.
+ */
+.tema-admin[data-tema="oscuro"] .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.85) saturate(0.5);
+}
+
+.tema-admin[data-tema="oscuro"] .leaflet-container {
+  background: var(--color-fondo);
+}
+
+.tema-admin .leaflet-bar a {
+  background: var(--color-superficie);
+  border-color: var(--color-borde);
+  color: var(--color-tinta);
+}
+
+.tema-admin .leaflet-bar a:hover {
+  background: var(--color-marca-tenue);
+}
+
+.tema-admin[data-tema="oscuro"] .leaflet-control-attribution {
+  background: rgb(17 38 45 / 0.85);
+  color: var(--color-tinta-media);
+}
+
+.tema-admin[data-tema="oscuro"] .leaflet-control-attribution a {
+  color: var(--color-marca);
+}
+
+.tema-admin[data-tema="oscuro"] .leaflet-popup-content-wrapper,
+.tema-admin[data-tema="oscuro"] .leaflet-popup-tip {
+  background: var(--color-superficie);
   color: var(--color-tinta);
 }

@@ -38,7 +38,7 @@ type Props = {
 
 export function MapaFlota(props: Props) {
   return (
-    <div className="relative size-full overflow-hidden rounded-2xl border-[0.5px] border-borde">
+    <div className="relative size-full overflow-hidden rounded-2xl border border-borde">
       <Lienzo {...props} />
       <LeyendaDeRutas rutas={props.rutas} />
     </div>
