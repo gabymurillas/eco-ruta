@@ -1,7 +1,7 @@
 "use client";
 
-import { DivIcon } from "leaflet";
-import { useMemo } from "react";
+import { DivIcon, type Marker as MarcadorLeaflet } from "leaflet";
+import { useEffect, useMemo, useRef } from "react";
 import { Marker, Popup } from "react-leaflet";
 import { colorDeRuta, tintaSobreColorDeRuta } from "@/domain/colores";
 import { svgDeIcono } from "@/domain/iconos";
@@ -16,6 +16,9 @@ type Props = {
   /** Atenuado y sin halo cuando la unidad dejó de transmitir. */
   transmitiendo: boolean;
   detalle?: string;
+  /** Elegida desde otra parte de la pantalla: se resalta y abre su ficha. */
+  seleccionado?: boolean;
+  alElegir?: () => void;
 };
 
 const DIAMETRO = 40;
@@ -29,14 +32,29 @@ export function MarcadorUnidad({
   icono,
   transmitiendo,
   detalle,
+  seleccionado = false,
+  alElegir,
 }: Props) {
+  const referencia = useRef<MarcadorLeaflet>(null);
   const marcador = useMemo(
-    () => construirMarcador({ color, icono, transmitiendo }),
-    [color, icono, transmitiendo],
+    () => construirMarcador({ color, icono, transmitiendo, seleccionado }),
+    [color, icono, transmitiendo, seleccionado],
   );
 
+  useEffect(() => {
+    if (seleccionado) {
+      referencia.current?.openPopup();
+    }
+  }, [seleccionado]);
+
   return (
-    <Marker position={[lat, lng]} icon={marcador} alt={`Unidad ${nombre}`}>
+    <Marker
+      ref={referencia}
+      position={[lat, lng]}
+      icon={marcador}
+      alt={`Unidad ${nombre}`}
+      eventHandlers={alElegir ? { click: alElegir } : undefined}
+    >
       <Popup>
         <span className="font-serif text-sm font-bold">{nombre}</span>
         {rutaNombre && <span className="block text-xs">{rutaNombre}</span>}
@@ -57,9 +75,13 @@ function construirMarcador({
   color,
   icono,
   transmitiendo,
-}: Pick<Props, "color" | "icono" | "transmitiendo">): DivIcon {
+  seleccionado,
+}: Pick<Props, "color" | "icono" | "transmitiendo" | "seleccionado">): DivIcon {
   const relleno = colorDeRuta(color);
   const tinta = tintaSobreColorDeRuta(color);
+  // Anillo de selección en terracota profundo: marca la interacción, no un estado
+  // de la unidad (mismo criterio que la parada elegida en la web del ciudadano).
+  const anillo = seleccionado ? "outline:3px solid oklch(48% 0.15 35);outline-offset:1px;" : "";
   const halo = transmitiendo
     ? `<span class="pulso-en-vivo" style="position:absolute;inset:-6px;border-radius:999px;background:${relleno};opacity:.25"></span>`
     : "";
@@ -72,7 +94,7 @@ function construirMarcador({
     html: `
       <span style="position:relative;display:flex;width:${DIAMETRO}px;height:${DIAMETRO}px;align-items:center;justify-content:center;opacity:${transmitiendo ? 1 : 0.55}">
         ${halo}
-        <span style="position:relative;display:flex;width:${DIAMETRO}px;height:${DIAMETRO}px;align-items:center;justify-content:center;border-radius:999px;background:${relleno};border:3px solid oklch(99% 0.008 75);color:${tinta}">
+        <span style="position:relative;display:flex;width:${DIAMETRO}px;height:${DIAMETRO}px;align-items:center;justify-content:center;border-radius:999px;background:${relleno};border:3px solid oklch(99% 0.008 75);color:${tinta};${anillo}">
           ${svgDeIcono(icono, 20)}
         </span>
       </span>

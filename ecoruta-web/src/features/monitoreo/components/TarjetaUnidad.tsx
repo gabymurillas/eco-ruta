@@ -12,6 +12,9 @@ type Props = {
   unidad: EstadoUnidad;
   umbralSinSenalS: number;
   umbralBateriaPct: number;
+  seleccionada?: boolean;
+  /** Null si la unidad no tiene posición: no hay a dónde llevar el mapa. */
+  alVerEnMapa?: (() => void) | null;
 };
 
 const TONO_POR_SALUD: Record<SaludUnidad, "neutro" | "advertencia" | "error"> = {
@@ -30,7 +33,17 @@ const LEYENDA_POR_SALUD: Record<SaludUnidad, string> = {
   sin_vincular: "Sin dispositivo vinculado",
 };
 
-export function TarjetaUnidad({ unidad, umbralSinSenalS, umbralBateriaPct }: Props) {
+export function idDeTarjeta(unidadId: string): string {
+  return `tarjeta-unidad-${unidadId}`;
+}
+
+export function TarjetaUnidad({
+  unidad,
+  umbralSinSenalS,
+  umbralBateriaPct,
+  seleccionada = false,
+  alVerEnMapa = null,
+}: Props) {
   const salud = evaluarSalud({
     vinculado: unidad.dispositivo_vinculado,
     enRecorrido: unidad.en_recorrido,
@@ -51,18 +64,15 @@ export function TarjetaUnidad({ unidad, umbralSinSenalS, umbralBateriaPct }: Pro
   );
 
   return (
-    <Tarjeta tono={tono} className="flex flex-col gap-3">
-      <div className="flex items-center gap-2.5">
-        <span
-          aria-hidden="true"
-          className="size-2.5 shrink-0 rounded-full"
-          style={{ backgroundColor: colorDeRuta(unidad.ruta_color) }}
-        />
-        <span className="font-serif text-sm font-bold">{unidad.unidad_nombre}</span>
-        <span className="truncate text-xs font-semibold text-tinta-suave">
-          {unidad.ruta_nombre ?? "Sin ruta asignada"}
-        </span>
-      </div>
+    <Tarjeta
+      tono={tono}
+      className={`flex flex-col gap-3 ${seleccionada ? "outline-2 outline-marca-profundo" : ""}`}
+    >
+      <Encabezado
+        unidad={unidad}
+        seleccionada={seleccionada}
+        alVerEnMapa={alVerEnMapa}
+      />
 
       {salud === "transmitiendo" ? (
         <dl className="flex gap-5">
@@ -83,6 +93,52 @@ export function TarjetaUnidad({ unidad, umbralSinSenalS, umbralBateriaPct }: Pro
         </p>
       )}
     </Tarjeta>
+  );
+}
+
+function Encabezado({
+  unidad,
+  seleccionada,
+  alVerEnMapa,
+}: {
+  unidad: EstadoUnidad;
+  seleccionada: boolean;
+  alVerEnMapa: (() => void) | null;
+}) {
+  const contenido = (
+    <>
+      <span
+        aria-hidden="true"
+        className="size-2.5 shrink-0 rounded-full"
+        style={{ backgroundColor: colorDeRuta(unidad.ruta_color) }}
+      />
+      <span className="font-serif text-sm font-bold">{unidad.unidad_nombre}</span>
+      <span className="truncate text-xs font-semibold text-tinta-suave">
+        {unidad.ruta_nombre ?? "Sin ruta asignada"}
+      </span>
+    </>
+  );
+
+  if (!alVerEnMapa) {
+    return (
+      <div id={idDeTarjeta(unidad.unidad_id)} className="flex items-center gap-2.5">
+        {contenido}
+      </div>
+    );
+  }
+
+  return (
+    <button
+      id={idDeTarjeta(unidad.unidad_id)}
+      type="button"
+      onClick={alVerEnMapa}
+      aria-pressed={seleccionada}
+      title="Ver en el mapa"
+      className="-m-2 flex min-h-10 scroll-my-16 items-center gap-2.5 rounded-lg p-2 text-left transition-colors duration-300 ease-out hover:bg-fondo focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo"
+    >
+      {contenido}
+      <span className="sr-only">: ver en el mapa</span>
+    </button>
   );
 }
 

@@ -2,9 +2,8 @@ import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import { IndicadorKpi } from "@/components/ui/IndicadorKpi";
 import { bateriaEnAlerta, evaluarSalud } from "@/domain/flota";
 import { IndicadorEnVivo } from "@/features/monitoreo/components/IndicadorEnVivo";
-import { MapaFlota } from "@/features/monitoreo/components/MapaFlota";
+import { PanelFlota } from "@/features/monitoreo/components/PanelFlota";
 import { TarjetaIncidencia } from "@/features/monitoreo/components/TarjetaIncidencia";
-import { TarjetaUnidad } from "@/features/monitoreo/components/TarjetaUnidad";
 import { obtenerEstadoDeFlota } from "@/services/flota.service";
 import { obtenerIncidenciasActivas } from "@/services/incidencias.service";
 import { obtenerRutasDeMapa } from "@/services/mapa.service";
@@ -101,39 +100,39 @@ export default async function MonitoreoPage() {
           />
         </div>
 
-        <div className="flex min-h-0 flex-1 gap-5">
-          <MapaFlota
-            unidades={unidades
-              // Sin coordenadas no hay nada que dibujar: una unidad recien
-              // registrada que aun no transmitio no tiene posicion.
-              .filter((unidad) => unidad.unidad_lat !== null && unidad.unidad_lng !== null)
-              .map((unidad) => ({
-                id: unidad.unidad_id,
-                nombre: unidad.unidad_nombre,
-                lat: unidad.unidad_lat,
-                lng: unidad.unidad_lng,
-                rutaNombre: unidad.ruta_nombre,
-                color: unidad.ruta_color,
-                icono: unidad.ruta_icono,
-                transmitiendo:
-                  unidad.en_recorrido &&
-                  unidad.segundos_sin_senal !== null &&
-                  unidad.segundos_sin_senal <= umbralSinSenalS,
-                segundosSinSenal: unidad.segundos_sin_senal,
-                velocidadKmh: unidad.velocidad_kmh,
-              }))}
-            rutas={(rutasDeMapa.ok ? rutasDeMapa.datos : []).map((ruta) => ({
-              id: ruta.ruta_id,
-              nombre: ruta.ruta_nombre,
-              color: ruta.ruta_color,
-              trazado: ruta.trazado_geojson,
+        <PanelFlota
+          unidadesEnMapa={unidades
+            // Sin coordenadas no hay nada que dibujar: una unidad recien
+            // registrada que aun no transmitio no tiene posicion.
+            .filter((unidad) => unidad.unidad_lat !== null && unidad.unidad_lng !== null)
+            .map((unidad) => ({
+              id: unidad.unidad_id,
+              nombre: unidad.unidad_nombre,
+              lat: unidad.unidad_lat,
+              lng: unidad.unidad_lng,
+              rutaNombre: unidad.ruta_nombre,
+              color: unidad.ruta_color,
+              icono: unidad.ruta_icono,
+              transmitiendo:
+                unidad.en_recorrido &&
+                unidad.segundos_sin_senal !== null &&
+                unidad.segundos_sin_senal <= umbralSinSenalS,
+              segundosSinSenal: unidad.segundos_sin_senal,
+              velocidadKmh: unidad.velocidad_kmh,
             }))}
-          />
-
-          <aside className="flex w-86 shrink-0 flex-col gap-3 overflow-y-auto rounded-2xl border-[0.5px] border-borde bg-superficie p-5">
-            {/* Van antes que la flota: una incidencia activa pide una decisión del
-                gestor, y la lista de unidades puede ser larga. */}
-            {incidencias.ok && incidencias.datos.length > 0 && (
+          rutas={(rutasDeMapa.ok ? rutasDeMapa.datos : []).map((ruta) => ({
+            id: ruta.ruta_id,
+            nombre: ruta.ruta_nombre,
+            color: ruta.ruta_color,
+            trazado: ruta.trazado_geojson,
+          }))}
+          unidades={unidades}
+          umbrales={{ sinSenalS: umbralSinSenalS, bateriaPct: umbralBateriaPct }}
+          encabezado={
+            // Van antes que la flota: una incidencia activa pide una decisión del
+            // gestor, y la lista de unidades puede ser larga.
+            incidencias.ok &&
+            incidencias.datos.length > 0 && (
               <>
                 <h2 className="text-xs font-bold tracking-wide text-tinta-suave">
                   Incidencias activas
@@ -142,26 +141,9 @@ export default async function MonitoreoPage() {
                   <TarjetaIncidencia key={incidencia.id} incidencia={incidencia} />
                 ))}
               </>
-            )}
-
-            <h2 className="text-xs font-bold tracking-wide text-tinta-suave">Flota</h2>
-
-            {unidades.length === 0 ? (
-              <p className="text-sm text-tinta-media">
-                Todavía no hay unidades registradas.
-              </p>
-            ) : (
-              unidades.map((unidad) => (
-                <TarjetaUnidad
-                  key={unidad.unidad_id}
-                  unidad={unidad}
-                  umbralSinSenalS={umbralSinSenalS}
-                  umbralBateriaPct={umbralBateriaPct}
-                />
-              ))
-            )}
-          </aside>
-        </div>
+            )
+          }
+        />
       </div>
     </>
   );

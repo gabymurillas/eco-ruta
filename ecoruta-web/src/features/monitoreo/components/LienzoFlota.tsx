@@ -1,6 +1,7 @@
 "use client";
 
 import { Mapa } from "@/components/mapa/Mapa";
+import { VolarA, type Destino } from "@/components/mapa/ControlesDeMapa";
 import { MarcadorUnidad } from "@/components/mapa/MarcadorUnidad";
 import { MarcadorParada, TrazadoRuta } from "@/components/mapa/CapasDeRuta";
 import { describirUltimaSenal } from "@/domain/flota";
@@ -35,11 +36,19 @@ export type ParadaEnMapa = {
   color: string | null;
 };
 
+export type SeleccionEnMapa = {
+  unidadId: string | null;
+  /** Solo cambia cuando la elección viene de la lista: el mapa vuela ahí. */
+  destino: Destino | null;
+  alElegir: (unidadId: string) => void;
+};
+
 type Props = {
   unidades: readonly UnidadEnMapa[];
   rutas: readonly RutaEnMapa[];
   paradas?: readonly ParadaEnMapa[];
   mostrarGeocercas?: boolean;
+  seleccion?: SeleccionEnMapa;
 };
 
 /**
@@ -53,6 +62,7 @@ export function LienzoFlota({
   rutas,
   paradas = [],
   mostrarGeocercas = false,
+  seleccion,
 }: Props) {
   const trazados = rutas.map((ruta) => ({
     ...ruta,
@@ -97,8 +107,12 @@ export function LienzoFlota({
           icono={unidad.icono}
           transmitiendo={unidad.transmitiendo}
           detalle={describirDetalle(unidad)}
+          seleccionado={seleccion?.unidadId === unidad.id}
+          alElegir={seleccion ? () => seleccion.alElegir(unidad.id) : undefined}
         />
       ))}
+
+      {seleccion && <VolarA destino={seleccion.destino} />}
     </Mapa>
   );
 }

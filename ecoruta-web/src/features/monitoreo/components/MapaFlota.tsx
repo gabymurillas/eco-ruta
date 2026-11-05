@@ -1,9 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { colorDeRuta } from "@/domain/colores";
 import type {
   ParadaEnMapa,
   RutaEnMapa,
+  SeleccionEnMapa,
   UnidadEnMapa,
 } from "./LienzoFlota";
 
@@ -31,12 +33,43 @@ type Props = {
   rutas: readonly RutaEnMapa[];
   paradas?: readonly ParadaEnMapa[];
   mostrarGeocercas?: boolean;
+  seleccion?: SeleccionEnMapa;
 };
 
 export function MapaFlota(props: Props) {
   return (
-    <div className="size-full overflow-hidden rounded-2xl border-[0.5px] border-borde">
+    <div className="relative size-full overflow-hidden rounded-2xl border-[0.5px] border-borde">
       <Lienzo {...props} />
+      <LeyendaDeRutas rutas={props.rutas} />
+    </div>
+  );
+}
+
+/**
+ * Sin leyenda, el gestor tenía que abrir cada marcador para saber qué línea es
+ * de qué ruta. Va con nombre además del color: el color nunca va solo.
+ */
+function LeyendaDeRutas({ rutas }: { rutas: readonly RutaEnMapa[] }) {
+  if (rutas.length === 0) {
+    return null;
+  }
+
+  return (
+    // Por encima de los paneles de Leaflet (z 400) y por debajo de sus controles.
+    <div className="absolute bottom-3 left-3 z-[500] max-w-60 rounded-xl border-[0.5px] border-borde bg-superficie px-3 py-2.5">
+      <h2 className="sr-only">Rutas en el mapa</h2>
+      <ul className="flex flex-col gap-1.5">
+        {rutas.map((ruta) => (
+          <li key={ruta.id} className="flex items-center gap-2 text-xs font-semibold">
+            <span
+              aria-hidden="true"
+              className="h-1 w-4 shrink-0 rounded-full"
+              style={{ backgroundColor: colorDeRuta(ruta.color) }}
+            />
+            <span className="truncate">{ruta.nombre}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
