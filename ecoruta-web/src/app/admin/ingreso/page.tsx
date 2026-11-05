@@ -1,66 +1,57 @@
-import Image from "next/image";
-
-import morrosPanoramico from "@/assets/morros-panoramico.jpg";
+import { cookies } from "next/headers";
+import { LogoAdmin } from "@/components/ui/LogoAdmin";
+import { COOKIE_TEMA, leerTema } from "@/domain/tema";
 import { FormularioIngreso } from "@/features/autenticacion/components/FormularioIngreso";
+import { PortadaIngreso } from "@/features/autenticacion/components/PortadaIngreso";
+import { SelectorDeTema } from "@/features/tema/components/SelectorDeTema";
 
 export const metadata = {
   title: "Ingreso · EcoRuta administración",
 };
 
-export default function IngresoPage() {
+export default async function IngresoPage() {
+  const tema = leerTema((await cookies()).get(COOKIE_TEMA)?.value);
+
   return (
-    <div className="flex min-h-dvh">
-      <main className="flex w-full flex-col justify-center gap-9 px-8 py-16 sm:px-16 md:w-[440px] md:shrink-0 md:border-r-[0.5px] md:border-borde md:bg-superficie md:px-12 lg:w-[560px] lg:px-20">
-        <header className="flex flex-col gap-1">
-          <h1 className="font-serif text-3xl font-black tracking-tight">EcoRuta</h1>
-          <p className="text-[13px] font-semibold tracking-wide text-tinta-suave">
-            Administración · San Juan de los Morros
-          </p>
-        </header>
+    <div className="flex min-h-dvh flex-1">
+      <PortadaIngreso />
 
-        <FormularioIngreso />
+      <main className="relative flex w-full flex-col justify-center bg-superficie px-8 py-20 sm:px-16 md:w-[480px] md:shrink-0 md:border-l md:border-borde lg:w-[560px] lg:px-[72px]">
+        <div className="absolute top-6 right-6">
+          <SelectorDeTema temaInicial={tema} />
+        </div>
 
-        <aside className="flex items-start gap-2.5 rounded-xl border-[0.5px] border-borde bg-superficie p-4 md:bg-fondo">
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.9"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mt-px shrink-0 text-tinta-suave"
-            aria-hidden="true"
-          >
-            <rect x="4.5" y="10.5" width="15" height="9.5" rx="2.5" />
-            <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" />
-          </svg>
-          <p className="text-xs leading-relaxed text-tinta-media">
-            Solo el ente gestor inicia sesión. El ciudadano nunca se autentica y el
-            dispositivo de cada unidad se vincula con un código, no con una cuenta.
+        <div className="mx-auto flex w-full max-w-[416px] flex-col">
+          {/* En el teléfono no hay foto: la marca va arriba del formulario. */}
+          <LogoAdmin subtitulo="Panel de gestión" className="mb-10 md:hidden" />
+
+          <h1 className="text-[30px] font-extrabold tracking-tight">Inicia sesión</h1>
+          <p className="mt-1.5 mb-8 text-tinta-media">
+            Entra con la cuenta de administración del ente gestor.
           </p>
-        </aside>
+
+          <FormularioIngreso />
+
+          <aside className="mt-7 flex gap-3 rounded-xl border border-borde bg-fondo px-4 py-3.5 text-[13.5px] leading-relaxed text-tinta-media">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              className="mt-0.5 shrink-0 text-marca"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 11v5M12 8v.1" />
+            </svg>
+            Solo el personal del ente gestor tiene cuenta. Los ciudadanos usan la web sin
+            registrarse y cada unidad se vincula con un código.
+          </aside>
+        </div>
       </main>
-
-      {/* Desde md y no desde lg: una laptop con la escala de pantalla al 125–150 % queda
-          por debajo de 1024 px y se quedaba sin foto. Sin `preload`: en móvil el panel
-          está oculto y la carga diferida evita descargar la foto. */}
-      <figure className="relative hidden flex-1 bg-fondo md:block">
-        <Image
-          src={morrosPanoramico}
-          alt=""
-          fill
-          sizes="(min-width: 1024px) calc(100vw - 560px), calc(100vw - 440px)"
-          placeholder="blur"
-          // La panorámica recortada a un panel casi cuadrado deja los dos morros
-          // grandes en el tercio inferior; la vertical anterior era 85 % cielo.
-          className="object-cover object-[42%_50%]"
-        />
-        <figcaption className="absolute bottom-6 left-6 rounded-full border-[0.5px] border-borde bg-superficie px-3.5 py-1.5 text-xs font-semibold text-tinta-media">
-          Los Morros, San Juan de los Morros
-        </figcaption>
-      </figure>
     </div>
   );
 }

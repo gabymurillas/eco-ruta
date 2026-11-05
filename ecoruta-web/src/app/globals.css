@@ -40,6 +40,10 @@
   --color-info: oklch(52% 0.12 240);
   --color-ubicacion: oklch(55% 0.15 250);
 
+  /* Identidad del panel de administración: azul petróleo del menú y amarillo del logo. */
+  --color-noche: #0e2a33;
+  --color-sol: #f2b33d;
+
   --font-sans: var(--font-source-sans), system-ui, sans-serif;
   --font-serif: var(--font-merriweather), Georgia, serif;
 }
@@ -48,6 +52,88 @@ body {
   background: var(--color-fondo);
   color: var(--color-tinta);
   font-family: var(--font-sans);
+}
+
+/*
+  Panel de administración: identidad propia de herramienta de trabajo.
+
+  Redefine los mismos tokens que usa la web del ciudadano, pero solo dentro del
+  contenedor del admin (app/admin/layout.tsx). Así cada clase existente
+  (`bg-fondo`, `text-tinta`, `bg-marca-profundo`…) toma la paleta del panel sin
+  tocar la web pública. Contrastes verificados con WCAG 2.2 AA en los dos temas.
+
+  Tono sobrio: los avisos llevan texto en tinta; el color de estado queda en el
+  ícono o el punto que lo acompaña.
+*/
+.tema-admin {
+  --color-fondo: #f1f5f6;
+  --color-superficie: #ffffff;
+  --color-borde: #dce4e7;
+  --color-borde-suave: #e6ecee;
+  --color-borde-campo: #78898f;
+
+  --color-tinta: #10232a;
+  --color-tinta-media: #4b5e65;
+  --color-tinta-suave: #5f7178;
+
+  /* En el admin la «marca» es el azul petróleo: botón principal y foco. */
+  --color-marca: #197878;
+  --color-marca-profundo: #0e2a33;
+  --color-marca-tenue: #e8eff1;
+
+  --color-exito: #1e8e5a;
+  --color-advertencia: #b4531a;
+  --color-advertencia-fondo: #f7f5f2;
+  --color-advertencia-borde: #e2ddd6;
+  --color-advertencia-tinta: #10232a;
+  --color-error: #b42318;
+
+  --font-sans: var(--font-figtree), system-ui, sans-serif;
+  --font-serif: var(--font-figtree), system-ui, sans-serif;
+
+  background: var(--color-fondo);
+  color: var(--color-tinta);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+.tema-admin[data-tema="oscuro"] {
+  --color-fondo: #0b1b21;
+  --color-superficie: #11262d;
+  --color-borde: #24414a;
+  --color-borde-suave: #1c333a;
+  --color-borde-campo: #6e878e;
+
+  --color-tinta: #e4edef;
+  --color-tinta-media: #a9bcc2;
+  --color-tinta-suave: #8fa5ac;
+
+  --color-marca: #4fc1be;
+  --color-marca-profundo: #e4edef;
+  --color-marca-tenue: #173a44;
+
+  /* Sobre fondo oscuro los colores de ruta suben de luminosidad para leerse. */
+  --color-ruta-teal: #3ba7a6;
+  --color-ruta-mostaza: #d9b23e;
+  --color-ruta-ciruela: #c0649a;
+
+  --color-exito: #3cc283;
+  --color-advertencia: #f08a4b;
+  --color-advertencia-fondo: #152a31;
+  --color-advertencia-borde: #24414a;
+  --color-advertencia-tinta: #e4edef;
+  --color-error: #f28b82;
+
+  color-scheme: dark;
+}
+
+/* Lo que asoma detrás del contenedor (rebote del scroll) toma el fondo del admin. */
+body:has(.tema-admin) {
+  background: #f1f5f6;
+}
+
+body:has(.tema-admin[data-tema="oscuro"]) {
+  background: #0b1b21;
 }
 
 /* El pulso de "en vivo": 2s, suave, no intrusivo. */

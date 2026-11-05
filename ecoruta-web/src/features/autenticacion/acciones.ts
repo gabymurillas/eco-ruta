@@ -5,6 +5,8 @@ import { cerrarSesion, iniciarSesion } from "@/services/auth.service";
 
 export type EstadoIngreso = {
   error?: string;
+  /** Vuelve con el error: React limpia el formulario tras enviarlo y no hay que obligar a reescribirlo. */
+  correo?: string;
 };
 
 /**
@@ -19,13 +21,13 @@ export async function ingresar(
   const contrasena = String(datos.get("contrasena") ?? "");
 
   if (!correo || !contrasena) {
-    return { error: "Escribe tu correo y tu contraseña." };
+    return { error: "Escribe tu correo y tu contraseña.", correo };
   }
 
   const resultado = await iniciarSesion({ correo, contrasena });
 
   if (!resultado.ok) {
-    return { error: resultado.error };
+    return { error: resultado.error, correo };
   }
 
   redirect("/admin");

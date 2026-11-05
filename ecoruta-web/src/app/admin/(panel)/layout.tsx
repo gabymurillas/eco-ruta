@@ -9,6 +9,7 @@ import { obtenerAdministrador } from "@/services/auth.service";
  * Vive en el grupo (panel) y no en /admin, porque en App Router los layouts anidan:
  * si estuviera en /admin tambien envolveria a /admin/ingreso y su redireccion crearia
  * un bucle infinito. El grupo no aparece en la URL, asi que (panel)/page.tsx es /admin.
+ * El layout de /admin existe, pero solo pone la fuente, la paleta y el tema.
  *
  * El proxy ya redirige a quien no tenga sesion; esto verifica ademas que la cuenta
  * tenga rol de administracion, y es la ultima barrera antes de RLS.
