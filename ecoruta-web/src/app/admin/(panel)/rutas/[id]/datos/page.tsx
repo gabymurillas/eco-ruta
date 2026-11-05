@@ -70,6 +70,9 @@ export default async function DatosDeRutaPage({
         <FormularioRuta
           radioMinimoSugeridoM={radioMinimoSugeridoM(exactitudMaximaM)}
           exactitudMaximaM={exactitudMaximaM}
+          coloresEnUso={rutas.datos
+            .filter((otra) => otra.id !== ruta.id)
+            .map((otra) => ({ color: otra.color, ruta: otra.nombre }))}
           ruta={{
             id: ruta.id,
             nombre: ruta.nombre,

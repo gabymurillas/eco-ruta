@@ -23,6 +23,19 @@ export type IconoDisponible = (typeof ICONOS_DISPONIBLES)[number];
 
 export const ICONO_POR_DEFECTO: IconoDisponible = "bus";
 
+/** El valor guardado va sin tilde (`camion`); el gestor lee el nombre. */
+const NOMBRES: Record<IconoDisponible, string> = {
+  bus: "Bus",
+  camion: "Camión",
+  cisterna: "Cisterna",
+  van: "Van",
+  generico: "Genérico",
+};
+
+export function nombreDeIcono(icono: IconoDisponible): string {
+  return NOMBRES[icono];
+}
+
 export type Forma =
   | { tipo: "path"; d: string }
   | { tipo: "rect"; x: number; y: number; ancho: number; alto: number; rx: number }

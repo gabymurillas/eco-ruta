@@ -31,6 +31,19 @@ const TINTA_CLARA = "#FFFFFF";
 
 export const TOKENS_DE_COLOR = Object.keys(PALETA);
 
+/** El token es la clave guardada; esto es lo que lee el gestor. */
+const NOMBRES: Record<string, string> = {
+  teal: "Verde azulado",
+  mostaza: "Mostaza",
+  ciruela: "Ciruela",
+  oliva: "Oliva",
+  indigo: "Índigo",
+};
+
+export function nombreDeColor(token: string): string {
+  return NOMBRES[token.toLowerCase()] ?? token;
+}
+
 export function colorDeRuta(token: string | null): string {
   if (!token) {
     return COLOR_POR_DEFECTO;
