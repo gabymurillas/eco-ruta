@@ -11,6 +11,7 @@ import {
   type PuntoClave,
   type ViajeGrabado,
 } from "../hooks/useEditorDeRuta";
+import { useAvisoAntesDeSalir } from "../hooks/useAvisoAntesDeSalir";
 import type { ParadaEnMapa } from "./LienzoEditor";
 import { PanelPuntosClave, ParadasQueToca } from "./PanelPuntosClave";
 import { PanelViajes } from "./PanelViajes";
@@ -49,6 +50,7 @@ export function EditorDeRuta(props: Props) {
     paradasDeRutaIniciales: props.paradasDeRuta,
   });
   const [modo, setModo] = useState<Modo>("puntos");
+  useAvisoAntesDeSalir(editor.sinGuardar);
 
   const orden = new Map(editor.paradasDeRuta.map((p) => [p.parada_id, p.orden]));
   const paradas = props.paradasDeLaCiudad.map((p) => ({ ...p, orden: orden.get(p.id) ?? null }));

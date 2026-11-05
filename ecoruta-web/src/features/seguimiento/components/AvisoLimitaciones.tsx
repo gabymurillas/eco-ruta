@@ -16,7 +16,7 @@ export function AvisoLimitaciones({ alCerrar }: Props) {
   return (
     <section
       aria-labelledby="titulo-limitaciones"
-      className="flex flex-col gap-3 rounded-2xl border border-info bg-superficie p-4"
+      className="flex flex-col gap-3 rounded-2xl border-[0.5px] border-info bg-superficie p-4"
     >
       <h2 id="titulo-limitaciones" className="font-serif text-[15px] font-bold">
         Antes de empezar

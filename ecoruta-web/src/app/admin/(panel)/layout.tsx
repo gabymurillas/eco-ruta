@@ -75,7 +75,18 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">{children}</div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* El panel es de escritorio: el mapa, la tabla y el editor no caben en un
+            teléfono. Se avisa en vez de bloquear, por si hay que mirar algo en la calle. */}
+        <p
+          role="note"
+          className="border-b-[0.5px] border-advertencia-borde bg-advertencia-fondo px-4 py-2.5 text-xs font-semibold text-advertencia-tinta md:hidden"
+        >
+          El panel está pensado para una computadora. En esta pantalla algunas secciones
+          se ven cortadas.
+        </p>
+        {children}
+      </div>
     </div>
   );
 }

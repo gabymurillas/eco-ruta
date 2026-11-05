@@ -53,7 +53,8 @@ function Filas({ llegadas, ...ajustes }: Ajustes & { llegadas: readonly LlegadaR
   if (llegadas.length === 0) {
     return (
       <p className="text-sm leading-relaxed text-tinta-media">
-        No hay unidades circulando por esta parada en este momento.
+        No hay unidades circulando por esta parada en este momento. La lista se
+        actualiza sola: si una sale, aparece aquí.
       </p>
     );
   }

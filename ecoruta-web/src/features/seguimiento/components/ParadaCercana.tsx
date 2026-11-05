@@ -9,7 +9,7 @@ type Props = {
 
 export function ParadaCercana({ parada, alCambiar }: Props) {
   return (
-    <div className="flex items-center gap-4 rounded-[18px] border-[0.5px] border-borde bg-marca-tenue p-4">
+    <div className="flex items-center gap-4 rounded-[18px] border-[0.5px] border-borde bg-fondo p-4">
       <div className="flex size-11 shrink-0 items-center justify-center rounded-full border-[0.5px] border-borde bg-superficie text-marca-profundo">
         <svg
           width="21"

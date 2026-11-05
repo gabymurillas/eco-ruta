@@ -38,14 +38,6 @@ export function ListaRutasEnParada({ rutas }: Props) {
               {ruta.tipo ?? "Servicio sin tipo declarado"}
             </span>
           </div>
-
-          {/*
-            El tiempo estimado exige el trazado de la ruta y posiciones transmitiéndose.
-            Mientras no existan, se dice que no hay dato en vez de inventar un número.
-          */}
-          <span className="text-xs font-semibold text-tinta-suave">
-            Sin unidad en vivo
-          </span>
         </li>
       ))}
     </ul>

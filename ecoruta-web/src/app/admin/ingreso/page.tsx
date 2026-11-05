@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import morrosAtardecer from "@/assets/morros-atardecer.jpg";
+import morrosPanoramico from "@/assets/morros-panoramico.jpg";
 import { FormularioIngreso } from "@/features/autenticacion/components/FormularioIngreso";
 
 export const metadata = {
@@ -48,12 +48,14 @@ export default function IngresoPage() {
           está oculto y la carga diferida evita descargar la foto. */}
       <figure className="relative hidden flex-1 bg-fondo md:block">
         <Image
-          src={morrosAtardecer}
+          src={morrosPanoramico}
           alt=""
           fill
           sizes="(min-width: 1024px) calc(100vw - 560px), calc(100vw - 440px)"
           placeholder="blur"
-          className="object-cover object-[50%_82%]"
+          // La panorámica recortada a un panel casi cuadrado deja los dos morros
+          // grandes en el tercio inferior; la vertical anterior era 85 % cielo.
+          className="object-cover object-[42%_50%]"
         />
         <figcaption className="absolute bottom-6 left-6 rounded-full border-[0.5px] border-borde bg-superficie px-3.5 py-1.5 text-xs font-semibold text-tinta-media">
           Los Morros, San Juan de los Morros
