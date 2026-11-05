@@ -52,6 +52,8 @@ export default async function MonitoreoPage() {
   }));
 
   const enRecorrido = saludes.filter((u) => u.salud === "transmitiendo").length;
+  const vinculadas = unidades.filter((unidad) => unidad.dispositivo_vinculado).length;
+  const incidenciasActivas = incidencias.ok ? incidencias.datos.length : null;
 
   const alertasDeEquipo = saludes.filter(
     ({ unidad, salud }) =>
@@ -76,10 +78,13 @@ export default async function MonitoreoPage() {
 
       <div className="flex flex-1 flex-col gap-5 overflow-hidden p-7">
         <div className="flex shrink-0 gap-4">
+          {/* Antes decía «Unidades activas» y contaba las registradas. Ahora dice
+              lo que cuenta, y el detalle muestra cuántas pueden salir: sin
+              teléfono vinculado una unidad no transmite. */}
           <IndicadorKpi
-            titulo="Unidades activas"
+            titulo="Flota"
             valor={String(unidades.length)}
-            detalle="registradas"
+            detalle={`${vinculadas} con equipo vinculado`}
           />
           <IndicadorKpi
             titulo="En recorrido"
@@ -89,8 +94,9 @@ export default async function MonitoreoPage() {
           />
           <IndicadorKpi
             titulo="Incidencias"
-            valor={incidencias.ok ? String(incidencias.datos.length) : "—"}
-            detalle="activas"
+            valor={incidenciasActivas === null ? "—" : String(incidenciasActivas)}
+            detalle={incidenciasActivas === null ? "no se pudieron cargar" : "activas"}
+            tono={incidenciasActivas ? "advertencia" : "neutro"}
           />
           <IndicadorKpi
             titulo="Alertas de equipo"
