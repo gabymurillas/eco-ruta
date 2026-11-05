@@ -17,7 +17,7 @@ export type Fase =
   | { tipo: "cargando" }
   | { tipo: "bienvenida" }
   | { tipo: "buscando" }
-  | { tipo: "sin_ubicacion"; motivo: "negada" | "no_disponible" }
+  | { tipo: "sin_ubicacion"; motivo: "negada" | "fallida" | "no_disponible" }
   | { tipo: "error"; mensaje: string }
   | { tipo: "sin_paradas"; masCercana: ParadaConRutas | null }
   | { tipo: "selector"; paradas: ParadaConRutas[] }
@@ -131,7 +131,11 @@ function derivarFase({
     return { tipo: "bienvenida" };
   }
 
-  if (ubicacion.estado === "negada" || ubicacion.estado === "no_disponible") {
+  if (
+    ubicacion.estado === "negada" ||
+    ubicacion.estado === "fallida" ||
+    ubicacion.estado === "no_disponible"
+  ) {
     return { tipo: "sin_ubicacion", motivo: ubicacion.estado };
   }
 

@@ -1,12 +1,17 @@
 type Props = {
-  motivo: "negada" | "no_disponible" | "sin_paradas";
+  motivo: "negada" | "fallida" | "no_disponible" | "sin_paradas";
 };
 
 const MENSAJES: Record<Props["motivo"], { titulo: string; detalle: string }> = {
   negada: {
     titulo: "Necesitamos tu ubicación",
     detalle:
-      "Sin tu ubicación no podemos saber qué paradas tienes cerca. Actívala en los ajustes del navegador, en los permisos de este sitio, y vuelve a cargar la página.",
+      "Sin tu ubicación no podemos saber qué paradas tienes cerca. Actívala en los permisos de este sitio (el candado junto a la dirección) y toca «Intentar de nuevo».",
+  },
+  fallida: {
+    titulo: "No pudimos ubicarte",
+    detalle:
+      "Tu teléfono no encontró tu posición a tiempo. Suele pasar bajo techo o con el GPS apagado: revisa que la ubicación del teléfono esté activa e intenta de nuevo.",
   },
   no_disponible: {
     titulo: "Tu navegador no comparte ubicación",

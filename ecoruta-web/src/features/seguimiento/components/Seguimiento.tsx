@@ -28,9 +28,11 @@ export function Seguimiento({
     fase.tipo === "parada" ? fase.parada.paradaId : null,
   );
 
+  // En escritorio la columna se queda del ancho de un teléfono grande: estirada,
+  // la lista de llegadas y el mapa pierden la lectura de un vistazo.
   return (
     <div className="flex min-h-dvh flex-col bg-fondo text-tinta">
-      <header className="flex items-center justify-between gap-3 px-5 pb-4 pt-14">
+      <header className="mx-auto flex w-full max-w-xl items-center justify-between gap-3 px-5 pb-4 pt-14">
         <div className="flex flex-col gap-0.5">
           <span className="font-serif text-[22px] font-black tracking-tight">
             EcoRuta
@@ -53,7 +55,7 @@ export function Seguimiento({
           )}
       </header>
 
-      <main className="flex flex-1 flex-col gap-4 rounded-t-[20px] border-t-[0.5px] border-borde bg-superficie px-5 pb-8 pt-6">
+      <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 rounded-t-[20px] border-t-[0.5px] sm:border-x-[0.5px] border-borde bg-superficie px-5 pb-8 pt-6">
         <Contenido
           miParada={miParada}
           llegadas={llegadas}
@@ -184,7 +186,7 @@ function Contratiempo({
         <ParadaMasLejos parada={fase.masCercana} alElegir={alElegir} />
       )}
 
-      {fase.tipo === "error" && (
+      {puedeReintentar(fase) && (
         <Boton onClick={alReintentar} className="self-start">
           Intentar de nuevo
         </Boton>
@@ -196,6 +198,18 @@ function Contratiempo({
         </Boton>
       )}
     </>
+  );
+}
+
+/**
+ * Reintentar sirve cuando falló la búsqueda o el GPS, y también con el permiso
+ * negado: si el ciudadano lo activó en los ajustes, vuelve a funcionar sin
+ * recargar. Un navegador sin geolocalización no cambia por insistir.
+ */
+function puedeReintentar(fase: FaseContratiempo): boolean {
+  return (
+    fase.tipo === "error" ||
+    (fase.tipo === "sin_ubicacion" && fase.motivo !== "no_disponible")
   );
 }
 

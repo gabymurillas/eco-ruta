@@ -10,6 +10,8 @@ export type EstadoUbicacion =
   | { estado: "pidiendo" }
   | { estado: "concedida"; ubicacion: Ubicacion }
   | { estado: "negada" }
+  /** Hay permiso pero el GPS no respondió a tiempo o no encontró posición. */
+  | { estado: "fallida" }
   | { estado: "no_disponible" };
 
 /** Una parada cercana ya agrupada con las rutas que pasan por ella. */

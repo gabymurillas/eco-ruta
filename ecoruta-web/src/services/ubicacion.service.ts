@@ -23,7 +23,12 @@ export function obtenerUbicacionActual(): Promise<EstadoUbicacion> {
             exactitudM: posicion.coords.accuracy,
           },
         }),
-      () => resolver({ estado: "negada" }),
+      // Solo el código 1 es un «no» del ciudadano. Tiempo agotado o sin posición
+      // es el GPS, y se arregla reintentando, no tocando los permisos.
+      (error) =>
+        resolver({
+          estado: error.code === error.PERMISSION_DENIED ? "negada" : "fallida",
+        }),
       { enableHighAccuracy: true, timeout: TIEMPO_MAXIMO_MS },
     );
   });
