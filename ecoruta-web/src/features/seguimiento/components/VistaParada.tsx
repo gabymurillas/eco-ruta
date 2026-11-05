@@ -59,11 +59,9 @@ export function VistaParada(props: Props) {
 
       <ParadaCercana parada={parada} alCambiar={alCambiar} />
 
-      {limitaciones.visible && (
-        <AvisoLimitaciones alCerrar={limitaciones.cerrar} />
-      )}
-
-      <div className="h-56 overflow-hidden rounded-2xl border-[0.5px] border-borde">
+      {/* El alto sigue a la pantalla: en un teléfono chico no tapa las llegadas y en
+          uno grande deja de ser una franja. */}
+      <div className="h-[clamp(16rem,42dvh,26rem)] overflow-hidden rounded-2xl border-[0.5px] border-borde">
         <LienzoSeguimiento
           ubicacion={props.ubicacion}
           paradas={paradasDelMapa(parada, props.otrasParadas)}
@@ -86,6 +84,12 @@ export function VistaParada(props: Props) {
           umbralSinSenalS={umbralSinSenalS}
           penalizacionIncidenciaPct={props.penalizacionIncidenciaPct}
         />
+      )}
+
+      {/* Al final y no entre la parada y el mapa: se lee una sola vez, y en su
+          lugar anterior separaba lo que el ciudadano vino a ver. */}
+      {limitaciones.visible && (
+        <AvisoLimitaciones alCerrar={limitaciones.cerrar} />
       )}
 
       {aviso && (
