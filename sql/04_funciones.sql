@@ -117,22 +117,29 @@ $$;
 --
 -- `ruta_tiene_trazado` existe para que la interfaz sepa si puede prometer un
 -- tiempo estimado: sin trazado la distancia iría en línea recta y subestimaría
--- siempre.
-create or replace function llegadas_a_parada(parada uuid)
+-- siempre. Las columnas del tiempo estimado (distancia sobre el trazado, ya_paso,
+-- velocidades, incidencia) se explican en 14_tiempo_estimado.sql.
+drop function if exists llegadas_a_parada(uuid);
+
+create function llegadas_a_parada(parada uuid)
 returns table (
-  unidad_id          uuid,
-  unidad_nombre      text,
-  unidad_lat         double precision,
-  unidad_lng         double precision,
-  viaje_id           uuid,
-  segundos_sin_senal integer,
-  distancia_recta_m  double precision,
-  ultima_parada      text,
-  ruta_id            uuid,
-  ruta_nombre        text,
-  ruta_color         text,
-  ruta_icono         text,
-  ruta_tiene_trazado boolean
+  unidad_id           uuid,
+  unidad_nombre       text,
+  unidad_lat          double precision,
+  unidad_lng          double precision,
+  viaje_id            uuid,
+  segundos_sin_senal  integer,
+  distancia_recta_m   double precision,
+  distancia_trazado_m double precision,
+  ya_paso             boolean,
+  velocidades_kmh     double precision[],
+  incidencia_activa   boolean,
+  ultima_parada       text,
+  ruta_id             uuid,
+  ruta_nombre         text,
+  ruta_color          text,
+  ruta_icono          text,
+  ruta_tiene_trazado  boolean
 )
 language sql
 stable
@@ -143,6 +150,12 @@ as $$
     select p.id, p.ubicacion
     from paradas p
     where p.id = parada
+  ),
+  tolerancia as (
+    select coalesce(
+      (select valor from parametros where clave = 'distancia_parada_trazado_m'),
+      40
+    )::double precision as m
   )
   select
     u.id,
@@ -158,6 +171,13 @@ as $$
       when pos.ubicacion is null then null
       else ST_Distance(pos.ubicacion, o.ubicacion)
     end,
+    tr.distancia_m,
+    coalesce(tr.ya_paso, false),
+    vel.velocidades,
+    exists (
+      select 1 from incidencias i
+      where i.ruta_id = r.id and i.activa
+    ),
     ult.nombre,
     r.id,
     r.nombre,
@@ -165,17 +185,55 @@ as $$
     r.icono,
     r.trazado is not null
   from objetivo o
+  cross join tolerancia t
   join paradas_por_ruta pr on pr.parada_id = o.id
   join rutas r on r.id = pr.ruta_id and r.activa
   join unidades u on u.ruta_id = r.id and u.activa
   left join viajes v on v.unidad_id = u.id and v.finalizado_at is null
   left join lateral (
-    select p2.velocidad_kmh, p2.ubicacion, p2.capturado_at
+    select p2.ubicacion, p2.capturado_at
     from posiciones p2
     where p2.unidad_id = u.id and p2.usable
     order by p2.capturado_at desc
     limit 1
   ) pos on true
+  left join lateral (
+    select array_agg(rec.velocidad_kmh::double precision order by rec.capturado_at desc)
+             as velocidades
+    from (
+      select p4.velocidad_kmh, p4.capturado_at
+      from posiciones p4
+      where p4.viaje_id = v.id and p4.usable
+      order by p4.capturado_at desc
+      limit 5
+    ) rec
+  ) vel on v.id is not null
+  left join lateral (
+    select
+      case
+        when x.fu <= x.fp then
+          ST_Length(ST_LineSubstring(x.linea, x.fu, x.fp)::geography)
+        when x.circular then
+          ST_Length(ST_LineSubstring(x.linea, x.fu, 1)::geography)
+            + ST_Length(ST_LineSubstring(x.linea, 0, x.fp)::geography)
+        when ST_Length(ST_LineSubstring(x.linea, x.fp, x.fu)::geography) < t.m then 0
+        else null
+      end as distancia_m,
+      x.fu > x.fp
+        and not x.circular
+        and ST_Length(ST_LineSubstring(x.linea, x.fp, x.fu)::geography) >= t.m
+        as ya_paso
+    from (
+      select
+        r.trazado::geometry as linea,
+        ST_LineLocatePoint(r.trazado::geometry, pos.ubicacion::geometry) as fu,
+        ST_LineLocatePoint(r.trazado::geometry, o.ubicacion::geometry) as fp,
+        ST_Distance(
+          ST_StartPoint(r.trazado::geometry)::geography,
+          ST_EndPoint(r.trazado::geometry)::geography
+        ) < t.m as circular
+    ) x
+  ) tr on r.trazado is not null and pos.ubicacion is not null
   left join lateral (
     select p3.nombre
     from eventos_geocerca e

@@ -46,6 +46,7 @@ sql/07_geocercas.sql
 sql/08_incidencia_otro.sql
 sql/12_realtime_monitoreo.sql
 sql/13_exposicion_solo_en_servicio.sql
+sql/14_tiempo_estimado.sql
 ```
 
 `sql/05_consultas_historicos.sql` no crea nada: documenta cómo se calcula cada indicador

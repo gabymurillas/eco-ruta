@@ -166,13 +166,13 @@ revoca la sesión del teléfono.
 | CIU-02 | Detectar la ubicación y preseleccionar la parada más cercana; permitir cambiar entre las cercanas | P0 | ✅ |
 | CIU-03 | Recordar «mi parada» solo en el navegador (`localStorage`); funcionar igual si el almacenamiento está bloqueado | P0 | ✅ |
 | CIU-04 | Mostrar las rutas que pasan por la parada, con chip de color **y** nombre | P0 | ✅ |
-| CIU-05 | Mostrar las unidades en camino y su tiempo estimado, rotulado siempre como «estimado» | P0 | ✅ |
+| CIU-05 | Mostrar las unidades en camino y su tiempo estimado, rotulado siempre como «estimado» | P0 | ✅ (desde 2026-11-05: antes la lista decía «En camino» sin cifra) |
 | CIU-06 | Aviso «se acerca» cuando una unidad entra a `radio_aproximacion_m` (500 m) de mi parada, una sola vez por viaje | P0 | ✅ (falta prueba de punta a punta con un recorrido real) |
 | CIU-07 | Aviso «ya pasó» tras la salida confirmada por histéresis, una sola vez por viaje | P0 | ✅ (ídem) |
 | CIU-08 | Explicar una vez las limitaciones (avisos solo con la página abierta) | P0 | ✅ |
 | CIU-09 | **Tiempo estimado con historial (versión mínima):** usar la velocidad típica de la ruta en esa franja horaria cuando haya suficientes viajes; si no, el cálculo simple. Ver [ADR-0011](../04-arquitectura/adr/0011-eta-estimado-con-historial.md) | P1 | ⬜ |
 | CIU-10 | Mostrar el estado «sin señal» de una unidad, atenuada y sin halo | P0 | 🟡 (maqueta `SenalPerdida`; validar en la web pública) |
-| CIU-11 | Indicar cuando una incidencia activa afecta el tiempo estimado | P1 | 🟡 (penalización definida en dominio; validar en interfaz) |
+| CIU-11 | Indicar cuando una incidencia activa afecta el tiempo estimado | P1 | ✅ (margen `penalizacion_incidencia_pct` y aviso en la fila) |
 | CIU-12 | Sin ubicación: mensaje explicativo, sin elección manual | P0 | ✅ |
 | CIU-13 | Sin paradas a 1,5 km: mostrar la más cercana y su distancia | P1 | ✅ |
 | CIU-14 | Estado vacío: no hay unidades en servicio en mi parada | P0 | 🟡 (maqueta `SinUnidades`) |

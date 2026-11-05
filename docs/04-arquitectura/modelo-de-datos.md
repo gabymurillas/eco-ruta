@@ -59,6 +59,7 @@ erDiagram
 | `emision_detenido_s` | 30 | Intervalo de emisión detenido y latido |
 | `radio_aproximacion_m` | 500 | Anillo del aviso «se acerca» |
 | `distancia_parada_trazado_m` | 40 | Parada asociada a una ruta |
+| `penalizacion_incidencia_pct` | 25 | Margen que suma al tiempo estimado una incidencia activa |
 
 > **Ninguno está calibrado todavía.** Se ajustan tras la prueba de campo (SIS-08) con un
 > `update`, sin tocar código.
@@ -98,5 +99,5 @@ La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 
 `01_schema` → `02_parametros` → `03_rls` → `04_funciones` → `06_vinculacion` → `07_geocercas`
 → `08_incidencia_otro` → `09_avisos_parada` → `10_paradas_de_ciudad` → `11_trazado_asistido` →
-`12_realtime_monitoreo` → `13_exposicion_solo_en_servicio`. `05_consultas_historicos` es documentación. Se aplican a mano en
+`12_realtime_monitoreo` → `13_exposicion_solo_en_servicio` → `14_tiempo_estimado`. `05_consultas_historicos` es documentación. Se aplican a mano en
 Supabase.

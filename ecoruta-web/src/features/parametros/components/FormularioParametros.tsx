@@ -30,6 +30,12 @@ const GRUPOS = [
     descripcion:
       "Cada cuánto emite el teléfono de la unidad y cuándo el sistema considera que algo va mal.",
   },
+  {
+    id: "tiempo" as const,
+    titulo: "Tiempo estimado",
+    descripcion:
+      "Ajustan el tiempo estimado que ve el ciudadano. El cálculo base es la distancia sobre el trazado entre la velocidad reciente de la unidad.",
+  },
 ];
 
 export function FormularioParametros({ valores }: Props) {

@@ -12,7 +12,7 @@ export type DefinicionParametro = {
   unidad: string;
   minimo: number;
   maximo: number;
-  grupo: "geocercas" | "transmision";
+  grupo: "geocercas" | "transmision" | "tiempo";
   /** Por qué existe y qué pasa si se toca. */
   explicacion: string;
 };
@@ -106,6 +106,16 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
     grupo: "transmision",
     explicacion:
       "Porcentaje que dispara la alerta en el monitoreo. El teléfono va enchufado, así que una batería que baja suele significar un cargador suelto.",
+  },
+  {
+    clave: "penalizacion_incidencia_pct",
+    titulo: "Margen por incidencia",
+    unidad: "%",
+    minimo: 0,
+    maximo: 200,
+    grupo: "tiempo",
+    explicacion:
+      "Cuánto se alarga el tiempo estimado mientras la ruta tiene una incidencia sin resolver. Con 25, un estimado de 8 min pasa a 10 min. En 0 la incidencia se avisa pero no cambia el tiempo.",
   },
 ];
 

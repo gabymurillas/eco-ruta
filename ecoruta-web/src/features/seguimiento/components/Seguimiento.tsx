@@ -15,9 +15,14 @@ import { VistaParada } from "./VistaParada";
 type Props = {
   umbralSinSenalS: number;
   radioAproximacionM: number;
+  penalizacionIncidenciaPct: number;
 };
 
-export function Seguimiento({ umbralSinSenalS, radioAproximacionM }: Props) {
+export function Seguimiento({
+  umbralSinSenalS,
+  radioAproximacionM,
+  penalizacionIncidenciaPct,
+}: Props) {
   const miParada = useMiParada();
   const { fase } = miParada;
   const llegadas = useLlegadas(
@@ -55,6 +60,7 @@ export function Seguimiento({ umbralSinSenalS, radioAproximacionM }: Props) {
           llegadas={llegadas}
           umbralSinSenalS={umbralSinSenalS}
           radioAproximacionM={radioAproximacionM}
+          penalizacionIncidenciaPct={penalizacionIncidenciaPct}
         />
       </main>
     </div>
@@ -66,6 +72,7 @@ type PropsContenido = {
   llegadas: readonly LlegadaRow[];
   umbralSinSenalS: number;
   radioAproximacionM: number;
+  penalizacionIncidenciaPct: number;
 };
 
 function Contenido({
@@ -73,6 +80,7 @@ function Contenido({
   llegadas,
   umbralSinSenalS,
   radioAproximacionM,
+  penalizacionIncidenciaPct,
 }: PropsContenido) {
   const { fase, ubicacion, cercanas, elegida } = miParada;
 
@@ -130,6 +138,7 @@ function Contenido({
           llegadas={llegadas}
           umbralSinSenalS={umbralSinSenalS}
           radioAproximacionM={radioAproximacionM}
+          penalizacionIncidenciaPct={penalizacionIncidenciaPct}
           alCambiar={miParada.abrirSelector}
         />
       );

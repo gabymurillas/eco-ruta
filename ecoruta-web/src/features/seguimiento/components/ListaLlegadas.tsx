@@ -1,19 +1,24 @@
 import { IconoRuta } from "@/components/ui/IconoRuta";
 import { colorDeRuta, tintaSobreColorDeRuta } from "@/domain/colores";
+import { formatearMinutos } from "@/domain/formato";
 import {
   describirAntiguedad,
+  estimarLlegada,
   evaluarLlegada,
-  puedeEstimarTiempo,
   type EstadoLlegada,
+  type TiempoLlegada,
 } from "@/domain/llegadas";
 import type { LlegadaRow } from "@/services/llegadas.service";
 
 type Props = {
   llegadas: readonly LlegadaRow[];
   umbralSinSenalS: number;
+  penalizacionIncidenciaPct: number;
 };
 
-export function ListaLlegadas({ llegadas, umbralSinSenalS }: Props) {
+type PropsFila = Omit<Props, "llegadas"> & { llegada: LlegadaRow };
+
+export function ListaLlegadas({ llegadas, ...ajustes }: Props) {
   if (llegadas.length === 0) {
     return (
       <p className="text-sm leading-relaxed text-tinta-media">
@@ -25,31 +30,30 @@ export function ListaLlegadas({ llegadas, umbralSinSenalS }: Props) {
   return (
     <ul className="flex flex-col gap-2.5">
       {llegadas.map((llegada) => (
-        <FilaLlegada
-          key={llegada.unidad_id}
-          llegada={llegada}
-          umbralSinSenalS={umbralSinSenalS}
-        />
+        <FilaLlegada key={llegada.unidad_id} llegada={llegada} {...ajustes} />
       ))}
     </ul>
   );
 }
 
-function FilaLlegada({
-  llegada,
-  umbralSinSenalS,
-}: {
-  llegada: LlegadaRow;
-  umbralSinSenalS: number;
-}) {
+function FilaLlegada({ llegada, umbralSinSenalS, penalizacionIncidenciaPct }: PropsFila) {
   const estado = evaluarLlegada({
     enViaje: llegada.viaje_id !== null,
     segundosSinSenal: llegada.segundos_sin_senal,
     umbralSinSenalS,
   });
+  const tiempo = estimarLlegada({
+    estado,
+    rutaTieneTrazado: llegada.ruta_tiene_trazado,
+    distanciaTrazadoM: llegada.distancia_trazado_m,
+    yaPaso: llegada.ya_paso,
+    velocidadesKmh: llegada.velocidades_kmh ?? [],
+    incidenciaActiva: llegada.incidencia_activa,
+    penalizacionIncidenciaPct,
+  });
 
   const senalPerdida = estado.tipo === "senal_perdida";
-  const atenuado = estado.tipo !== "en_camino";
+  const atenuado = estado.tipo !== "en_camino" || tiempo.tipo === "ya_paso";
 
   return (
     <li
@@ -83,30 +87,24 @@ function FilaLlegada({
           </span>
         </div>
 
-        <TiempoEstimado
-          estado={estado}
-          rutaTieneTrazado={llegada.ruta_tiene_trazado}
-        />
+        <TiempoEstimado estado={estado} tiempo={tiempo} />
       </div>
 
       {senalPerdida && <AvisoSenalPerdida estado={estado} />}
+      {tiempo.tipo === "minutos" && tiempo.conIncidencia && <AvisoIncidencia />}
     </li>
   );
 }
 
 function TiempoEstimado({
   estado,
-  rutaTieneTrazado,
+  tiempo,
 }: {
   estado: EstadoLlegada;
-  rutaTieneTrazado: boolean;
+  tiempo: TiempoLlegada;
 }) {
   if (estado.tipo === "sin_recorrido") {
-    return (
-      <span className="shrink-0 text-xs font-bold text-tinta-suave">
-        Sin recorrido activo
-      </span>
-    );
+    return <EtiquetaEstado texto="Sin recorrido activo" />;
   }
 
   if (estado.tipo === "senal_perdida") {
@@ -117,18 +115,38 @@ function TiempoEstimado({
     );
   }
 
-  // Con trazado cargado aquí iría el tiempo estimado. Mientras no lo haya, se dice
-  // que la unidad viene en camino en vez de inventar un número.
-  if (!puedeEstimarTiempo(estado, rutaTieneTrazado)) {
-    return (
-      <span className="shrink-0 text-xs font-bold text-marca-profundo">En camino</span>
-    );
+  if (tiempo.tipo === "ya_paso") {
+    return <EtiquetaEstado texto="Ya pasó por aquí" />;
+  }
+
+  // Sin trazado no hay distancia confiable: se dice que viene en vez de inventar
+  // un número.
+  if (tiempo.tipo === "sin_estimado") {
+    return <span className="shrink-0 text-xs font-bold text-tinta">En camino</span>;
   }
 
   return (
-    <span className="shrink-0 font-serif text-[17px] font-black text-marca-profundo">
-      En camino
+    <span className="flex shrink-0 flex-col items-end leading-none">
+      <span className="font-serif text-[22px] font-black text-tinta">
+        {tiempo.minutos === 0 ? "Llegando" : `~${formatearMinutos(tiempo.minutos)}`}
+      </span>
+      <span className="pt-1 text-[11px] font-semibold text-tinta-media">estimado</span>
     </span>
+  );
+}
+
+function EtiquetaEstado({ texto }: { texto: string }) {
+  return <span className="shrink-0 text-xs font-bold text-tinta-media">{texto}</span>;
+}
+
+function AvisoIncidencia() {
+  return (
+    <>
+      <div className="h-px bg-borde-suave" />
+      <p className="text-xs font-semibold text-advertencia-tinta">
+        Hay una incidencia en esta ruta: el tiempo estimado ya suma un margen por ella.
+      </p>
+    </>
   );
 }
 

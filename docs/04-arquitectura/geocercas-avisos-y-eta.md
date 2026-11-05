@@ -61,9 +61,18 @@ tiempo_estimado = distancia_restante_sobre_el_trazado / velocidad_referencia
 ```
 
 - La distancia sigue el trazado real (`ST_LineLocatePoint` + `ST_LineSubstring`), no la línea
-  recta.
-- La velocidad es el promedio de las últimas 5 posiciones usables, con un piso mínimo.
-- Con una incidencia activa se aplica una penalización y la interfaz lo indica.
+  recta. La calcula `llegadas_a_parada` (`sql/14_tiempo_estimado.sql`); la cuenta en minutos la
+  hace el dominio de la web (`domain/eta.ts`, `estimarLlegada` en `domain/llegadas.ts`).
+- Si la unidad está más adelante que la parada sobre el trazado: en una ruta circular (inicio
+  y fin a menos de `distancia_parada_trazado_m`) se da la vuelta; en una abierta la fila dice
+  «Ya pasó por aquí». Una diferencia menor a esa misma tolerancia es deriva del GPS con la
+  unidad encima de la parada y se muestra «Llegando».
+- La velocidad es el promedio de las últimas 5 posiciones usables del viaje (las lecturas sin
+  velocidad se descartan), con un piso de 8 km/h.
+- Con una incidencia activa en la ruta se suma `penalizacion_incidencia_pct` (25 %) y la fila
+  lo dice.
+- Solo hay cifra con la ruta trazada y la señal fresca. Sin trazado: «En camino»; con la señal
+  perdida: «Sin confirmar».
 - En la interfaz y en la documentación: «tiempo estimado» o «ETA estimado». **Nunca
   «predictivo».**
 

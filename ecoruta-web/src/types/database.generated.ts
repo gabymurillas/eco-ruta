@@ -855,6 +855,8 @@ export type Database = {
         Args: { parada: string }
         Returns: {
           distancia_recta_m: number
+          distancia_trazado_m: number
+          incidencia_activa: boolean
           ruta_color: string
           ruta_icono: string
           ruta_id: string
@@ -866,7 +868,9 @@ export type Database = {
           unidad_lat: number
           unidad_lng: number
           unidad_nombre: string
+          velocidades_kmh: number[]
           viaje_id: string
+          ya_paso: boolean
         }[]
       }
       longtransactionsenabled: { Args: never; Returns: boolean }

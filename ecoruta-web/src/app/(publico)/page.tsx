@@ -10,6 +10,7 @@ export const metadata = {
 /** Valores de respaldo si los parámetros no cargan: coinciden con los del esquema. */
 const UMBRAL_SIN_SENAL_POR_DEFECTO_S = 300;
 const RADIO_APROXIMACION_POR_DEFECTO_M = 500;
+const PENALIZACION_INCIDENCIA_POR_DEFECTO_PCT = 25;
 
 /** Las rutas solo componen features: la lógica y los datos viven en la feature. */
 export default async function SeguimientoPage() {
@@ -27,6 +28,10 @@ export default async function SeguimientoPage() {
       }
       radioAproximacionM={
         valores.get("radio_aproximacion_m") ?? RADIO_APROXIMACION_POR_DEFECTO_M
+      }
+      penalizacionIncidenciaPct={
+        valores.get("penalizacion_incidencia_pct") ??
+        PENALIZACION_INCIDENCIA_POR_DEFECTO_PCT
       }
     />
   );

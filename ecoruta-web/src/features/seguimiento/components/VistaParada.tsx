@@ -37,6 +37,7 @@ type Props = {
   llegadas: readonly LlegadaRow[];
   umbralSinSenalS: number;
   radioAproximacionM: number;
+  penalizacionIncidenciaPct: number;
   alCambiar: () => void;
 };
 
@@ -78,7 +79,11 @@ export function VistaParada(props: Props) {
           agregue una, aquí verás cuándo llega.
         </p>
       ) : (
-        <ListaLlegadas llegadas={llegadas} umbralSinSenalS={umbralSinSenalS} />
+        <ListaLlegadas
+          llegadas={llegadas}
+          umbralSinSenalS={umbralSinSenalS}
+          penalizacionIncidenciaPct={props.penalizacionIncidenciaPct}
+        />
       )}
 
       {aviso && (
