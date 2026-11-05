@@ -1,22 +1,30 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Boton } from "@/components/ui/Boton";
 import type { UnidadConRuta } from "@/services/unidades.service";
 import { eliminar } from "../acciones";
 
 type Props = {
   unidad: UnidadConRuta;
-  onTerminar: () => void;
+  onCancelar: () => void;
+  onEliminada: () => void;
 };
 
 /**
  * Pide confirmación con las consecuencias a la vista: borrar una unidad se lleva
  * su historial, y no se puede deshacer.
  */
-export function ConfirmarEliminarUnidad({ unidad, onTerminar }: Props) {
+export function ConfirmarEliminarUnidad({ unidad, onCancelar, onEliminada }: Props) {
   const [error, setError] = useState<string>();
   const [eliminando, iniciar] = useTransition();
+  const titulo = useRef<HTMLHeadingElement>(null);
+
+  // El panel aparece en la otra punta de la pantalla: sin mover el foco, quien
+  // navega con teclado o lector de pantalla no se entera de que se abrió.
+  useEffect(() => {
+    titulo.current?.focus();
+  }, []);
 
   function confirmar() {
     iniciar(async () => {
@@ -27,13 +35,23 @@ export function ConfirmarEliminarUnidad({ unidad, onTerminar }: Props) {
         return;
       }
 
-      onTerminar();
+      onEliminada();
     });
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border-[0.5px] border-error bg-superficie p-5">
-      <h2 className="font-serif text-[15px] font-bold">¿Eliminar «{unidad.nombre}»?</h2>
+    <section
+      aria-labelledby="titulo-eliminar-unidad"
+      className="flex flex-col gap-3 rounded-2xl border-[0.5px] border-error bg-superficie p-5"
+    >
+      <h2
+        ref={titulo}
+        id="titulo-eliminar-unidad"
+        tabIndex={-1}
+        className="font-serif text-[15px] font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error"
+      >
+        ¿Eliminar «{unidad.nombre}»?
+      </h2>
 
       <ul className="flex list-disc flex-col gap-1.5 pl-4 text-[13px] leading-relaxed text-tinta-media">
         <li>
@@ -64,10 +82,10 @@ export function ConfirmarEliminarUnidad({ unidad, onTerminar }: Props) {
         >
           {eliminando ? "Eliminando…" : error ? "Reintentar" : "Sí, eliminar"}
         </button>
-        <Boton variante="secundario" onClick={onTerminar} disabled={eliminando}>
-          No
+        <Boton variante="secundario" onClick={onCancelar} disabled={eliminando}>
+          Cancelar
         </Boton>
       </div>
-    </div>
+    </section>
   );
 }

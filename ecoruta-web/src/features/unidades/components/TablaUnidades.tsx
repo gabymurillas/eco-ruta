@@ -34,7 +34,7 @@ export function TablaUnidades({ unidades }: Props) {
             Unidades registradas y estado de su dispositivo
           </caption>
           <thead>
-            <tr className="border-b-[0.5px] border-borde bg-marca-tenue text-left">
+            <tr className="border-b-[0.5px] border-borde bg-fondo text-left">
               <Th className="w-56">Unidad</Th>
               <Th>Ruta asignada</Th>
               <Th className="w-44">Dispositivo</Th>
@@ -95,16 +95,17 @@ export function TablaUnidades({ unidades }: Props) {
                     <button
                       type="submit"
                       disabled={enviando}
-                      className="rounded-full px-2 py-1 text-[13px] font-bold text-marca-profundo transition-colors duration-300 ease-out hover:bg-marca-tenue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo disabled:opacity-50"
+                      className="inline-flex h-10 items-center rounded-full px-3 text-[13px] font-bold text-marca-profundo transition-colors duration-300 ease-out hover:bg-marca-tenue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo disabled:opacity-50"
                     >
                       {unidad.vinculado ? "Revincular" : "Vincular"}
                     </button>
                   </form>
                   <button
+                    id={idBotonEliminar(unidad.id)}
                     type="button"
                     onClick={() => setIdAEliminar(unidad.id)}
                     aria-label={`Eliminar ${unidad.nombre}`}
-                    className="ml-1 rounded-full px-2 py-1 text-[13px] font-bold text-error transition-colors duration-300 ease-out hover:bg-error/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error"
+                    className="ml-1 inline-flex h-10 items-center rounded-full px-3 text-[13px] font-bold text-error transition-colors duration-300 ease-out hover:bg-error/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error"
                   >
                     Eliminar
                   </button>
@@ -132,7 +133,13 @@ export function TablaUnidades({ unidades }: Props) {
           <ConfirmarEliminarUnidad
             key={unidadAEliminar.id}
             unidad={unidadAEliminar}
-            onTerminar={() => setIdAEliminar(null)}
+            onCancelar={() => {
+              setIdAEliminar(null);
+              // El foco vuelve a donde estaba: sin esto el teclado arranca de nuevo
+              // desde el principio de la página.
+              document.getElementById(idBotonEliminar(unidadAEliminar.id))?.focus();
+            }}
+            onEliminada={() => setIdAEliminar(null)}
           />
         ) : codigoActivo && unidadDelPanel ? (
           <form action={enviar}>
@@ -155,6 +162,10 @@ export function TablaUnidades({ unidades }: Props) {
       </aside>
     </div>
   );
+}
+
+function idBotonEliminar(unidadId: string): string {
+  return `eliminar-unidad-${unidadId}`;
 }
 
 function EstadoDispositivo({ unidad }: { unidad: UnidadConRuta }) {
