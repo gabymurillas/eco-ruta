@@ -237,3 +237,12 @@ function distanciaASegmentoM(punto: Punto, a: Punto, b: Punto): number {
 function mismoPunto(a: Punto, b: Punto): boolean {
   return Math.abs(a.lat - b.lat) < 1e-7 && Math.abs(a.lng - b.lng) < 1e-7;
 }
+
+/** Largo del recorrido sumando sus tramos. */
+export function longitudM(puntos: readonly Punto[]): number {
+  let total = 0;
+  for (let i = 1; i < puntos.length; i++) {
+    total += distanciaM(puntos[i - 1], puntos[i]);
+  }
+  return total;
+}

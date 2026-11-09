@@ -28,41 +28,6 @@ export function leerPeriodo(valor: string | undefined): PeriodoDias {
   return PERIODOS_DIAS.find((dias) => dias === numero) ?? 7;
 }
 
-/**
- * Lee un punto de la columna `geography` tal como lo entrega PostgREST: EWKB en
- * hexadecimal. Un punto con SRID ocupa siempre 25 bytes (orden, tipo, SRID, x, y),
- * así que leerlo aquí evita una vista o una función solo para sacar lat/lng.
- * Cualquier otra forma devuelve null y la incidencia se muestra sin mapa.
- */
-export function leerPuntoEwkb(hex: unknown): { lat: number; lng: number } | null {
-  if (typeof hex !== "string" || !/^[0-9a-fA-F]{50}$/.test(hex)) {
-    return null;
-  }
-
-  const bytes = new Uint8Array(25);
-  for (let i = 0; i < 25; i++) {
-    bytes[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
-  }
-
-  const vista = new DataView(bytes.buffer);
-  const littleEndian = bytes[0] === 1;
-  const tipo = vista.getUint32(1, littleEndian);
-
-  // 0x20000001: punto con SRID. Sin la bandera de SRID el largo sería otro.
-  if (tipo !== 0x20000001) {
-    return null;
-  }
-
-  const lng = vista.getFloat64(9, littleEndian);
-  const lat = vista.getFloat64(17, littleEndian);
-
-  if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
-    return null;
-  }
-
-  return { lat, lng };
-}
-
 // El servidor de Vercel corre en UTC: sin la zona fija, un reporte de las 10 a. m.
 // se leería como de las 2 p. m.
 const ZONA = "America/Caracas";

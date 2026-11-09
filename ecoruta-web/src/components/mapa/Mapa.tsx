@@ -2,7 +2,7 @@
 
 import "leaflet/dist/leaflet.css";
 import { useEffect } from "react";
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import { AttributionControl, MapContainer, TileLayer, useMap } from "react-leaflet";
 import type { ReactNode } from "react";
 import {
   calcularEncuadre,
@@ -15,6 +15,12 @@ type Props = {
   encuadrar?: readonly Punto[];
   zoom?: number;
   className?: string;
+  /**
+   * Solo para mirar: sin arrastre, zoom ni teclado. Para vistas previas dentro
+   * de una tarjeta, donde un mapa que se mueve con la rueda roba el scroll de
+   * la página.
+   */
+  estatico?: boolean;
   children?: ReactNode;
 };
 
@@ -35,21 +41,37 @@ const TESELAS_OSM = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 const ATRIBUCION =
   '&copy; colaboradores de <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
-export function Mapa({ encuadrar = [], zoom = ZOOM_CIUDAD, className, children }: Props) {
+const MARGEN_ENCUADRE_PX = 40;
+const MARGEN_ENCUADRE_ESTATICO_PX = 16;
+
+export function Mapa({ encuadrar = [], zoom = ZOOM_CIUDAD, className, estatico = false, children }: Props) {
   const encuadre = calcularEncuadre(encuadrar);
 
   return (
     <MapContainer
       center={[encuadre.centro.lat, encuadre.centro.lng]}
       zoom={zoom}
-      scrollWheelZoom
+      scrollWheelZoom={!estatico}
+      dragging={!estatico}
+      zoomControl={!estatico}
+      doubleClickZoom={!estatico}
+      touchZoom={!estatico}
+      boxZoom={!estatico}
+      keyboard={!estatico}
+      attributionControl={!estatico}
       className={className}
       // Leaflet numera el zoom por niveles enteros; el fraccionado deja las teselas
       // borrosas en pantallas de baja densidad.
       zoomSnap={1}
     >
       <TileLayer url={TESELAS_OSM} attribution={ATRIBUCION} maxZoom={19} />
-      <AjustarEncuadre puntos={encuadre.puntos} />
+      {/* En una vista previa angosta el prefijo de Leaflet parte el crédito en dos
+          líneas sobre el mapa. El de OpenStreetMap es obligatorio y se queda. */}
+      {estatico && <AttributionControl prefix={false} />}
+      <AjustarEncuadre
+        puntos={encuadre.puntos}
+        margen={estatico ? MARGEN_ENCUADRE_ESTATICO_PX : MARGEN_ENCUADRE_PX}
+      />
       {children}
     </MapContainer>
   );
@@ -61,7 +83,7 @@ export function Mapa({ encuadrar = [], zoom = ZOOM_CIUDAD, className, children }
  * Vive como componente hijo porque `useMap` solo funciona dentro del contenedor:
  * es la forma que da react-leaflet de alcanzar la instancia del mapa.
  */
-function AjustarEncuadre({ puntos }: { puntos: readonly Punto[] }) {
+function AjustarEncuadre({ puntos, margen }: { puntos: readonly Punto[]; margen: number }) {
   const mapa = useMap();
 
   // La clave depende de las coordenadas y no del arreglo: una lista nueva con los
@@ -76,11 +98,11 @@ function AjustarEncuadre({ puntos }: { puntos: readonly Punto[] }) {
 
     mapa.fitBounds(
       puntos.map((punto) => [punto.lat, punto.lng]),
-      { padding: [40, 40], maxZoom: 16 },
+      { padding: [margen, margen], maxZoom: 16 },
     );
     // `puntos` se omite a propósito: `clave` ya representa su contenido.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clave, mapa]);
+  }, [clave, mapa, margen]);
 
   return null;
 }

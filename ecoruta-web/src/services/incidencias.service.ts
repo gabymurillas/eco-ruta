@@ -1,5 +1,5 @@
 import { crearClienteServidor } from "@/lib/supabase/server";
-import { leerPuntoEwkb } from "@/domain/incidencias";
+import { leerPuntoEwkb } from "@/domain/ewkb";
 import { exito, fallo, falloRegistrado, type Resultado } from "./resultado";
 
 const MILISEGUNDOS_POR_SEGUNDO = 1000;
