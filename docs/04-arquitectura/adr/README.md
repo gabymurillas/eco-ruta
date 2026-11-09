@@ -19,5 +19,6 @@ anterior como «Reemplazado por ADR-XXXX».
 | [0011](0011-eta-estimado-con-historial.md) | Tiempo estimado con historial por franja (versión mínima) | Propuesto |
 | [0012](0012-visibilidad-solo-en-servicio.md) | Unidades visibles solo durante un viaje activo | Aceptado e implementado |
 | [0013](0013-retencion-de-telemetria.md) | Retención de 90 días de la telemetría cruda | Aceptado, implementación pendiente |
+| [0014](0014-plataforma-multiorganizacion.md) | Una sola plataforma para varias organizaciones | Propuesto (después de la tesis) |
 
 Plantilla para un ADR nuevo: copiar cualquiera, numerar en orden y agregarlo a esta tabla.
