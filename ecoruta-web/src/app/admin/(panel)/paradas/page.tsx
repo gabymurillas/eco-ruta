@@ -34,32 +34,19 @@ export default async function ParadasPage() {
   const radioMinimoM = radioMinimoSugeridoM(exactitudMaximaM);
 
   return (
-    <>
-      <header className="flex h-18 shrink-0 items-center border-b-[0.5px] border-borde bg-superficie px-7">
-        <div className="flex flex-col gap-px">
-          <h1 className="font-serif text-[19px] font-black tracking-tight">Paradas</h1>
-          <p className="text-xs font-semibold text-tinta-suave">
-            Las rutas pasan por las paradas que toca su trazado. No hace falta asignarlas.
-          </p>
-        </div>
-      </header>
-
-      <main className="min-h-0 flex-1 p-7">
-        <EditorDeParadas
-          paradas={paradas.datos}
-          trazados={
-            rutas.ok
-              ? rutas.datos.map((ruta) => ({
-                  id: ruta.ruta_id,
-                  color: ruta.ruta_color,
-                  puntos: trazadoALatLng(ruta.trazado_geojson),
-                }))
-              : []
-          }
-          radioPorDefectoM={radioMinimoM}
-          radioMinimoM={radioMinimoM}
-        />
-      </main>
-    </>
+    <EditorDeParadas
+      paradas={paradas.datos}
+      trazados={
+        rutas.ok
+          ? rutas.datos.map((ruta) => ({
+              id: ruta.ruta_id,
+              color: ruta.ruta_color,
+              puntos: trazadoALatLng(ruta.trazado_geojson),
+            }))
+          : []
+      }
+      radioPorDefectoM={radioMinimoM}
+      radioMinimoM={radioMinimoM}
+    />
   );
 }

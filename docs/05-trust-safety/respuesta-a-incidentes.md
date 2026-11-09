@@ -45,7 +45,7 @@
 ### G4 — Avisos o tiempos estimados masivamente erróneos (S2)
 1. Revisar los parámetros (un `update` equivocado es la causa más probable).
 2. Revisar `eventos_geocerca` del viaje afectado y la exactitud de las posiciones.
-3. Si hace falta, apagar `notifica` en las paradas afectadas mientras se corrige.
+3. Si hace falta, apagar los avisos de las paradas afectadas mientras se corrige: en el panel, **Paradas → la parada → «Avisar a los ciudadanos»** (columna `notifica`). La parada sigue registrando el paso de las unidades; solo deja de avisar.
 
 ### G5 — Exposición que pone en riesgo a un chofer (S1)
 1. Desactivar la ruta o la unidad (`activa = false`): deja de verse al público.

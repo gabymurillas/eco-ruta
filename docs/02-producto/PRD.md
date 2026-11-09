@@ -191,7 +191,7 @@ revoca la sesión del teléfono.
 | ADM-04 | Incidencias activas visibles en el monitoreo | P0 | ✅ |
 | ADM-05 | CRUD de rutas: nombre, tipo libre, color de la paleta de cinco, ícono, horario y activa | P0 | ✅ |
 | ADM-06 | Trazado asistido: puntos clave ruteados por las calles (OSRM), tramos rectos y trazado desde un viaje grabado | P0 | ✅ |
-| ADM-07 | Paradas de la ciudad: crear, mover y buscar lugares; radio de geocerca | P0 | ✅ |
+| ADM-07 | Paradas de la ciudad: crear, mover (también por coordenadas) y buscar lugares; radio de geocerca; avisos al ciudadano por parada | P0 | ✅ |
 | ADM-08 | Asociación automática parada–ruta por cercanía al trazado (`distancia_parada_trazado_m`) | P0 | ✅ |
 | ADM-09 | CRUD de unidades y asignación de ruta | P0 | ✅ |
 | ADM-10 | Vinculación: código de 5 caracteres, de un solo uso y válido por 10 minutos | P0 | ✅ |

@@ -16,7 +16,7 @@ export type ResultadoAccion = {
   paradaId?: string;
 };
 
-type DatosDeParada = Pick<ParadaDeLaCiudad, "nombre" | "lat" | "lng" | "radioM">;
+type DatosDeParada = Pick<ParadaDeLaCiudad, "nombre" | "lat" | "lng" | "radioM" | "notifica">;
 
 export async function agregarParada(datos: DatosDeParada): Promise<ResultadoAccion> {
   const nombre = datos.nombre.trim();

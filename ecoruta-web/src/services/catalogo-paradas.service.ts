@@ -21,16 +21,25 @@ export type ParadaDeLaCiudad = {
   lat: number;
   lng: number;
   radioM: number;
+  /** Con `false` la parada registra el paso de las unidades, pero no avisa al ciudadano. */
+  notifica: boolean;
   rutas: RutaQuePasa[];
 };
 
 export async function obtenerParadasDeLaCiudad(): Promise<Resultado<ParadaDeLaCiudad[]>> {
   const supabase = await crearClienteServidor();
-  const { data, error } = await supabase.rpc("paradas_de_la_ciudad");
+  // `paradas_de_la_ciudad` no devuelve `notifica`; se lee aparte para no exigir
+  // una migración solo por una columna que ya está en la tabla.
+  const [{ data, error }, avisos] = await Promise.all([
+    supabase.rpc("paradas_de_la_ciudad"),
+    supabase.from("paradas").select("id, notifica"),
+  ]);
 
-  if (error) {
+  if (error || avisos.error) {
     return fallo("No se pudieron cargar las paradas.");
   }
+
+  const notificaDe = new Map(avisos.data.map((fila) => [fila.id, fila.notifica]));
 
   return exito(
     (data ?? []).map((fila) => ({
@@ -39,6 +48,7 @@ export async function obtenerParadasDeLaCiudad(): Promise<Resultado<ParadaDeLaCi
       lat: fila.parada_lat,
       lng: fila.parada_lng,
       radioM: fila.radio_geocerca_m,
+      notifica: notificaDe.get(fila.parada_id) ?? true,
       // jsonb llega sin tipo: la forma la fija `paradas_de_la_ciudad`.
       rutas: fila.rutas as RutaQuePasa[],
     })),
@@ -50,6 +60,7 @@ type DatosDeParada = {
   lat: number;
   lng: number;
   radioM: number;
+  notifica: boolean;
 };
 
 export async function crearParada({
@@ -57,6 +68,7 @@ export async function crearParada({
   lat,
   lng,
   radioM,
+  notifica,
 }: DatosDeParada): Promise<Resultado<string>> {
   const supabase = await crearClienteServidor();
   const { data, error } = await supabase.rpc("crear_parada", {
@@ -70,17 +82,26 @@ export async function crearParada({
     return fallo("No se pudo crear la parada.");
   }
 
+  // `crear_parada` la deja avisando (el valor por defecto de la columna). Solo
+  // hace falta una segunda escritura si el admin la creó sin avisos.
+  if (!notifica) {
+    const sinAvisos = await supabase.from("paradas").update({ notifica }).eq("id", data);
+    if (sinAvisos.error) {
+      return fallo("La parada se creó, pero sigue avisando. Ábrela y vuelve a apagar los avisos.");
+    }
+  }
+
   return exito(data);
 }
 
 /**
- * Posición, radio y nombre en una sola llamada del admin. Son dos escrituras; si
+ * Posición, radio, nombre y avisos en una sola llamada del admin. Son dos escrituras; si
  * la segunda falla, la primera ya quedó y reintentar con los mismos datos no
  * hace daño.
  */
 export async function actualizarParada(
   paradaId: string,
-  { nombre, lat, lng, radioM }: DatosDeParada,
+  { nombre, lat, lng, radioM, notifica }: DatosDeParada,
 ): Promise<Resultado<null>> {
   const supabase = await crearClienteServidor();
 
@@ -95,10 +116,10 @@ export async function actualizarParada(
     return fallo("No se pudo mover la parada.");
   }
 
-  const renombrada = await supabase.from("paradas").update({ nombre }).eq("id", paradaId);
+  const renombrada = await supabase.from("paradas").update({ nombre, notifica }).eq("id", paradaId);
 
   if (renombrada.error) {
-    return fallo("No se pudo renombrar la parada.");
+    return fallo("No se pudo guardar el nombre ni los avisos de la parada.");
   }
 
   return exito(null);

@@ -21,7 +21,7 @@ type Props = {
  * La parada que se está editando. `paradaId` nulo es una parada nueva: un
  * borrador que solo existe en pantalla hasta que el admin lo confirma.
  */
-export type Ficha = Pick<ParadaDeLaCiudad, "nombre" | "lat" | "lng" | "radioM"> & {
+export type Ficha = Pick<ParadaDeLaCiudad, "nombre" | "lat" | "lng" | "radioM" | "notifica"> & {
   paradaId: string | null;
 };
 
@@ -104,6 +104,7 @@ export function useEditorDeParadas({ paradas, radioPorDefectoM, radioMinimoM }: 
         paradaId: null,
         nombre: `Parada ${paradas.length + 1}`,
         radioM: radioPorDefectoM,
+        notifica: true,
         ...punto,
       });
     }
@@ -136,7 +137,7 @@ export function useEditorDeParadas({ paradas, radioPorDefectoM, radioMinimoM }: 
       return;
     }
 
-    abrirFicha({ paradaId: null, nombre: lugar.nombre, lat: lugar.lat, lng: lugar.lng, radioM: radioPorDefectoM });
+    abrirFicha({ paradaId: null, nombre: lugar.nombre, lat: lugar.lat, lng: lugar.lng, radioM: radioPorDefectoM, notifica: true });
   }
 
   function seleccionarParada(paradaId: string) {
@@ -147,7 +148,7 @@ export function useEditorDeParadas({ paradas, radioPorDefectoM, radioMinimoM }: 
     const parada = paradas.find((p) => p.id === paradaId);
 
     if (parada) {
-      abrirFicha({ paradaId: parada.id, nombre: parada.nombre, lat: parada.lat, lng: parada.lng, radioM: parada.radioM });
+      abrirFicha({ paradaId: parada.id, nombre: parada.nombre, lat: parada.lat, lng: parada.lng, radioM: parada.radioM, notifica: parada.notifica });
       setDestino({ lat: parada.lat, lng: parada.lng, id: Date.now() });
     }
   }
@@ -264,6 +265,7 @@ function distinta(ficha: Ficha, parada: ParadaDeLaCiudad): boolean {
     ficha.nombre.trim() !== parada.nombre ||
     ficha.lat !== parada.lat ||
     ficha.lng !== parada.lng ||
-    ficha.radioM !== parada.radioM
+    ficha.radioM !== parada.radioM ||
+    ficha.notifica !== parada.notifica
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { DivIcon } from "leaflet";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Circle, Marker, Tooltip } from "react-leaflet";
 import { CapturarClics, VolarA, type Destino } from "@/components/mapa/ControlesDeMapa";
 import { TrazadoRuta } from "@/components/mapa/CapasDeRuta";
@@ -40,7 +40,9 @@ export function LienzoParadas({
   onSeleccionarParada,
   onMoverFicha,
 }: Props) {
-  const encuadrar = paradas.map(({ lat, lng }) => ({ lat, lng }));
+  // Se encuadra una sola vez, al abrir: si siguiera a la lista, cada parada
+  // guardada alejaría el mapa a toda la ciudad y el admin perdería su zoom.
+  const [encuadrar] = useState<Punto[]>(() => paradas.map(({ lat, lng }) => ({ lat, lng })));
 
   return (
     <Mapa encuadrar={encuadrar} className="size-full">
@@ -106,8 +108,8 @@ function ParadaEnFicha({ ficha, onMover }: { ficha: Ficha; onMover: (punto: Punt
         center={[ficha.lat, ficha.lng]}
         radius={ficha.radioM}
         pathOptions={{
-          color: "oklch(25% 0.02 60)",
-          fillColor: "oklch(25% 0.02 60)",
+          color: COLOR_EDICION,
+          fillColor: COLOR_EDICION,
           fillOpacity: 0.12,
           weight: 2,
           dashArray: ficha.paradaId === null ? "6 5" : undefined,
@@ -133,16 +135,28 @@ function ParadaEnFicha({ ficha, onMover }: { ficha: Ficha; onMover: (punto: Punt
   );
 }
 
+/**
+ * Leaflet escribe el color de la geocerca como atributo SVG, donde las variables
+ * de CSS no funcionan: va fijo, en un azul que se distingue en los dos temas y
+ * que no es color de ninguna ruta.
+ */
+const COLOR_EDICION = "oklch(58% 0.14 240)";
+
+/**
+ * Los marcadores sí son HTML: usan los colores del tema y se leen igual en
+ * claro y en oscuro. La parada abierta va en el azul de edición, como su geocerca.
+ */
 function construirIcono({ editando, sinRuta }: { editando: boolean; sinRuta: boolean }): DivIcon {
-  const diametro = editando ? 24 : 16;
+  const diametro = editando ? 26 : 16;
   const borde = editando ? 5 : 3;
-  const relleno = sinRuta ? "transparent" : "oklch(99% 0.008 75)";
+  const relleno = sinRuta ? "transparent" : "var(--color-superficie)";
   const estilo = sinRuta ? "dashed" : "solid";
+  const color = editando ? COLOR_EDICION : "var(--color-tinta)";
 
   return new DivIcon({
     className: "",
     iconSize: [diametro, diametro],
     iconAnchor: [diametro / 2, diametro / 2],
-    html: `<span style="display:block;width:${diametro}px;height:${diametro}px;border-radius:999px;background:${relleno};border:${borde}px ${estilo} oklch(25% 0.02 60);cursor:${editando ? "grab" : "pointer"}"></span>`,
+    html: `<span style="display:block;width:${diametro}px;height:${diametro}px;border-radius:999px;background:${relleno};border:${borde}px ${estilo} ${color};cursor:${editando ? "grab" : "pointer"}"></span>`,
   });
 }
