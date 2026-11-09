@@ -1,7 +1,7 @@
 "use client";
 
 import { DivIcon } from "leaflet";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Marker, Polyline, Popup, Tooltip } from "react-leaflet";
 import { CapturarClics } from "@/components/mapa/ControlesDeMapa";
 import { Mapa } from "@/components/mapa/Mapa";
@@ -37,7 +37,13 @@ type Props = {
 export function LienzoEditor(props: Props) {
   const { color, linea, puntos, paradas, onClicEnMapa } = props;
   const tono = colorDeRuta(color);
-  const encuadrar: Punto[] = [...paradas.map(({ lat, lng }) => ({ lat, lng })), ...linea];
+  // Se encuadra una sola vez, al abrir. La línea cambia con cada punto que el
+  // admin agrega o mueve: si el encuadre la siguiera, el mapa se alejaría a toda
+  // la ruta en cada clic y perdería el zoom con el que el admin estaba trabajando.
+  const [encuadrar] = useState<Punto[]>(() => [
+    ...paradas.map(({ lat, lng }) => ({ lat, lng })),
+    ...linea,
+  ]);
 
   return (
     <Mapa encuadrar={encuadrar} className="size-full [&.leaflet-container]:cursor-crosshair">
