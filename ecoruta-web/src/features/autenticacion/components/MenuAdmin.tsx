@@ -25,6 +25,16 @@ const GRUPOS: Grupo[] = [
     titulo: "Operación",
     secciones: [
       { href: "/admin", titulo: "Monitoreo", icono: <path d="M3 12h4l3-8 4 16 3-8h4" /> },
+      {
+        href: "/admin/incidencias",
+        titulo: "Incidencias",
+        icono: (
+          <>
+            <path d="M12 3l9 16H3z" />
+            <path d="M12 10v4M12 17v.1" />
+          </>
+        ),
+      },
     ],
   },
   {

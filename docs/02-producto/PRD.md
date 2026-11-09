@@ -201,7 +201,7 @@ revoca la sesión del teléfono.
 | ADM-14 | Históricos: viajes completados, cobertura e incidencias en los últimos 7 días; viajes por día | P1 | 🟡 (básico hecho) |
 | ADM-15 | Históricos: velocidad típica por ruta y franja (insumo de CIU-09) | P1 | ⬜ |
 | ADM-16 | Ver el recorrido real de un viaje y sus desvíos sobre el trazado | P2 | ⬜ |
-| ADM-17 | Resolver (cerrar) incidencias | P1 | 🟡 (validar flujo) |
+| ADM-17 | Resolver (cerrar) incidencias | P1 | 🟡 (sección `/admin/incidencias` hecha; falta probarla con un reporte real) |
 
 ### 6.3 App del dispositivo de ruta (`DIS`) — repositorio aparte
 
