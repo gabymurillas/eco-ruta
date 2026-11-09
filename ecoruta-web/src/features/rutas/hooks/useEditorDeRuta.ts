@@ -130,6 +130,19 @@ export function useEditorDeRuta({ rutaId, trazadoInicial, puntosClaveIniciales, 
     avisar("exito", `Recorrido cargado con ${camino.datos.puntos.length} puntos. Revísalo y guárdalo.`);
   }
 
+  /**
+   * Vuelve a lo que estaba guardado. Llevar `edicion` a 0 cancela un cálculo de
+   * camino en curso: el efecto solo recalcula después de un cambio del admin.
+   */
+  function descartar() {
+    setPuntos([...puntosClaveIniciales]);
+    setLinea([...trazadoInicial]);
+    setEdicion(0);
+    setSinGuardar(false);
+    setOcupado("libre");
+    setErrorCamino(null);
+  }
+
   async function guardar() {
     setOcupado("guardando");
     const resultado = await guardarTrazadoDeRuta(rutaId, latLngATrazado(linea), puntos);
@@ -160,6 +173,7 @@ export function useEditorDeRuta({ rutaId, trazadoInicial, puntosClaveIniciales, 
     limpiar: () => cambiarPuntos([]),
     convertirTrazadoViejo,
     usarViaje,
+    descartar,
     guardar,
     cerrarAviso: () => setAviso(null),
   };

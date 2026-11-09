@@ -246,3 +246,42 @@ export function longitudM(puntos: readonly Punto[]): number {
   }
   return total;
 }
+
+/**
+ * Cuánto mide, sobre la línea calculada, el tramo que llega a cada punto clave.
+ * El primero no tiene tramo (es el inicio) y vale 0.
+ *
+ * Cada punto clave se ubica en el vértice más cercano de la línea, buscando
+ * siempre hacia adelante: una ruta que vuelve por la misma calle pasa dos veces
+ * cerca del mismo lugar, y buscar en toda la línea mezclaría la ida y la vuelta.
+ */
+export function longitudesDeTramos(puntos: readonly Punto[], linea: readonly Punto[]): number[] {
+  if (linea.length < 2) {
+    return puntos.map(() => 0);
+  }
+
+  let desde = 0;
+  return puntos.map((punto, indice) => {
+    let masCercano = desde;
+    for (let i = desde; i < linea.length; i++) {
+      if (distanciaM(linea[i], punto) < distanciaM(linea[masCercano], punto)) {
+        masCercano = i;
+      }
+    }
+
+    const tramo = indice === 0 ? 0 : longitudM(linea.slice(desde, masCercano + 1));
+    desde = masCercano;
+    return tramo;
+  });
+}
+
+/** «Inicio», «Fin» o el número del punto: igual en el mapa y en la lista. */
+export function etiquetaDePunto(indice: number, total: number): string {
+  if (indice === 0) {
+    return "Inicio";
+  }
+  if (indice === total - 1) {
+    return "Fin";
+  }
+  return String(indice + 1);
+}

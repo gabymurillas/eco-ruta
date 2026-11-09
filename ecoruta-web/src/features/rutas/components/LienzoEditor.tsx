@@ -5,8 +5,9 @@ import { useMemo } from "react";
 import { Marker, Polyline, Popup, Tooltip } from "react-leaflet";
 import { CapturarClics } from "@/components/mapa/ControlesDeMapa";
 import { Mapa } from "@/components/mapa/Mapa";
-import { colorDeRuta, tintaSobreColorDeRuta } from "@/domain/colores";
+import { colorDeRuta } from "@/domain/colores";
 import type { Punto } from "@/domain/mapa";
+import { etiquetaDePunto } from "@/domain/trazado";
 import type { PuntoClave } from "../hooks/useEditorDeRuta";
 
 export type ParadaEnMapa = Punto & {
@@ -36,7 +37,6 @@ type Props = {
 export function LienzoEditor(props: Props) {
   const { color, linea, puntos, paradas, onClicEnMapa } = props;
   const tono = colorDeRuta(color);
-  const tinta = tintaSobreColorDeRuta(color);
   const encuadrar: Punto[] = [...paradas.map(({ lat, lng }) => ({ lat, lng })), ...linea];
 
   return (
@@ -61,7 +61,6 @@ export function LienzoEditor(props: Props) {
           indice={indice}
           total={puntos.length}
           tono={tono}
-          tinta={tinta}
           {...props}
         />
       ))}
@@ -74,13 +73,11 @@ type PropsPunto = Props & {
   indice: number;
   total: number;
   tono: string;
-  /** Mostaza es claro: lleva el número en tinta oscura (ver CLAUDE.md, colores de ruta). */
-  tinta: string;
 };
 
-function MarcadorPuntoClave({ punto, indice, total, tono, tinta, onMoverPunto, onQuitarPunto, onAlternarRecto }: PropsPunto) {
-  const etiqueta = indice === 0 ? "Inicio" : indice === total - 1 ? "Fin" : String(indice + 1);
-  const icono = useMemo(() => iconoPuntoClave(etiqueta, tono, tinta), [etiqueta, tono, tinta]);
+function MarcadorPuntoClave({ punto, indice, total, tono, onMoverPunto, onQuitarPunto, onAlternarRecto }: PropsPunto) {
+  const etiqueta = etiquetaDePunto(indice, total);
+  const icono = useMemo(() => iconoPuntoClave(etiqueta, tono, punto.recto), [etiqueta, tono, punto.recto]);
 
   return (
     <Marker
@@ -134,15 +131,20 @@ function MarcadorParada({ parada, tono }: { parada: ParadaEnMapa; tono: string }
   );
 }
 
-/** Los puntos clave son más grandes que las paradas y llevan su número: se arrastran. */
-function iconoPuntoClave(etiqueta: string, tono: string, tinta: string): DivIcon {
-  const ancho = etiqueta.length > 2 ? 44 : 26;
+/**
+ * Los puntos clave son más grandes que las paradas y llevan su etiqueta: se
+ * arrastran. Fondo de superficie con borde del color de la ruta, así el texto
+ * se lee igual sobre cualquier color y en los dos temas. El borde punteado
+ * marca que se llega a ese punto en línea recta, como en la lista del panel.
+ */
+function iconoPuntoClave(etiqueta: string, tono: string, recto: boolean): DivIcon {
+  const ancho = etiqueta.length > 2 ? 52 : 30;
 
   return new DivIcon({
     className: "",
-    iconSize: [ancho, 26],
-    iconAnchor: [ancho / 2, 13],
-    html: `<span style="display:flex;align-items:center;justify-content:center;width:${ancho}px;height:26px;border-radius:999px;background:${tono};color:${tinta};border:2px solid oklch(99% 0.008 75);font:700 11px 'Source Sans 3',system-ui,sans-serif;cursor:grab">${etiqueta}</span>`,
+    iconSize: [ancho, 30],
+    iconAnchor: [ancho / 2, 15],
+    html: `<span style="display:flex;align-items:center;justify-content:center;width:${ancho}px;height:30px;border-radius:999px;background:var(--color-superficie);color:var(--color-tinta);border:3px ${recto ? "dashed" : "solid"} ${tono};box-shadow:0 1px 3px rgb(0 0 0 / .25);font:800 12px var(--font-figtree),system-ui,sans-serif;cursor:grab">${etiqueta}</span>`,
   });
 }
 
