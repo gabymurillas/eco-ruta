@@ -1,118 +1,110 @@
 import { colorDeRuta } from "@/domain/colores";
-import type { ViajesPorDia } from "@/services/historicos.service";
+import { etiquetaDiaSemana, etiquetaNumeroDia, type DiaApilado } from "@/domain/historicos";
+
+export type RutaDelGrafico = { id: string; nombre: string; color: string };
 
 type Props = {
-  filas: readonly ViajesPorDia[];
+  dias: readonly DiaApilado[];
+  rutas: readonly RutaDelGrafico[];
 };
 
-const ALTURA_MAXIMA_PX = 140;
+/** Con más de una semana no caben el nombre del día ni el total sobre cada barra. */
+const DIAS_CON_ROTULO_COMPLETO = 7;
 
 /**
- * Barras agrupadas por día. Se dibujan con divs y no con una librería de gráficos:
- * son cinco días y tres rutas, y una dependencia más habría que justificarla.
+ * Barras apiladas por día. Se dibujan con divs y no con una librería de gráficos:
+ * son pocas barras, y una dependencia más habría que justificarla.
  *
- * El color viene de la ruta, pero cada barra lleva su valor en el texto accesible:
- * el color nunca es el único portador de significado.
+ * El color sigue a la ruta, nunca a su posición: cada ruta ocupa siempre el
+ * mismo lugar de la pila. La leyenda y el detalle al pasar el mouse dicen qué
+ * es cada color, y la tabla «Por ruta» trae las mismas cifras en texto.
  */
-export function GraficoViajesPorDia({ filas }: Props) {
-  const dias = agruparPorDia(filas);
-  const maximo = Math.max(1, ...filas.map((fila) => fila.viajes));
-  const rutas = rutasPresentes(filas);
+export function GraficoViajesPorDia({ dias, rutas }: Props) {
+  const maximo = Math.max(1, ...dias.map((dia) => dia.total));
+  const completo = dias.length <= DIAS_CON_ROTULO_COMPLETO;
+  const porId = new Map(rutas.map((ruta) => [ruta.id, ruta]));
 
-  if (filas.length === 0) {
+  if (dias.every((dia) => dia.total === 0)) {
     return (
-      <p className="text-sm text-tinta-media">
-        No hubo viajes registrados en este período.
+      <p className="p-5 text-sm text-tinta-media">
+        No hubo viajes completados en este período. Aparecen aquí cuando una unidad cierra su
+        recorrido.
       </p>
     );
   }
 
   return (
-    <figure className="flex flex-col gap-4">
-      <figcaption className="sr-only">
-        Viajes completados por día, separados por ruta
-      </figcaption>
+    <figure className="flex min-h-0 flex-1 flex-col">
+      <figcaption className="sr-only">Viajes completados por día, separados por ruta</figcaption>
+      <Leyenda rutas={rutas} />
 
-      <ul className="flex flex-wrap gap-3.5">
-        {rutas.map((ruta) => (
-          <li key={ruta.id} className="flex items-center gap-1.5">
-            <span
-              aria-hidden="true"
-              className="size-2 rounded-sm"
-              style={{ backgroundColor: colorDeRuta(ruta.color) }}
-            />
-            <span className="text-xs font-semibold text-tinta-media">{ruta.nombre}</span>
+      <ol className={`flex min-h-56 flex-1 items-stretch px-5 pt-4 pb-4 ${completo ? "gap-6" : "gap-1"}`}>
+        {dias.map((dia) => (
+          <li
+            key={dia.dia}
+            tabIndex={0}
+            className="group relative flex flex-1 flex-col items-center gap-1.5 rounded-lg outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo"
+          >
+            <div className="flex w-full flex-1 items-end justify-center border-b border-borde">
+              <div
+                className={`flex flex-col-reverse gap-0.5 ${completo ? "w-14" : "w-full max-w-5"}`}
+                style={{ height: `${(dia.total / maximo) * 100}%` }}
+              >
+                {dia.segmentos.map((segmento) => (
+                  <span
+                    key={segmento.rutaId}
+                    className="block min-h-0.5 last:rounded-t"
+                    style={{
+                      flexGrow: segmento.viajes,
+                      backgroundColor: colorDeRuta(porId.get(segmento.rutaId)?.color ?? null),
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+            {completo && <b className="text-[15px] leading-none">{dia.total}</b>}
+            <span className="text-[12.5px] font-semibold text-tinta-media">
+              {completo ? etiquetaDiaSemana(dia.dia) : etiquetaNumeroDia(dia.dia)}
+            </span>
+            <Detalle dia={dia} porId={porId} />
           </li>
         ))}
-      </ul>
-
-      <div className="flex items-end gap-6" style={{ height: ALTURA_MAXIMA_PX + 28 }}>
-        {dias.map(({ dia, barras }) => (
-          <div key={dia} className="flex flex-1 flex-col items-center gap-2">
-            <div
-              className="flex w-full items-end justify-center gap-1.5"
-              style={{ height: ALTURA_MAXIMA_PX }}
-            >
-              {barras.map((barra) => (
-                <div
-                  key={barra.ruta_id}
-                  title={`${barra.ruta_nombre}: ${barra.viajes} viajes`}
-                  className="w-5 rounded-t"
-                  style={{
-                    height: Math.max(4, (barra.viajes / maximo) * ALTURA_MAXIMA_PX),
-                    backgroundColor: colorDeRuta(barra.ruta_color),
-                  }}
-                >
-                  <span className="sr-only">
-                    {barra.ruta_nombre}: {barra.viajes} viajes
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <span className="text-xs font-semibold text-tinta-suave">
-              {formatearDia(dia)}
-            </span>
-          </div>
-        ))}
-      </div>
+      </ol>
     </figure>
   );
 }
 
-function agruparPorDia(filas: readonly ViajesPorDia[]) {
-  const porDia = new Map<string, ViajesPorDia[]>();
-
-  for (const fila of filas) {
-    const existentes = porDia.get(fila.dia);
-
-    if (existentes) {
-      existentes.push(fila);
-    } else {
-      porDia.set(fila.dia, [fila]);
-    }
-  }
-
-  return [...porDia.entries()].map(([dia, barras]) => ({ dia, barras }));
+function Leyenda({ rutas }: { rutas: readonly RutaDelGrafico[] }) {
+  return (
+    <ul className="flex flex-wrap gap-x-3.5 gap-y-1 px-5">
+      {rutas.map((ruta) => (
+        <li key={ruta.id} className="flex items-center gap-1.5 text-[12.5px] font-semibold text-tinta-media">
+          <i aria-hidden="true" className="size-2.5 rounded-[3px]" style={{ backgroundColor: colorDeRuta(ruta.color) }} />
+          {ruta.nombre}
+        </li>
+      ))}
+    </ul>
+  );
 }
 
-function rutasPresentes(filas: readonly ViajesPorDia[]) {
-  const rutas = new Map<string, { id: string; nombre: string; color: string }>();
-
-  for (const fila of filas) {
-    rutas.set(fila.ruta_id, {
-      id: fila.ruta_id,
-      nombre: fila.ruta_nombre,
-      color: fila.ruta_color,
-    });
-  }
-
-  return [...rutas.values()];
-}
-
-function formatearDia(dia: string): string {
-  return new Date(`${dia}T00:00:00`).toLocaleDateString("es-VE", {
-    weekday: "short",
-    day: "numeric",
-  });
+/** Transparente y no oculto: el lector de pantalla lo lee siempre; a la vista, al pasar el mouse o enfocar. */
+function Detalle({ dia, porId }: { dia: DiaApilado; porId: Map<string, RutaDelGrafico> }) {
+  return (
+    <div className="pointer-events-none absolute bottom-full z-10 mb-1 w-max max-w-56 rounded-[10px] border border-borde bg-superficie p-2.5 text-left text-xs opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+      <p className="font-bold">
+        {etiquetaDiaSemana(dia.dia)} {etiquetaNumeroDia(dia.dia)}: {dia.total}{" "}
+        {dia.total === 1 ? "viaje" : "viajes"}
+      </p>
+      {dia.segmentos.map((segmento) => (
+        <p key={segmento.rutaId} className="mt-1 flex items-center gap-1.5 text-tinta-media">
+          <i
+            aria-hidden="true"
+            className="size-2 rounded-[2px]"
+            style={{ backgroundColor: colorDeRuta(porId.get(segmento.rutaId)?.color ?? null) }}
+          />
+          {porId.get(segmento.rutaId)?.nombre}: {segmento.viajes}
+        </p>
+      ))}
+    </div>
+  );
 }

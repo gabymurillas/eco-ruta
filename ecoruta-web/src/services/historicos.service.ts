@@ -1,6 +1,6 @@
 import { crearClienteServidor } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
-import { exito, fallo, type Resultado } from "./resultado";
+import { exito, fallo, falloRegistrado, type Resultado } from "./resultado";
 
 export type ResumenHistoricos =
   Database["public"]["Functions"]["resumen_historicos"]["Returns"][number];
@@ -29,6 +29,22 @@ export async function obtenerViajesPorDia(
 
   if (error) {
     return fallo("No se pudieron cargar los viajes por día.");
+  }
+
+  return exito(data ?? []);
+}
+
+export type ResumenDeRuta =
+  Database["public"]["Functions"]["resumen_por_ruta"]["Returns"][number];
+
+export async function obtenerResumenPorRuta(
+  dias: number,
+): Promise<Resultado<ResumenDeRuta[]>> {
+  const supabase = await crearClienteServidor();
+  const { data, error } = await supabase.rpc("resumen_por_ruta", { dias });
+
+  if (error) {
+    return falloRegistrado("resumen_por_ruta", error, "No se pudo calcular el resumen por ruta.");
   }
 
   return exito(data ?? []);

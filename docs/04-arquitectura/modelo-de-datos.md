@@ -89,7 +89,8 @@ La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 | `rutas_para_mapa`, `paradas_de_ruta`, `paradas_de_la_ciudad` | RPC | Lectura para los mapas |
 | `guardar_trazado_de_ruta`, `crear_parada`, `mover_parada` | RPC | Edición del admin |
 | `resumen_historicos(dias)` | RPC | Históricos del admin |
-| `viajes_por_dia(dias)` | RPC | Históricos del admin. ⚠️ Existe en la base pero **no está en `sql/`** (brecha TS-08) |
+| `viajes_por_dia(dias)` | RPC | Históricos del admin: viajes cerrados por día (hora de Caracas) y ruta. En `sql/15` |
+| `resumen_por_ruta(dias)` | RPC | Históricos del admin: viajes, duración, cobertura e incidencias (y cuántas siguen activas) por ruta. En `sql/15` |
 | `viajes_grabados`, `recorrido_de_viaje` | RPC | Trazado desde un viaje grabado |
 | `estado_flota` | RPC | Monitoreo |
 | `canjear_codigo_de_vinculacion`, `registrar_auth_de_dispositivo`, `registrar_salud_del_dispositivo`, `eliminar_unidad` | RPC, **definer** | Vinculación y ciclo de vida del dispositivo (`sql/06`) |

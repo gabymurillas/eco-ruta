@@ -13,6 +13,6 @@ referencia (`TS-XX`) y su verificación.
 | TS-05 | El admin entra sin MFA | Media | — | Activar TOTP en Supabase Auth y exigir `aal2` en `es_admin()` | Abierta |
 | TS-06 | Uso de OSM, OSRM y Photon públicos: dependencia de sus políticas de uso; ven la IP y la zona que consulta el usuario | Baja | — | Vigilar el volumen; proveedor con acuerdo si hay piloto; mencionarlo en [privacidad](../06-legal/privacidad.md) | Aceptada para H1 |
 | TS-07 | La columna `dispositivos.push_token` existe aunque push está fuera de alcance | Baja | — | No poblarla; eliminarla en una migración futura | Abierta |
-| TS-08 | `viajes_por_dia` existe en la base pero no en `sql/`: el esquema no es reproducible desde el repositorio | Baja | — | Volcar su definición a `04_funciones.sql` | Abierta |
+| TS-08 | `viajes_por_dia` existe en la base pero no en `sql/`: el esquema no es reproducible desde el repositorio | Baja | — | Volcar su definición a `sql/` | Cerrada: `sql/15_historicos_por_ruta.sql` |
 | TS-09 | La ubicación exacta del ciudadano viaja como parámetro de `paradas_cercanas` y puede quedar en los registros del proveedor | Baja | — | Redondear a unos 3 decimales (unos 100 m) en el cliente antes de llamar | Abierta |
 | TS-10 | Sin límite de intentos en `vincular-dispositivo` ni límites propios contra el raspado de la API pública | Baja | — | Contador de intentos por IP o por código; vigilar el uso | Abierta |

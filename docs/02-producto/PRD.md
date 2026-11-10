@@ -198,7 +198,7 @@ revoca la sesión del teléfono.
 | ADM-11 | Eliminar una unidad revoca la cuenta del teléfono | P0 | ✅ |
 | ADM-12 | Desvincular el teléfono sin borrar la unidad ni su historial | P1 | ⬜ (brecha TS-04) |
 | ADM-13 | Editar los parámetros calibrables desde la interfaz | P0 | ✅ |
-| ADM-14 | Históricos: viajes completados, cobertura e incidencias en los últimos 7 días; viajes por día | P1 | 🟡 (básico hecho) |
+| ADM-14 | Históricos: viajes completados, cobertura e incidencias en los últimos 7 o 30 días; viajes por día; resumen por ruta | P1 | ✅ |
 | ADM-15 | Históricos: velocidad típica por ruta y franja (insumo de CIU-09) | P1 | ⬜ |
 | ADM-16 | Ver el recorrido real de un viaje y sus desvíos sobre el trazado | P2 | ⬜ |
 | ADM-17 | Resolver (cerrar) incidencias | P1 | 🟡 (sección `/admin/incidencias` hecha; falta probarla con un reporte real) |

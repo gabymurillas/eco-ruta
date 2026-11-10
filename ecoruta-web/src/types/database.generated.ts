@@ -999,6 +999,21 @@ export type Database = {
           viajes_completados: number
         }[]
       }
+      resumen_por_ruta: {
+        Args: { dias?: number }
+        Returns: {
+          cobertura_pct: number
+          duracion_promedio_min: number
+          incidencias: number
+          incidencias_activas: number
+          paradas_planificadas: number
+          paradas_visitadas: number
+          ruta_color: string
+          ruta_id: string
+          ruta_nombre: string
+          viajes_completados: number
+        }[]
+      }
       rutas_para_mapa: {
         Args: never
         Returns: {
