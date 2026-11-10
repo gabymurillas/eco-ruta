@@ -185,7 +185,7 @@ revoca la sesión del teléfono.
 
 | ID | Requisito | Prioridad | Estado |
 |---|---|---|---|
-| ADM-01 | Ingreso con correo y contraseña; guardia de sesión en `/admin` | P0 | ✅ |
+| ADM-01 | Ingreso con correo y contraseña; guardia de sesión en `/admin`; «Mantener la sesión» (desmarcado, termina al cerrar el navegador) y recuperación de contraseña por enlace al correo | P0 | ✅ (la recuperación exige la URL de retorno en la lista de Supabase Auth) |
 | ADM-02 | Monitoreo en vivo de la flota por Realtime, sin recargar | P0 | ✅ |
 | ADM-03 | Tarjeta de unidad: nombre, ruta, velocidad, última señal y batería; borde ámbar con batería baja y rojo sin señal | P0 | ✅ |
 | ADM-04 | Incidencias activas visibles en el monitoreo | P0 | ✅ |

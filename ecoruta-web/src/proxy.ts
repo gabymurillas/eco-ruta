@@ -1,8 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/entorno";
+import { ajustarVencimiento, COOKIE_SESION_CORTA } from "@/lib/supabase/sesion-corta";
 
 const RUTA_INGRESO = "/admin/ingreso";
+
+/** Se abren sin sesión: entrar y recuperar la contraseña. */
+const RUTAS_SIN_SESION = new Set([RUTA_INGRESO, "/admin/recuperar", "/admin/auth/confirmar"]);
 
 /**
  * Renueva la sesión en cada petición y protege `/admin`.
@@ -14,6 +18,7 @@ const RUTA_INGRESO = "/admin/ingreso";
  */
 export async function proxy(request: NextRequest) {
   let respuesta = NextResponse.next({ request });
+  const sesionCorta = request.cookies.has(COOKIE_SESION_CORTA);
 
   const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     cookies: {
@@ -24,7 +29,7 @@ export async function proxy(request: NextRequest) {
         }
         respuesta = NextResponse.next({ request });
         for (const { name, value, options } of cookiesNuevas) {
-          respuesta.cookies.set(name, value, options);
+          respuesta.cookies.set(name, value, ajustarVencimiento(options, sesionCorta));
         }
       },
     },
@@ -40,7 +45,7 @@ export async function proxy(request: NextRequest) {
   const esZonaAdmin = ruta.startsWith("/admin");
   const esIngreso = ruta === RUTA_INGRESO;
 
-  if (esZonaAdmin && !esIngreso && !user) {
+  if (esZonaAdmin && !RUTAS_SIN_SESION.has(ruta) && !user) {
     const destino = request.nextUrl.clone();
     destino.pathname = RUTA_INGRESO;
     return NextResponse.redirect(destino);

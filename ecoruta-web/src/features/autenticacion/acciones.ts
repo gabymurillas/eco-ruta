@@ -1,7 +1,13 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { cerrarSesion, iniciarSesion } from "@/services/auth.service";
+import {
+  cambiarContrasena,
+  cerrarSesion,
+  iniciarSesion,
+  solicitarRestablecimiento,
+} from "@/services/auth.service";
 
 export type EstadoIngreso = {
   error?: string;
@@ -19,12 +25,14 @@ export async function ingresar(
 ): Promise<EstadoIngreso> {
   const correo = String(datos.get("correo") ?? "").trim();
   const contrasena = String(datos.get("contrasena") ?? "");
+  // Un checkbox desmarcado no viaja en el formulario.
+  const mantener = datos.get("mantener") !== null;
 
   if (!correo || !contrasena) {
     return { error: "Escribe tu correo y tu contraseña.", correo };
   }
 
-  const resultado = await iniciarSesion({ correo, contrasena });
+  const resultado = await iniciarSesion({ correo, contrasena, mantener });
 
   if (!resultado.ok) {
     return { error: resultado.error, correo };
@@ -36,4 +44,50 @@ export async function ingresar(
 export async function salir(): Promise<void> {
   await cerrarSesion();
   redirect("/admin/ingreso");
+}
+
+export type EstadoRecuperacion = {
+  error?: string;
+  /** El correo al que se mandó el enlace: la pantalla lo nombra. */
+  enviadoA?: string;
+};
+
+export async function pedirEnlace(
+  _estadoPrevio: EstadoRecuperacion,
+  datos: FormData,
+): Promise<EstadoRecuperacion> {
+  const correo = String(datos.get("correo") ?? "").trim();
+
+  if (!correo) {
+    return { error: "Escribe el correo de tu cuenta." };
+  }
+
+  // El enlace vuelve al mismo sitio desde donde se pidió (producción o local).
+  // Supabase solo acepta destinos de su lista de URL permitidas.
+  const origen = (await headers()).get("origin") ?? "";
+  const resultado = await solicitarRestablecimiento(correo, `${origen}/admin/auth/confirmar`);
+
+  return resultado.ok ? { enviadoA: correo } : { error: resultado.error };
+}
+
+export type EstadoContrasenaNueva = { error?: string };
+
+export async function guardarContrasenaNueva(
+  _estadoPrevio: EstadoContrasenaNueva,
+  datos: FormData,
+): Promise<EstadoContrasenaNueva> {
+  const nueva = String(datos.get("contrasena") ?? "");
+  const repetida = String(datos.get("repetida") ?? "");
+
+  if (nueva !== repetida) {
+    return { error: "Las dos contraseñas no coinciden." };
+  }
+
+  const resultado = await cambiarContrasena(nueva);
+
+  if (!resultado.ok) {
+    return { error: resultado.error };
+  }
+
+  redirect("/admin");
 }
