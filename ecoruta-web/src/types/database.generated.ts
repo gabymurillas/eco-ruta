@@ -851,6 +851,7 @@ export type Database = {
         Args: { coordenadas: Json; puntos: Json; ruta: string }
         Returns: undefined
       }
+      inicio_del_periodo: { Args: { dias: number }; Returns: string }
       llegadas_a_parada: {
         Args: { parada: string }
         Returns: {
@@ -994,6 +995,7 @@ export type Database = {
           cobertura_pct: number
           duracion_promedio_min: number
           incidencias: number
+          incidencias_activas: number
           paradas_planificadas: number
           paradas_visitadas: number
           viajes_completados: number

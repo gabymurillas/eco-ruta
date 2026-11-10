@@ -17,7 +17,6 @@ import {
   obtenerResumenPorRuta,
   obtenerViajesPorDia,
   type ResumenHistoricos,
-  type ResumenDeRuta,
 } from "@/services/historicos.service";
 
 export const metadata = {
@@ -50,7 +49,7 @@ export default async function HistoricosPage({ searchParams }: PageProps<"/admin
         <p className="ml-auto text-sm text-tinta-media">{describirRango(dias)}</p>
       </header>
 
-      <Indicadores resumen={resumen.datos} porRuta={porRuta.ok ? porRuta.datos : null} periodo={periodo} />
+      <Indicadores resumen={resumen.datos} periodo={periodo} />
 
       <div className="flex min-h-0 flex-1 flex-wrap gap-4">
         <section className="flex min-w-[420px] flex-1 flex-col gap-3 rounded-2xl border border-borde bg-superficie pt-4">
@@ -82,16 +81,9 @@ function rutasDelGrafico(filas: readonly { ruta_id: string; ruta_nombre: string;
   return [...rutas.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
 }
 
-function Indicadores({
-  resumen,
-  porRuta,
-  periodo,
-}: {
-  resumen: ResumenHistoricos;
-  porRuta: ResumenDeRuta[] | null;
-  periodo: Periodo;
-}) {
-  const activas = porRuta?.reduce((suma, fila) => suma + fila.incidencias_activas, 0);
+function Indicadores({ resumen, periodo }: { resumen: ResumenHistoricos; periodo: Periodo }) {
+  // Total y activas salen de la misma consulta: «resueltas» no puede quedar negativa.
+  const activas = resumen.incidencias_activas;
   const duracion = resumen.duracion_promedio_min;
 
   return (
@@ -117,7 +109,7 @@ function Indicadores({
       <IndicadorKpi
         titulo="Incidencias"
         valor={String(resumen.incidencias)}
-        detalle={activas === undefined ? "reportadas en el período" : `${resumen.incidencias - activas} resueltas · ${activas} activas`}
+        detalle={`${resumen.incidencias - activas} resueltas · ${activas} activas`}
         icono={<><path d="M12 3l9 16H3z" /><path d="M12 10v4M12 17v.1" /></>}
         tono={activas ? "advertencia" : "neutro"}
       />
