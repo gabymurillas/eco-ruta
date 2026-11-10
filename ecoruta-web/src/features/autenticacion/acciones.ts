@@ -1,6 +1,7 @@
 "use server";
 
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { COOKIE_RECUPERACION, OPCIONES_RECUPERACION } from "@/lib/recuperacion";
 import { redirect } from "next/navigation";
 import {
   cambiarContrasena,
@@ -76,6 +77,14 @@ export async function guardarContrasenaNueva(
   _estadoPrevio: EstadoContrasenaNueva,
   datos: FormData,
 ): Promise<EstadoContrasenaNueva> {
+  const almacen = await cookies();
+
+  // La página ya lo exige; aquí se repite porque una Server Action se puede
+  // llamar sin pasar por la página.
+  if (!almacen.has(COOKIE_RECUPERACION)) {
+    return { error: "El enlace venció. Pide uno nuevo desde «¿Olvidaste la contraseña?»." };
+  }
+
   const nueva = String(datos.get("contrasena") ?? "");
   const repetida = String(datos.get("repetida") ?? "");
 
@@ -89,5 +98,7 @@ export async function guardarContrasenaNueva(
     return { error: resultado.error };
   }
 
+  // Un solo uso: para volver a cambiarla hay que pedir otro enlace.
+  almacen.delete({ name: COOKIE_RECUPERACION, path: OPCIONES_RECUPERACION.path });
   redirect("/admin");
 }

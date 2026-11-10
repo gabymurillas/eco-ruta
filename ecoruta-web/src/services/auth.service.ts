@@ -57,18 +57,26 @@ export async function cerrarSesion(): Promise<void> {
  * Pide a Supabase el correo con el enlace para elegir otra contraseña.
  *
  * Responde igual exista o no la cuenta: decir «ese correo no está registrado»
- * permitiría averiguar qué correos tienen acceso al panel. Solo un fallo del
- * servicio (por ejemplo, el límite de correos por hora) se informa.
+ * permitiría averiguar qué correos tienen acceso al panel. Por eso tampoco se
+ * informa el límite de envíos (429): Supabase solo lo aplica a cuentas que
+ * existen, y avisarlo las delataría. Solo una caída del servicio (5xx o sin red)
+ * se informa. Todo error queda en el registro: un SMTP mal configurado o una URL
+ * de retorno que falta en la lista de Supabase se ven ahí y no en la pantalla.
  */
 export async function solicitarRestablecimiento(correo: string, urlDeRetorno: string): Promise<Resultado<null>> {
   const supabase = await crearClienteServidor();
   const { error } = await supabase.auth.resetPasswordForEmail(correo, { redirectTo: urlDeRetorno });
 
-  if (error && error.status !== 400 && error.status !== 404) {
-    return falloRegistrado("restablecer contraseña", error, "No se pudo enviar el correo. Intenta de nuevo en unos minutos.");
+  if (!error) {
+    return exito(null);
   }
 
-  return exito(null);
+  console.error("[ecoruta] restablecer contraseña:", error);
+  const caidaDelServicio = error.status === undefined || error.status >= 500;
+
+  return caidaDelServicio
+    ? fallo("No se pudo enviar el correo. Intenta de nuevo en unos minutos.")
+    : exito(null);
 }
 
 /**
@@ -79,13 +87,21 @@ export async function solicitarRestablecimiento(correo: string, urlDeRetorno: st
  * plantilla que manda `token_hash` el enlace sirve desde cualquier navegador.
  */
 export async function confirmarRecuperacion(enlace: EnlaceDeRecuperacion): Promise<Resultado<null>> {
-  const supabase = await crearClienteServidor();
-  const { error } =
+  // Sesión corta: nace de un correo, y nadie eligió «Mantener la sesión».
+  const supabase = await crearClienteServidor({ sesionCorta: true });
+  const { data, error } =
     "codigo" in enlace
       ? await supabase.auth.exchangeCodeForSession(enlace.codigo)
       : await supabase.auth.verifyOtp({ type: "recovery", token_hash: enlace.tokenHash });
 
-  if (error) {
+  if (error || !data.user) {
+    return fallo("El enlace venció o ya se usó. Pide uno nuevo.");
+  }
+
+  // Igual que al ingresar: una cuenta sin rol de administración no se queda con
+  // sesión en el panel. Se responde como un enlace inválido, sin dar detalles.
+  if (!aAdministrador(data.user).esAdmin) {
+    await supabase.auth.signOut();
     return fallo("El enlace venció o ya se usó. Pide uno nuevo.");
   }
 

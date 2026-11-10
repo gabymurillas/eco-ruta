@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { COOKIE_RECUPERACION, OPCIONES_RECUPERACION } from "@/lib/recuperacion";
 import { confirmarRecuperacion } from "@/services/auth.service";
 
 /**
@@ -22,7 +23,10 @@ export async function GET(request: NextRequest) {
 
   if (!resultado?.ok) {
     destino.searchParams.set("error", "enlace");
+    return NextResponse.redirect(destino);
   }
 
-  return NextResponse.redirect(destino);
+  const respuesta = NextResponse.redirect(destino);
+  respuesta.cookies.set(COOKIE_RECUPERACION, "1", OPCIONES_RECUPERACION);
+  return respuesta;
 }

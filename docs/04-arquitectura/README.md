@@ -73,7 +73,21 @@ Admin → «Vincular» → código de 5 caracteres (10 min, un solo uso) → el 
 `app_metadata.unidad_id` → el teléfono recibe la sesión. El detalle está en el
 [contrato](../contrato-vinculacion.md).
 
-### 3.3 Consulta del ciudadano
+### 3.3 Sesión y recuperación de contraseña del admin
+
+- **«Mantener la sesión» desmarcado:** el servidor, el proxy y el cliente del navegador
+  escriben las cookies de Supabase sin vencimiento mientras exista la cookie
+  `ecoruta-sesion-corta` (`lib/supabase/sesion-corta.ts`). La marca hace falta porque cada
+  renovación del token vuelve a escribir las cookies con 400 días.
+- **Recuperación:** `/admin/recuperar` → `resetPasswordForEmail` (respuesta neutra: no revela
+  si la cuenta existe, ni siquiera por el límite de envíos) → enlace del correo →
+  `/admin/auth/confirmar` (canjea `code` o `token_hash`; solo cuentas con rol admin; sesión
+  corta; pone la marca de un solo uso `ecoruta-recuperacion`, 15 min) →
+  `/admin/restablecer` (exige la marca) → contraseña nueva → panel.
+- Con la plantilla de correo por defecto llega un `code` (PKCE): el enlace solo sirve en el
+  mismo navegador donde se pidió, y solo el más reciente.
+
+### 3.4 Consulta del ciudadano
 
 Ubicación del navegador → RPC `paradas_cercanas(lat, lng)` → selección de la parada →
 `llegadas_a_parada` (tiempo estimado) → suscripción Realtime a `avisos_parada` de esa parada.
@@ -107,3 +121,5 @@ Solo `services/` importa Supabase. Las reglas completas y los límites de tamañ
 | Backend | Supabase `yumfwnqvmcitjnskazgx` | Las migraciones de `sql/` se aplican a mano (SQL Editor o CLI) |
 | Edge Functions | `npx supabase functions deploy <f>` | — |
 | Pruebas de SQL | Clúster desechable de Postgres 17 + PostGIS | Ver la guía del repositorio |
+| Supabase Auth | *Authentication → URL Configuration → Redirect URLs* | Debe incluir `https://eco-ruta-nine.vercel.app/admin/auth/confirmar` (y la de `localhost`). Si falta, Supabase manda el enlace de recuperación a la *Site URL* sin avisar y nadie lo canjea |
+| Correo de Supabase | SMTP por defecto o propio | El SMTP por defecto solo entrega a correos de miembros del equipo de Supabase y con límite por hora. Para cuentas del ente gestor hace falta SMTP propio. Los rechazos quedan en el registro de Vercel (`[ecoruta] restablecer contraseña`), no en pantalla |

@@ -52,7 +52,8 @@ function EnlaceEnviado({ correo }: { correo: string }) {
         <p className="font-bold">Revisa tu correo</p>
         <p className="text-tinta-media">
           Si <strong className="font-semibold text-tinta">{correo}</strong> tiene una cuenta del
-          panel, te llegó un enlace para elegir otra contraseña. Ábrelo en este mismo navegador.
+          panel, te llegó un enlace para elegir otra contraseña. Ábrelo en este mismo navegador y,
+          si pediste más de uno, usa el más reciente.
         </p>
         <p className="text-tinta-media">
           Si no aparece en unos minutos, mira en «Correo no deseado».

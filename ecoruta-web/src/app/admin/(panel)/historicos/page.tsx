@@ -83,7 +83,8 @@ function rutasDelGrafico(filas: readonly { ruta_id: string; ruta_nombre: string;
 
 function Indicadores({ resumen, periodo }: { resumen: ResumenHistoricos; periodo: Periodo }) {
   // Total y activas salen de la misma consulta: «resueltas» no puede quedar negativa.
-  const activas = resumen.incidencias_activas;
+  // `?? 0` por si la web se publica antes de aplicar sql/16.
+  const activas = resumen.incidencias_activas ?? 0;
   const duracion = resumen.duracion_promedio_min;
 
   return (

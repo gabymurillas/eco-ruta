@@ -51,7 +51,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(destino);
   }
 
-  if (esIngreso && user) {
+  // Solo una cuenta de administración salta el ingreso. Otra con sesión (un admin
+  // al que le quitaron el rol) iría al panel, el panel la devolvería aquí y el
+  // proxy otra vez al panel: un bucle de redirecciones sin salida.
+  if (esIngreso && user?.app_metadata?.rol === "admin") {
     const destino = request.nextUrl.clone();
     destino.pathname = "/admin";
     return NextResponse.redirect(destino);

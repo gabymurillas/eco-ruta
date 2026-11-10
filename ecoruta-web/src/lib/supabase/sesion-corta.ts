@@ -14,9 +14,11 @@ import type { CookieOptions } from "@supabase/ssr";
  */
 export const COOKIE_SESION_CORTA = "ecoruta-sesion-corta";
 
+// Legible desde el navegador a propósito: el cliente del navegador también renueva
+// el token y necesita saber si la sesión es corta. Es solo una bandera, sin secreto.
 export const OPCIONES_MARCA: CookieOptions = {
   path: "/",
-  httpOnly: true,
+  httpOnly: false,
   sameSite: "lax",
   secure: process.env.NODE_ENV === "production",
 };
