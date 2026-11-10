@@ -74,6 +74,25 @@ export async function crearUnidad(
   return exito(data.id);
 }
 
+export async function actualizarUnidad(
+  unidadId: string,
+  nombre: string,
+  rutaId: string | null,
+): Promise<Resultado<null>> {
+  const supabase = await crearClienteServidor();
+
+  const { error } = await supabase
+    .from("unidades")
+    .update({ nombre, ruta_id: rutaId })
+    .eq("id", unidadId);
+
+  if (error) {
+    return falloRegistrado("actualizar_unidad", error, "No se pudieron guardar los cambios.");
+  }
+
+  return exito(null);
+}
+
 /**
  * Genera un código nuevo y lo deja listo para que el teléfono de la unidad lo canjee.
  *

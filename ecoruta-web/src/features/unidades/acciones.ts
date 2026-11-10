@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import {
+  actualizarUnidad,
   crearUnidad,
   eliminarUnidad,
   generarCodigoDeVinculacion,
@@ -9,6 +10,8 @@ import {
 
 export type EstadoUnidades = {
   error?: string;
+  /** La unidad que se acaba de crear o editar: el panel la deja elegida. */
+  guardada?: string;
   codigo?: { unidadId: string; codigo: string; expiraEn: string };
 };
 
@@ -51,7 +54,34 @@ export async function agregarUnidad(
   }
 
   revalidatePath("/admin/unidades");
-  return {};
+  return { guardada: resultado.datos };
+}
+
+export async function editarUnidad(
+  _estadoPrevio: EstadoUnidades,
+  datos: FormData,
+): Promise<EstadoUnidades> {
+  const unidadId = String(datos.get("unidadId") ?? "");
+  const nombre = String(datos.get("nombre") ?? "").trim();
+  const rutaId = String(datos.get("rutaId") ?? "") || null;
+
+  if (!unidadId) {
+    return { error: "No se indicó la unidad." };
+  }
+
+  if (!nombre) {
+    return { error: "Escribe un nombre para la unidad." };
+  }
+
+  const resultado = await actualizarUnidad(unidadId, nombre, rutaId);
+
+  if (!resultado.ok) {
+    return { error: resultado.error };
+  }
+
+  revalidatePath("/admin/unidades");
+  revalidatePath("/admin");
+  return { guardada: unidadId };
 }
 
 export async function eliminar(unidadId: string): Promise<{ error?: string }> {

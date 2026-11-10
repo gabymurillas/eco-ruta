@@ -1,10 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
-import { Boton } from "@/components/ui/Boton";
+import { useActionState, useEffect, useRef } from "react";
 import { Campo } from "@/components/ui/Campo";
-import { Tarjeta } from "@/components/ui/Tarjeta";
-import { agregarUnidad, type EstadoUnidades } from "../acciones";
+import { BOTON_PANEL_PRINCIPAL, BOTON_PANEL_SECUNDARIO } from "@/components/ui/estilos-panel";
+import type { UnidadConRuta } from "@/services/unidades.service";
+import { agregarUnidad, editarUnidad, type EstadoUnidades } from "../acciones";
 
 export type OpcionDeRuta = {
   id: string;
@@ -13,44 +13,70 @@ export type OpcionDeRuta = {
 
 type Props = {
   rutas: readonly OpcionDeRuta[];
+  /** Presente al editar. Ausente al crear. */
+  unidad?: UnidadConRuta;
+  onCancelar: () => void;
+  onGuardada: (unidadId: string) => void;
 };
 
 const ESTADO_INICIAL: EstadoUnidades = {};
 
-export function FormularioUnidad({ rutas }: Props) {
-  const [estado, enviar, enviando] = useActionState(agregarUnidad, ESTADO_INICIAL);
+export function FormularioUnidad({ rutas, unidad, onCancelar, onGuardada }: Props) {
+  const accion = unidad ? editarUnidad : agregarUnidad;
+  const [estado, enviar, enviando] = useActionState(
+    async (previo: EstadoUnidades, datos: FormData) => {
+      const resultado = await accion(previo, datos);
+      if (resultado.guardada) {
+        onGuardada(resultado.guardada);
+      }
+      return resultado;
+    },
+    ESTADO_INICIAL,
+  );
+  const titulo = useRef<HTMLHeadingElement>(null);
+
+  // El panel se abre lejos del botón que lo pidió: el foco tiene que ir con él.
+  useEffect(() => {
+    titulo.current?.focus();
+  }, []);
 
   return (
-    <Tarjeta className="flex flex-col gap-4">
+    <section aria-labelledby="titulo-formulario-unidad" className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <h2 className="font-serif text-[15px] font-bold">Nueva unidad</h2>
-        <p className="text-xs leading-relaxed text-tinta-media">
-          El servicio que presta lo define su ruta, no la unidad. Sin ruta asignada no
-          aparece en el mapa del ciudadano.
+        <h2
+          ref={titulo}
+          id="titulo-formulario-unidad"
+          tabIndex={-1}
+          className="text-[19px] leading-tight font-extrabold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo"
+        >
+          {unidad ? `Editar ${unidad.nombre}` : "Nueva unidad"}
+        </h2>
+        <p className="text-[13px] leading-relaxed text-tinta-media">
+          El servicio que presta lo define su ruta. Sin ruta asignada, la unidad no aparece en
+          el mapa del ciudadano.
         </p>
       </div>
 
       <form action={enviar} className="flex flex-col gap-4">
+        {unidad && <input type="hidden" name="unidadId" value={unidad.id} />}
+
         <Campo
           etiqueta="Nombre o número"
           name="nombre"
           id="nombre-unidad"
           required
           placeholder="Unidad 04"
+          defaultValue={unidad?.nombre ?? ""}
         />
 
         <div className="flex flex-col gap-2">
-          <label
-            htmlFor="rutaId"
-            className="text-xs font-bold tracking-wide text-tinta-suave"
-          >
+          <label htmlFor="ruta-unidad" className="text-xs font-bold tracking-wide text-tinta-suave">
             Ruta asignada
           </label>
-
           <select
-            id="rutaId"
+            id="ruta-unidad"
             name="rutaId"
-            defaultValue=""
+            defaultValue={unidad?.rutaId ?? ""}
             className="h-12 rounded-[10px] border-[0.5px] border-borde-campo bg-superficie px-3 text-[15px] font-semibold text-tinta focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-marca-profundo"
           >
             <option value="">Sin asignar</option>
@@ -68,10 +94,15 @@ export function FormularioUnidad({ rutas }: Props) {
           </p>
         )}
 
-        <Boton type="submit" disabled={enviando}>
-          {enviando ? "Creando…" : "Crear unidad"}
-        </Boton>
+        <div className="flex gap-2">
+          <button type="submit" disabled={enviando} className={`${BOTON_PANEL_PRINCIPAL} flex-1`}>
+            {enviando ? "Guardando…" : unidad ? "Guardar cambios" : "Crear unidad"}
+          </button>
+          <button type="button" onClick={onCancelar} disabled={enviando} className={BOTON_PANEL_SECUNDARIO}>
+            Cancelar
+          </button>
+        </div>
       </form>
-    </Tarjeta>
+    </section>
   );
 }

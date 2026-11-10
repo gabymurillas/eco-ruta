@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { Boton } from "@/components/ui/Boton";
+import { BOTON_PANEL_PELIGRO, BOTON_PANEL_SECUNDARIO } from "@/components/ui/estilos-panel";
 import type { UnidadConRuta } from "@/services/unidades.service";
 import { eliminar } from "../acciones";
 
@@ -42,13 +42,13 @@ export function ConfirmarEliminarUnidad({ unidad, onCancelar, onEliminada }: Pro
   return (
     <section
       aria-labelledby="titulo-eliminar-unidad"
-      className="flex flex-col gap-3 rounded-2xl border-[0.5px] border-error bg-superficie p-5"
+      className="flex flex-col gap-3"
     >
       <h2
         ref={titulo}
         id="titulo-eliminar-unidad"
         tabIndex={-1}
-        className="font-serif text-[15px] font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error"
+        className="text-[19px] leading-tight font-extrabold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error"
       >
         ¿Eliminar «{unidad.nombre}»?
       </h2>
@@ -78,13 +78,13 @@ export function ConfirmarEliminarUnidad({ unidad, onCancelar, onEliminada }: Pro
           type="button"
           onClick={confirmar}
           disabled={eliminando}
-          className="inline-flex h-12 flex-1 items-center justify-center rounded-full bg-error px-5 text-[15px] font-bold text-superficie transition-[filter] duration-300 ease-out hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error disabled:opacity-50"
+          className={`${BOTON_PANEL_PELIGRO} flex-1`}
         >
           {eliminando ? "Eliminando…" : error ? "Reintentar" : "Sí, eliminar"}
         </button>
-        <Boton variante="secundario" onClick={onCancelar} disabled={eliminando}>
+        <button type="button" onClick={onCancelar} disabled={eliminando} className={BOTON_PANEL_SECUNDARIO}>
           Cancelar
-        </Boton>
+        </button>
       </div>
     </section>
   );
