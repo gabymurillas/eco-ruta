@@ -1,20 +1,20 @@
 import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { radioMinimoSugeridoM } from "@/domain/parametros";
 import { FormularioRuta } from "@/features/rutas/components/FormularioRuta";
-import { obtenerParametros } from "@/services/parametros.service";
 import { obtenerRutas } from "@/services/rutas.service";
 
-export const dynamic = "force-dynamic";
+export const metadata = {
+  title: "Datos de la ruta · EcoRuta administración",
+};
 
-const EXACTITUD_POR_DEFECTO_M = 50;
+export const dynamic = "force-dynamic";
 
 export default async function DatosDeRutaPage({
   params,
 }: PageProps<"/admin/rutas/[id]/datos">) {
   const { id } = await params;
-  const [rutas, parametros] = await Promise.all([obtenerRutas(), obtenerParametros()]);
+  const rutas = await obtenerRutas();
 
   if (!rutas.ok) {
     return <FallaDeCarga mensaje={rutas.error} />;
@@ -25,13 +25,6 @@ export default async function DatosDeRutaPage({
   if (!ruta) {
     notFound();
   }
-
-  const exactitudMaximaM = parametros.ok
-    ? Number(
-        parametros.datos.find((p) => p.clave === "exactitud_maxima_m")?.valor ??
-          EXACTITUD_POR_DEFECTO_M,
-      )
-    : EXACTITUD_POR_DEFECTO_M;
 
   return (
     <>
@@ -68,8 +61,6 @@ export default async function DatosDeRutaPage({
 
       <main className="flex-1 overflow-y-auto p-7">
         <FormularioRuta
-          radioMinimoSugeridoM={radioMinimoSugeridoM(exactitudMaximaM)}
-          exactitudMaximaM={exactitudMaximaM}
           coloresEnUso={rutas.datos
             .filter((otra) => otra.id !== ruta.id)
             .map((otra) => ({ color: otra.color, ruta: otra.nombre }))}

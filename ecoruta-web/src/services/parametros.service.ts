@@ -1,6 +1,7 @@
+import { valoresConRespaldo, type ValoresParametros } from "@/domain/parametros";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import type { Parametro } from "@/types/database";
-import { exito, fallo, type Resultado } from "./resultado";
+import { exito, falloRegistrado, type Resultado } from "./resultado";
 
 export async function obtenerParametros(): Promise<Resultado<Parametro[]>> {
   const supabase = await crearClienteServidor();
@@ -11,10 +12,21 @@ export async function obtenerParametros(): Promise<Resultado<Parametro[]>> {
     .order("clave");
 
   if (error) {
-    return fallo("No se pudieron cargar los parámetros.");
+    return falloRegistrado("parametros", error, "No se pudieron cargar los parámetros.");
   }
 
   return exito(data);
+}
+
+/**
+ * Los valores que usan las pantallas para decidir (umbrales, radios, márgenes).
+ * Nunca falla: si la tabla no se puede leer, cada clave cae al valor del
+ * esquema. Solo la pantalla de Parámetros necesita saber que falló, y esa usa
+ * `obtenerParametros`.
+ */
+export async function obtenerValoresDeParametros(): Promise<ValoresParametros> {
+  const parametros = await obtenerParametros();
+  return valoresConRespaldo(parametros.ok ? parametros.datos : []);
 }
 
 /**
@@ -43,7 +55,11 @@ export async function guardarParametros(
     .upsert(filas, { onConflict: "clave" });
 
   if (error) {
-    return fallo("No se pudieron guardar los parámetros. No se modificó ninguno.");
+    return falloRegistrado(
+      "guardar parametros",
+      error,
+      "No se pudieron guardar los parámetros. No se modificó ninguno.",
+    );
   }
 
   return exito(null);

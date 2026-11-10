@@ -6,10 +6,24 @@
  * notificaciones que no llegan o que llegan de más.
  */
 
+export type ClaveParametro =
+  | "permanencia_minima_s"
+  | "histeresis_salida_s"
+  | "radio_aproximacion_m"
+  | "distancia_parada_trazado_m"
+  | "exactitud_maxima_m"
+  | "emision_movimiento_s"
+  | "emision_detenido_s"
+  | "sin_senal_umbral_s"
+  | "bateria_alerta_pct"
+  | "penalizacion_incidencia_pct";
+
 export type DefinicionParametro = {
-  clave: string;
+  clave: ClaveParametro;
   titulo: string;
   unidad: string;
+  /** El mismo valor que siembra sql/02_parametros.sql: respaldo si la tabla no se puede leer. */
+  porDefecto: number;
   minimo: number;
   maximo: number;
   grupo: "geocercas" | "transmision" | "tiempo";
@@ -22,6 +36,7 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
     clave: "permanencia_minima_s",
     titulo: "Permanencia mínima",
     unidad: "s",
+    porDefecto: 45,
     minimo: 5,
     maximo: 300,
     grupo: "geocercas",
@@ -32,6 +47,7 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
     clave: "histeresis_salida_s",
     titulo: "Histéresis de salida",
     unidad: "s",
+    porDefecto: 30,
     minimo: 5,
     maximo: 300,
     grupo: "geocercas",
@@ -42,6 +58,7 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
     clave: "radio_aproximacion_m",
     titulo: "Aviso de aproximación",
     unidad: "m",
+    porDefecto: 500,
     minimo: 100,
     maximo: 2000,
     grupo: "geocercas",
@@ -52,6 +69,7 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
     clave: "distancia_parada_trazado_m",
     titulo: "Distancia parada–trazado",
     unidad: "m",
+    porDefecto: 40,
     minimo: 10,
     maximo: 150,
     grupo: "geocercas",
@@ -62,6 +80,7 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
     clave: "exactitud_maxima_m",
     titulo: "Exactitud máxima",
     unidad: "m",
+    porDefecto: 50,
     minimo: 5,
     maximo: 200,
     grupo: "geocercas",
@@ -72,6 +91,7 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
     clave: "emision_movimiento_s",
     titulo: "En movimiento",
     unidad: "s",
+    porDefecto: 5,
     minimo: 1,
     maximo: 60,
     grupo: "transmision",
@@ -82,6 +102,7 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
     clave: "emision_detenido_s",
     titulo: "Detenido",
     unidad: "s",
+    porDefecto: 30,
     minimo: 5,
     maximo: 300,
     grupo: "transmision",
@@ -91,6 +112,7 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
     clave: "sin_senal_umbral_s",
     titulo: "Sin señal",
     unidad: "s",
+    porDefecto: 300,
     minimo: 60,
     maximo: 3600,
     grupo: "transmision",
@@ -101,6 +123,7 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
     clave: "bateria_alerta_pct",
     titulo: "Alerta de batería",
     unidad: "%",
+    porDefecto: 15,
     minimo: 5,
     maximo: 50,
     grupo: "transmision",
@@ -111,6 +134,7 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
     clave: "penalizacion_incidencia_pct",
     titulo: "Margen por incidencia",
     unidad: "%",
+    porDefecto: 25,
     minimo: 0,
     maximo: 200,
     grupo: "tiempo",
@@ -119,11 +143,31 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
   },
 ];
 
-export function definicionDe(clave: string): DefinicionParametro | undefined {
+function definicionDe(clave: string): DefinicionParametro | undefined {
   return DEFINICIONES.find((definicion) => definicion.clave === clave);
 }
 
-export type ErrorDeValidacion = {
+export type ValoresParametros = Record<ClaveParametro, number>;
+
+/**
+ * Los valores vigentes, con el de fábrica para cualquier clave que falte. Una
+ * pantalla que no pudo leer `parametros` sigue funcionando con los valores del
+ * esquema en vez de romperse o inventar los suyos.
+ */
+export function valoresConRespaldo(
+  filas: readonly { clave: string; valor: number }[],
+): ValoresParametros {
+  const leidos = new Map(filas.map(({ clave, valor }) => [clave, Number(valor)]));
+
+  return Object.fromEntries(
+    DEFINICIONES.map(({ clave, porDefecto }) => {
+      const valor = leidos.get(clave);
+      return [clave, valor !== undefined && Number.isFinite(valor) ? valor : porDefecto];
+    }),
+  ) as ValoresParametros;
+}
+
+type ErrorDeValidacion = {
   clave: string;
   mensaje: string;
 };

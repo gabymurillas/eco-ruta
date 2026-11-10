@@ -8,7 +8,7 @@ import {
   eliminarParada as borrarParada,
   type ParadaDeLaCiudad,
 } from "@/services/catalogo-paradas.service";
-import { obtenerParametros } from "@/services/parametros.service";
+import { obtenerValoresDeParametros } from "@/services/parametros.service";
 
 export type ResultadoAccion = {
   ok: boolean;
@@ -97,15 +97,8 @@ async function validarParada(
  * fuera del círculo aunque el vehículo esté encima de la parada.
  */
 async function radioMinimoDelSistema(): Promise<number> {
-  const parametros = await obtenerParametros();
-
-  if (!parametros.ok) {
-    return 0;
-  }
-
-  const exactitud = parametros.datos.find((p) => p.clave === "exactitud_maxima_m");
-
-  return exactitud ? radioMinimoSugeridoM(Number(exactitud.valor)) : 0;
+  const parametros = await obtenerValoresDeParametros();
+  return radioMinimoSugeridoM(parametros.exactitud_maxima_m);
 }
 
 /** Cambiar una parada cambia qué rutas la tocan: se refrescan todas las vistas que las muestran. */

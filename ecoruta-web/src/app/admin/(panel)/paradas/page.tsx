@@ -4,7 +4,7 @@ import { radioMinimoSugeridoM } from "@/domain/parametros";
 import { EditorDeParadas } from "@/features/paradas/components/EditorDeParadas";
 import { obtenerParadasDeLaCiudad } from "@/services/catalogo-paradas.service";
 import { obtenerRutasDeMapa } from "@/services/mapa.service";
-import { obtenerParametros } from "@/services/parametros.service";
+import { obtenerValoresDeParametros } from "@/services/parametros.service";
 
 export const metadata = {
   title: "Paradas · EcoRuta administración",
@@ -12,26 +12,18 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-const EXACTITUD_POR_DEFECTO_M = 50;
-
 export default async function ParadasPage() {
   const [paradas, rutas, parametros] = await Promise.all([
     obtenerParadasDeLaCiudad(),
     obtenerRutasDeMapa(),
-    obtenerParametros(),
+    obtenerValoresDeParametros(),
   ]);
 
   if (!paradas.ok) {
     return <FallaDeCarga mensaje={paradas.error} />;
   }
 
-  const exactitudMaximaM = parametros.ok
-    ? Number(
-        parametros.datos.find((p) => p.clave === "exactitud_maxima_m")?.valor ??
-          EXACTITUD_POR_DEFECTO_M,
-      )
-    : EXACTITUD_POR_DEFECTO_M;
-  const radioMinimoM = radioMinimoSugeridoM(exactitudMaximaM);
+  const radioMinimoM = radioMinimoSugeridoM(parametros.exactitud_maxima_m);
 
   return (
     <EditorDeParadas

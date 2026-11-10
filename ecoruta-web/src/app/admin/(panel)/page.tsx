@@ -9,7 +9,7 @@ import { TarjetaIncidencia } from "@/features/monitoreo/components/TarjetaIncide
 import { obtenerEstadoDeFlota } from "@/services/flota.service";
 import { obtenerIncidenciasActivas } from "@/services/incidencias.service";
 import { obtenerRutasDeMapa } from "@/services/mapa.service";
-import { obtenerParametros } from "@/services/parametros.service";
+import { obtenerValoresDeParametros } from "@/services/parametros.service";
 
 export const metadata = {
   title: "Monitoreo · EcoRuta administración",
@@ -23,7 +23,7 @@ export default async function MonitoreoPage() {
   const [flota, incidencias, parametros, rutasDeMapa] = await Promise.all([
     obtenerEstadoDeFlota(),
     obtenerIncidenciasActivas(),
-    obtenerParametros(),
+    obtenerValoresDeParametros(),
     obtenerRutasDeMapa(),
   ]);
 
@@ -31,11 +31,8 @@ export default async function MonitoreoPage() {
     return <FallaDeCarga mensaje={flota.error} />;
   }
 
-  const valores = parametros.ok
-    ? Object.fromEntries(parametros.datos.map((p) => [p.clave, Number(p.valor)]))
-    : {};
-  const umbralSinSenalS = valores.sin_senal_umbral_s ?? 300;
-  const umbralBateriaPct = valores.bateria_alerta_pct ?? 15;
+  const umbralSinSenalS = parametros.sin_senal_umbral_s;
+  const umbralBateriaPct = parametros.bateria_alerta_pct;
 
   const unidades = flota.datos;
 
@@ -115,11 +112,11 @@ export default async function MonitoreoPage() {
       </div>
 
       <PanelFlota
-        unidadesEnMapa={unidades
-          // Sin coordenadas no hay nada que dibujar: una unidad recien
-          // registrada que aun no transmitio no tiene posicion.
-          .filter((unidad) => unidad.unidad_lat !== null && unidad.unidad_lng !== null)
-          .map((unidad) => ({
+        unidadesEnMapa={saludes
+          // Sin coordenadas no hay nada que dibujar: una unidad recién
+          // registrada que aún no transmitió no tiene posición.
+          .filter(({ unidad }) => unidad.unidad_lat !== null && unidad.unidad_lng !== null)
+          .map(({ unidad, salud }) => ({
             id: unidad.unidad_id,
             nombre: unidad.unidad_nombre,
             lat: unidad.unidad_lat,
@@ -127,10 +124,7 @@ export default async function MonitoreoPage() {
             rutaNombre: unidad.ruta_nombre,
             color: unidad.ruta_color,
             icono: unidad.ruta_icono,
-            transmitiendo:
-              unidad.en_recorrido &&
-              unidad.segundos_sin_senal !== null &&
-              unidad.segundos_sin_senal <= umbralSinSenalS,
+            transmitiendo: salud === "transmitiendo",
             segundosSinSenal: unidad.segundos_sin_senal,
             velocidadKmh: unidad.velocidad_kmh,
           }))}

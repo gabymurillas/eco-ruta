@@ -24,8 +24,6 @@ export type DatosDeRuta = {
 };
 
 type Props = {
-  radioMinimoSugeridoM: number;
-  exactitudMaximaM: number;
   /** Presente al editar. Ausente al crear. */
   ruta?: DatosDeRuta;
   /** Colores que ya usan las demás rutas, para no repetir sin darse cuenta. */
@@ -34,12 +32,7 @@ type Props = {
 
 const ESTADO_INICIAL: EstadoRuta = {};
 
-export function FormularioRuta({
-  radioMinimoSugeridoM,
-  exactitudMaximaM,
-  ruta,
-  coloresEnUso = [],
-}: Props) {
+export function FormularioRuta({ ruta, coloresEnUso = [] }: Props) {
   const [estado, enviar, enviando] = useActionState(guardarRuta, ESTADO_INICIAL);
   const [color, setColor] = useState(ruta?.color ?? TOKENS_DE_COLOR[0]);
   const [icono, setIcono] = useState<string>(ruta?.icono ?? ICONO_POR_DEFECTO);
@@ -167,24 +160,13 @@ export function FormularioRuta({
         defaultValue={ruta?.horario ?? ""}
       />
 
-      <Tarjeta tono="advertencia" className="flex flex-col gap-1">
-        <span className="text-[13px] font-bold text-advertencia-tinta">
-          Las paradas arrancan en {radioMinimoSugeridoM} m de radio
-        </span>
-        <span className="text-xs leading-relaxed text-advertencia-tinta">
-          Es el doble de la exactitud máxima configurada ({exactitudMaximaM} m). Un radio
-          menor que la exactitud del GPS puede no dispararse nunca. Se ajusta en
-          Parámetros.
-        </span>
-      </Tarjeta>
-
       {!ruta && (
         <Tarjeta className="flex flex-col gap-1">
           <span className="text-[13px] font-bold">El trazado se dibuja después</span>
           <span className="text-xs leading-relaxed text-tinta-media">
-            Guarda la ruta primero. Luego, desde «Trazado y paradas», colocas las paradas
-            sobre el mapa y dibujas el recorrido. Sin trazado no hay tiempo estimado: la
-            distancia no puede seguir el recorrido real.
+            Guarda la ruta primero. Luego, desde «Trazado y paradas», dibujas el recorrido:
+            la ruta pasa por las paradas de la ciudad que queden junto a él. Sin trazado no
+            hay tiempo estimado: la distancia no puede seguir el recorrido real.
           </span>
         </Tarjeta>
       )}

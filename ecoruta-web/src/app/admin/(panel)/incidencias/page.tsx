@@ -12,7 +12,7 @@ import { FiltrosIncidencias } from "@/features/incidencias/components/FiltrosInc
 import { TablaIncidencias } from "@/features/incidencias/components/TablaIncidencias";
 import { obtenerIncidencias } from "@/services/incidencias.service";
 import { obtenerRutasDeMapa } from "@/services/mapa.service";
-import { obtenerParametros } from "@/services/parametros.service";
+import { obtenerValoresDeParametros } from "@/services/parametros.service";
 import { obtenerRutas } from "@/services/rutas.service";
 
 export const metadata = {
@@ -28,9 +28,6 @@ const PESTANAS: { valor: EstadoIncidencia; texto: string }[] = [
   { valor: "resueltas", texto: "Resueltas" },
   { valor: "todas", texto: "Todas" },
 ];
-
-// Mismo valor por defecto que sql/14: solo se usa si no se pudieron leer los parámetros.
-const PENALIZACION_POR_DEFECTO_PCT = 25;
 
 type Filtros = { estado: EstadoIncidencia; periodo: number; rutaId: string };
 
@@ -59,7 +56,7 @@ export default async function IncidenciasPage({ searchParams }: PageProps<"/admi
     obtenerIncidencias(filtros.periodo),
     obtenerRutas(),
     obtenerRutasDeMapa(),
-    obtenerParametros(),
+    obtenerValoresDeParametros(),
   ]);
 
   if (!incidencias.ok) {
@@ -71,9 +68,6 @@ export default async function IncidenciasPage({ searchParams }: PageProps<"/admi
   const visibles = filtrarPorEstado(deLaRuta, filtros.estado);
   const elegida = visibles.find((i) => i.id === leer("id")) ?? visibles[0];
 
-  const penalizacion = parametros.ok
-    ? parametros.datos.find((p) => p.clave === "penalizacion_incidencia_pct")?.valor
-    : undefined;
   const trazado = rutasDeMapa.ok
     ? rutasDeMapa.datos.find((r) => r.ruta_id === elegida?.rutaId)?.trazado_geojson
     : undefined;
@@ -115,7 +109,7 @@ export default async function IncidenciasPage({ searchParams }: PageProps<"/admi
           <DetalleIncidencia
             incidencia={elegida}
             trazado={trazado ?? null}
-            penalizacionPct={Number(penalizacion ?? PENALIZACION_POR_DEFECTO_PCT)}
+            penalizacionPct={parametros.penalizacion_incidencia_pct}
           />
         )}
       </div>

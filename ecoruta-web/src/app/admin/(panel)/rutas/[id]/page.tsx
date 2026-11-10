@@ -3,7 +3,7 @@ import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import { trazadoALatLng } from "@/domain/mapa";
 import { EditorDeRuta } from "@/features/rutas/components/EditorDeRuta";
 import { obtenerParadasDeLaCiudad } from "@/services/catalogo-paradas.service";
-import { obtenerParametros } from "@/services/parametros.service";
+import { obtenerValoresDeParametros } from "@/services/parametros.service";
 import {
   obtenerParadasDeRuta,
   obtenerPuntosClave,
@@ -17,9 +17,6 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-// El mismo valor por defecto que usa la vista `paradas_por_ruta` (sql/04).
-const DISTANCIA_PARADA_POR_DEFECTO_M = 40;
-
 export default async function EditorDeRutaPage({ params }: PageProps<"/admin/rutas/[id]">) {
   const { id } = await params;
 
@@ -29,7 +26,7 @@ export default async function EditorDeRutaPage({ params }: PageProps<"/admin/rut
     obtenerParadasDeLaCiudad(),
     obtenerPuntosClave(id),
     obtenerViajesGrabados(id),
-    obtenerParametros(),
+    obtenerValoresDeParametros(),
   ]);
 
   if (!ruta.ok || !ruta.datos) {
@@ -42,10 +39,6 @@ export default async function EditorDeRutaPage({ params }: PageProps<"/admin/rut
   if (!ciudad.ok) {
     return <FallaDeCarga mensaje={ciudad.error} />;
   }
-
-  const distancia = parametros.ok
-    ? parametros.datos.find((p) => p.clave === "distancia_parada_trazado_m")?.valor
-    : undefined;
 
   return (
     <EditorDeRuta
@@ -62,7 +55,7 @@ export default async function EditorDeRutaPage({ params }: PageProps<"/admin/rut
         lat,
         lng,
       }))}
-      distanciaParadaM={Number(distancia ?? DISTANCIA_PARADA_POR_DEFECTO_M)}
+      distanciaParadaM={parametros.distancia_parada_trazado_m}
     />
   );
 }

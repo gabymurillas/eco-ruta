@@ -1,26 +1,13 @@
 import Link from "next/link";
-import { radioMinimoSugeridoM } from "@/domain/parametros";
 import { FormularioRuta } from "@/features/rutas/components/FormularioRuta";
-import { obtenerParametros } from "@/services/parametros.service";
 import { obtenerRutas } from "@/services/rutas.service";
 
 export const metadata = {
   title: "Nueva ruta · EcoRuta administración",
 };
 
-const EXACTITUD_POR_DEFECTO_M = 50;
-
 export default async function NuevaRutaPage() {
-  const [parametros, rutas] = await Promise.all([obtenerParametros(), obtenerRutas()]);
-
-  // Si los parámetros no cargan, se usa el valor por defecto del esquema en vez de
-  // dejar la pantalla inservible: el radio sugerido es una guía, no un bloqueo.
-  const exactitudMaximaM = parametros.ok
-    ? Number(
-        parametros.datos.find((p) => p.clave === "exactitud_maxima_m")?.valor ??
-          EXACTITUD_POR_DEFECTO_M,
-      )
-    : EXACTITUD_POR_DEFECTO_M;
+  const rutas = await obtenerRutas();
 
   return (
     <>
@@ -55,8 +42,6 @@ export default async function NuevaRutaPage() {
 
       <main className="flex-1 overflow-y-auto p-7">
         <FormularioRuta
-          radioMinimoSugeridoM={radioMinimoSugeridoM(exactitudMaximaM)}
-          exactitudMaximaM={exactitudMaximaM}
           // Si las rutas no cargan, el formulario sirve igual: solo no marca colores.
           coloresEnUso={
             rutas.ok ? rutas.datos.map((otra) => ({ color: otra.color, ruta: otra.nombre })) : []
