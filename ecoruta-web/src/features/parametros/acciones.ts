@@ -19,8 +19,10 @@ export async function guardar(
   for (const definicion of DEFINICIONES) {
     const crudo = datos.get(definicion.clave);
 
+    // Solo llegan los campos cambiados: así no se pisa lo que otro admin guardó
+    // mientras esta pestaña estaba abierta. Un campo vacío no es cero.
     if (crudo !== null) {
-      valores.set(definicion.clave, Number(crudo));
+      valores.set(definicion.clave, String(crudo).trim() === "" ? Number.NaN : Number(crudo));
     }
   }
 
@@ -41,10 +43,9 @@ export async function guardar(
     return { error: resultado.error };
   }
 
-  // El radio sugerido del editor de rutas se deriva de la exactitud máxima,
-  // así que esa pantalla también queda obsoleta al guardar aquí.
+  // El radio inicial de las paradas se deriva de la exactitud máxima.
   revalidatePath("/admin/parametros");
-  revalidatePath("/admin/rutas");
+  revalidatePath("/admin/paradas");
 
   return { guardadoEn: new Date().toISOString() };
 }

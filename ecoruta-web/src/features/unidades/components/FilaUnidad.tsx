@@ -62,7 +62,11 @@ export function FilaUnidad({ unidad, elegida, umbralBateriaPct, onAccion }: Prop
       </td>
 
       <td className="px-4 py-3">
-        <Bateria pct={unidad.bateriaPct} alerta={bateriaEnAlerta(unidad.bateriaPct, umbralBateriaPct)} />
+        {/* Sin teléfono vinculado, la batería guardada es de un equipo que ya no está. */}
+        <Bateria
+          pct={unidad.vinculado ? unidad.bateriaPct : null}
+          alerta={unidad.vinculado && bateriaEnAlerta(unidad.bateriaPct, umbralBateriaPct)}
+        />
       </td>
 
       <td className="px-4 py-3">

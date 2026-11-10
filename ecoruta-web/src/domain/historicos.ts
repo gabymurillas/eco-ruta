@@ -65,12 +65,18 @@ export function apilarPorDia(
 const FECHA_CORTA = new Intl.DateTimeFormat("es-VE", { day: "numeric", month: "short", timeZone: "UTC" });
 const ANIO = new Intl.DateTimeFormat("es-VE", { year: "numeric", timeZone: "UTC" });
 
-/** «28 oct al 3 nov de 2026». Las claves ya están en hora de Caracas: se leen como UTC. */
+/**
+ * «28 oct al 3 nov de 2026», o «27 dic de 2025 al 2 ene de 2026» si cruza el año.
+ * Las claves ya están en hora de Caracas: se leen como UTC.
+ */
 export function describirRango(dias: readonly string[]): string {
   const desde = new Date(`${dias[0]}T00:00:00Z`);
   const hasta = new Date(`${dias[dias.length - 1]}T00:00:00Z`);
+  const anioDesde = ANIO.format(desde);
+  const anioHasta = ANIO.format(hasta);
+  const inicio = limpiar(FECHA_CORTA.format(desde)) + (anioDesde === anioHasta ? "" : ` de ${anioDesde}`);
 
-  return `${limpiar(FECHA_CORTA.format(desde))} al ${limpiar(FECHA_CORTA.format(hasta))} de ${ANIO.format(hasta)}`;
+  return `${inicio} al ${limpiar(FECHA_CORTA.format(hasta))} de ${anioHasta}`;
 }
 
 const DIA_SEMANA = new Intl.DateTimeFormat("es-VE", { weekday: "short", timeZone: "UTC" });

@@ -73,7 +73,10 @@ export function SeccionUnidades({ unidades, rutas, umbralBateriaPct }: Props) {
             unidades={unidades}
             rutas={rutas}
             onCerrar={cerrar}
-            onGuardada={() => setPanel(NINGUNO)}
+            onGuardada={(unidadId, creada) =>
+              // Lo que sigue a crear una unidad es vincular su teléfono.
+              setPanel(creada ? { modo: "vincular", unidadId } : NINGUNO)
+            }
           />
         </aside>
       </div>
@@ -141,10 +144,10 @@ function ContenidoPanel({
   unidades: readonly FichaUnidad[];
   rutas: readonly OpcionDeRuta[];
   onCerrar: () => void;
-  onGuardada: () => void;
+  onGuardada: (unidadId: string, creada: boolean) => void;
 }) {
   if (panel.modo === "nueva") {
-    return <FormularioUnidad rutas={rutas} onCancelar={onCerrar} onGuardada={onGuardada} />;
+    return <FormularioUnidad rutas={rutas} onCancelar={onCerrar} onGuardada={(id) => onGuardada(id, true)} />;
   }
 
   const unidad = panel.modo === "ninguno" ? undefined : unidades.find((u) => u.id === panel.unidadId);
@@ -160,13 +163,13 @@ function ContenidoPanel({
 
   if (panel.modo === "editar") {
     return (
-      <FormularioUnidad key={unidad.id} unidad={unidad} rutas={rutas} onCancelar={onCerrar} onGuardada={onGuardada} />
+      <FormularioUnidad key={unidad.id} unidad={unidad} rutas={rutas} onCancelar={onCerrar} onGuardada={(id) => onGuardada(id, false)} />
     );
   }
 
   if (panel.modo === "eliminar") {
     return (
-      <ConfirmarEliminarUnidad key={unidad.id} unidad={unidad} onCancelar={onCerrar} onEliminada={onGuardada} />
+      <ConfirmarEliminarUnidad key={unidad.id} unidad={unidad} onCancelar={onCerrar} onEliminada={() => onGuardada(unidad.id, false)} />
     );
   }
 
@@ -176,12 +179,13 @@ function ContenidoPanel({
 function FormularioVinculacion({ unidad }: { unidad: FichaUnidad }) {
   const [estado, enviar, generando] = useActionState(vincular, ESTADO_INICIAL);
 
-  // El recién generado manda; si no, el que ya estaba guardado y sigue pendiente.
-  const codigo =
-    estado.codigo ??
-    (unidad.telefono === "codigo_pendiente" && unidad.codigoVinculacion && unidad.codigoExpiraAt
+  // Con el teléfono ya vinculado no hay código que mostrar: el último se canjeó.
+  // Si no, manda el recién generado y, en su defecto, el pendiente guardado.
+  const guardado =
+    unidad.telefono === "codigo_pendiente" && unidad.codigoVinculacion && unidad.codigoExpiraAt
       ? { codigo: unidad.codigoVinculacion, expiraEn: unidad.codigoExpiraAt }
-      : null);
+      : null;
+  const codigo = unidad.vinculado ? null : (estado.codigo ?? guardado);
 
   return (
     <form action={enviar} className="flex flex-col gap-3">

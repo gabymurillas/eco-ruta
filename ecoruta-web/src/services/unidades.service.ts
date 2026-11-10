@@ -81,13 +81,42 @@ export async function actualizarUnidad(
 ): Promise<Resultado<null>> {
   const supabase = await crearClienteServidor();
 
-  const { error } = await supabase
+  // Un viaje abierto guardó la ruta con la que arrancó: cambiarla a mitad de
+  // recorrido dejaría las paradas y los avisos de ese viaje en la ruta vieja.
+  const [actual, abiertos] = await Promise.all([
+    supabase.from("unidades").select("ruta_id").eq("id", unidadId).maybeSingle(),
+    supabase
+      .from("viajes")
+      .select("id", { count: "exact", head: true })
+      .eq("unidad_id", unidadId)
+      .is("finalizado_at", null),
+  ]);
+
+  if (actual.error || abiertos.error) {
+    return falloRegistrado("actualizar_unidad", actual.error ?? abiertos.error, "No se pudieron guardar los cambios.");
+  }
+
+  if (!actual.data) {
+    return fallo("Esta unidad ya no existe. Recarga la página.");
+  }
+
+  if (actual.data.ruta_id !== rutaId && (abiertos.count ?? 0) > 0) {
+    return fallo("La unidad está en recorrido. Cambia la ruta cuando termine el viaje.");
+  }
+
+  const { data, error } = await supabase
     .from("unidades")
     .update({ nombre, ruta_id: rutaId })
-    .eq("id", unidadId);
+    .eq("id", unidadId)
+    .select("id");
 
   if (error) {
     return falloRegistrado("actualizar_unidad", error, "No se pudieron guardar los cambios.");
+  }
+
+  // Borrada entre la lectura y la escritura: el update no tocó ninguna fila.
+  if (data.length === 0) {
+    return fallo("Esta unidad ya no existe. Recarga la página.");
   }
 
   return exito(null);

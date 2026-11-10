@@ -8,7 +8,8 @@
 -- Definición: paradas efectivamente visitadas sobre paradas planificadas.
 --
 --   Planificada: cada parada que toca el trazado de la ruta del viaje
---                (vista paradas_por_ruta), contada una vez por viaje.
+--                (vista paradas_por_ruta), contada una vez por viaje cerrado
+--                (desde sql/16: un viaje en curso todavía no terminó de pasar).
 --                Si una ruta tiene 3 paradas y hubo 10 viajes, son 30 planificadas.
 --   Visitada:    existe un evento de geocerca de ese viaje en esa parada.
 --                `eventos_geocerca` tiene unique (viaje_id, parada_id), así que

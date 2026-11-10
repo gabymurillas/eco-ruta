@@ -4,8 +4,8 @@ import type { DefinicionParametro } from "@/domain/parametros";
 type Props = {
   definicion: DefinicionParametro;
   texto: string;
-  /** El valor guardado: con él se dice «antes 45 s». */
-  guardado: number;
+  /** El valor guardado: con él se dice «antes 45 s». Null si falta en la tabla. */
+  guardado: number | null;
   cambiado: boolean;
   error?: string;
   onCambio: (texto: string) => void;
@@ -15,6 +15,7 @@ type Props = {
 
 export function FilaParametro({ definicion, texto, guardado, cambiado, error, onCambio, nota }: Props) {
   const { clave, titulo, unidad, minimo, maximo, explicacion } = definicion;
+  const antes = guardado === null ? "sin valor guardado" : `antes ${guardado} ${unidad}`;
   const idRango = `${clave}-rango`;
   const idEstado = `${clave}-estado`;
   const fondo = error ? "bg-error/8" : cambiado ? "bg-marca-tenue" : "";
@@ -28,7 +29,7 @@ export function FilaParametro({ definicion, texto, guardado, cambiado, error, on
         </label>
         <p className="text-[12.5px] leading-snug text-tinta-media">{explicacion}</p>
         {nota}
-        <Estado id={idEstado} error={error} cambiado={cambiado} antes={`${guardado} ${unidad}`} />
+        <Estado id={idEstado} error={error} cambiado={cambiado} antes={antes} />
       </div>
 
       <div className="flex w-[150px] shrink-0 flex-col gap-1">
@@ -37,7 +38,8 @@ export function FilaParametro({ definicion, texto, guardado, cambiado, error, on
         >
           <input
             id={clave}
-            name={clave}
+            // Solo viaja lo cambiado: no se pisa lo que otro admin guardó entretanto.
+            name={cambiado ? clave : undefined}
             type="number"
             inputMode="numeric"
             value={texto}
@@ -83,7 +85,7 @@ function Estado({ id, error, cambiado, antes }: { id: string; error?: string; ca
           <path d="M4 20h4L19 9l-4-4L4 16z" />
         </svg>
       )}
-      {error ?? `Cambiado · antes ${antes}`}
+      {error ?? `Cambiado · ${antes}`}
     </span>
   );
 }

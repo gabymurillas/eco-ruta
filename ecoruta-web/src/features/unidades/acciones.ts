@@ -10,7 +10,7 @@ import {
 
 export type EstadoUnidades = {
   error?: string;
-  /** La unidad que se acaba de crear o editar: el panel la deja elegida. */
+  /** La unidad que se acaba de crear o editar: al crearla, el panel pasa a vincularla. */
   guardada?: string;
   codigo?: { unidadId: string; codigo: string; expiraEn: string };
 };

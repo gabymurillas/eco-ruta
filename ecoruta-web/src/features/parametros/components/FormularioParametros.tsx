@@ -7,13 +7,14 @@ import {
   radioMinimoSugeridoM,
   validarParametros,
   type DefinicionParametro,
-  type ValoresParametros,
+  type ClaveParametro,
 } from "@/domain/parametros";
 import { guardar, type EstadoGuardado } from "../acciones";
 import { FilaParametro } from "./FilaParametro";
 
 type Props = {
-  valores: ValoresParametros;
+  /** Solo las claves que hay en la tabla: una que falta se pide, no se inventa. */
+  valores: Partial<Record<ClaveParametro, number>>;
 };
 
 type Grupo = { id: DefinicionParametro["grupo"]; titulo: string; detalle?: string; icono: ReactNode };
@@ -42,6 +43,9 @@ const ESTADO_INICIAL: EstadoGuardado = {};
 export function FormularioParametros({ valores }: Props) {
   const [estado, enviar, enviando] = useActionState(guardar, ESTADO_INICIAL);
   const [textos, setTextos] = useState(() => aTextos(valores));
+  // Lo que respondió el último guardado deja de valer en cuanto se vuelve a editar.
+  const [editadoDespues, setEditadoDespues] = useState(false);
+  const respuesta = editadoDespues ? ESTADO_INICIAL : estado;
 
   // Se valida mientras se escribe: el rango ya está a la vista, no hace falta
   // esperar al servidor para decir que 3000 no cabe entre 100 y 2000.
@@ -50,7 +54,7 @@ export function FormularioParametros({ valores }: Props) {
       ({ clave, mensaje }) => [clave, mensaje],
     ),
   );
-  const cambiados = DEFINICIONES.filter(({ clave }) => aNumero(textos[clave]) !== valores[clave]);
+  const cambiados = DEFINICIONES.filter(({ clave }) => !Object.is(aNumero(textos[clave]), valores[clave] ?? Number.NaN));
   const hayErrores = Object.keys(erroresEnVivo).length > 0;
 
   function fila(definicion: DefinicionParametro, nota?: ReactNode) {
@@ -60,10 +64,13 @@ export function FormularioParametros({ valores }: Props) {
         key={clave}
         definicion={definicion}
         texto={textos[clave]}
-        guardado={valores[clave]}
+        guardado={valores[clave] ?? null}
         cambiado={cambiados.includes(definicion)}
-        error={erroresEnVivo[clave] ?? estado.erroresPorClave?.[clave]}
-        onCambio={(texto) => setTextos((previos) => ({ ...previos, [clave]: texto }))}
+        error={erroresEnVivo[clave] ?? respuesta.erroresPorClave?.[clave]}
+        onCambio={(texto) => {
+          setTextos((previos) => ({ ...previos, [clave]: texto }));
+          setEditadoDespues(true);
+        }}
         nota={nota}
       />
     );
@@ -79,14 +86,17 @@ export function FormularioParametros({ valores }: Props) {
   );
 
   return (
-    <form action={enviar} className="flex flex-col gap-4 p-6">
+    <form action={enviar} onSubmit={() => setEditadoDespues(false)} className="flex flex-col gap-4 p-6">
       <header className="flex flex-wrap items-center gap-x-3.5 gap-y-3">
         <h1 className="text-[26px] font-extrabold tracking-tight">Parámetros</h1>
         <p className="text-sm text-tinta-media">Afectan a todas las rutas y unidades a la vez</p>
         <div className="ml-auto flex items-center gap-3">
-          <EstadoDelFormulario estado={estado} cambios={cambiados.length} errores={Object.keys(erroresEnVivo).length} enviando={enviando} />
+          <EstadoDelFormulario estado={respuesta} cambios={cambiados.length} errores={Object.keys(erroresEnVivo).length} enviando={enviando} />
           {cambiados.length > 0 && (
-            <button type="button" onClick={() => setTextos(aTextos(valores))} disabled={enviando} className={BOTON_PANEL_SECUNDARIO}>
+            <button type="button" onClick={() => {
+                setTextos(aTextos(valores));
+                setEditadoDespues(true);
+              }} disabled={enviando} className={BOTON_PANEL_SECUNDARIO}>
               Descartar
             </button>
           )}
@@ -165,8 +175,8 @@ function porGrupo(grupo: DefinicionParametro["grupo"]): readonly DefinicionParam
   return DEFINICIONES.filter((definicion) => definicion.grupo === grupo);
 }
 
-function aTextos(valores: ValoresParametros): Record<string, string> {
-  return Object.fromEntries(DEFINICIONES.map(({ clave }) => [clave, String(valores[clave])]));
+function aTextos(valores: Props["valores"]): Record<string, string> {
+  return Object.fromEntries(DEFINICIONES.map(({ clave }) => [clave, String(valores[clave] ?? "")]));
 }
 
 /** Un campo vacío no es cero: es un número que falta. */

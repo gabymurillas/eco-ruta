@@ -189,6 +189,13 @@ export function validarParametros(
       continue;
     }
 
+    // Todos se miden en segundos, metros o porcentaje enteros, y el campo del
+    // formulario solo admite enteros: un 2,5 lo frenaría el navegador sin decir por qué.
+    if (!Number.isInteger(valor)) {
+      errores.push({ clave, mensaje: "Debe ser un número entero." });
+      continue;
+    }
+
     if (valor < definicion.minimo || valor > definicion.maximo) {
       errores.push({
         clave,

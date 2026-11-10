@@ -51,8 +51,9 @@ export function PanelVinculacion({ unidadNombre, vinculado, codigo, generando }:
       ) : (
         vinculado && (
           <Aviso>
-            Esta unidad ya tiene un teléfono vinculado. Al generar un código, queda sin vincular
-            hasta que un teléfono lo use.
+            Esta unidad ya tiene un teléfono vinculado. Generar un código sirve para pasar la
+            unidad a otro teléfono, pero el actual conserva su acceso: para cortarlo hoy hay que
+            eliminar la unidad.
           </Aviso>
         )
       )}

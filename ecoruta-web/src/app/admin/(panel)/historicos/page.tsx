@@ -152,7 +152,7 @@ function NotaCobertura() {
     <div className="mx-4 mt-auto mb-4 flex flex-col gap-1.5 rounded-[10px] border border-borde bg-fondo p-3 text-[12.5px] leading-relaxed text-tinta-media">
       <p>
         <strong className="font-bold text-tinta">Cobertura:</strong> de las paradas que cada viaje
-        debía tocar, en cuántas el sistema registró la llegada. Con 3 paradas y 10 viajes, son 30
+        completado debía tocar, en cuántas el sistema registró la llegada. Con 3 paradas y 10 viajes, son 30
         pasos.
       </p>
       <p>
