@@ -62,3 +62,23 @@ export function tintaSobreColorDeRuta(token: string | null): string {
     ? TINTA_OSCURA
     : TINTA_CLARA;
 }
+
+/**
+ * Para el panel, que tiene tema oscuro: sobre el mapa oscuro el tono de cada ruta
+ * se aclara (definido en globals.css, `--ruta-<token>`), porque ciruela e índigo
+ * quedaban por debajo de 3:1 contra el fondo. El tono no cambia: la ruta se sigue
+ * reconociendo por su color.
+ *
+ * `var()` sirve en estilos de HTML, no en atributos SVG: los trazados de Leaflet
+ * usan `claseDeRuta` y el CSS les cambia el `stroke`.
+ */
+export function colorDeRutaAdaptable(token: string | null): string {
+  const clave = token?.toLowerCase();
+  return clave && clave in PALETA ? `var(--ruta-${clave}, ${PALETA[clave]})` : colorDeRuta(token);
+}
+
+/** Clase para los trazados SVG de Leaflet; vacía para un hex suelto o desconocido. */
+export function claseDeRuta(token: string | null): string {
+  const clave = token?.toLowerCase();
+  return clave && clave in PALETA ? `ruta-${clave}` : "";
+}

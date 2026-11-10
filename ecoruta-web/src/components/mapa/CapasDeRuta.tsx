@@ -3,7 +3,7 @@
 import { DivIcon } from "leaflet";
 import { useMemo } from "react";
 import { Circle, CircleMarker, Marker, Polyline, Popup, Tooltip } from "react-leaflet";
-import { colorDeRuta } from "@/domain/colores";
+import { claseDeRuta, colorDeRuta } from "@/domain/colores";
 import type { Punto } from "@/domain/mapa";
 
 type PropsTrazado = {
@@ -23,6 +23,7 @@ export function TrazadoRuta({ puntos, color, secundario = false }: PropsTrazado)
       positions={puntos.map((punto) => [punto.lat, punto.lng])}
       pathOptions={{
         color: colorDeRuta(color),
+        className: claseDeRuta(color),
         weight: secundario ? 4 : 5,
         opacity: secundario ? 0.45 : 0.9,
         lineCap: "round",
@@ -70,6 +71,7 @@ export function MarcadorParada({
             fillOpacity: 0.12,
             weight: 1,
             dashArray: "5 6",
+            className: `${claseDeRuta(color)} ruta-relleno`,
           }}
         />
       )}
@@ -79,6 +81,7 @@ export function MarcadorParada({
         radius={destacada ? 8 : 6}
         pathOptions={{
           color: tono,
+          className: claseDeRuta(color),
           fillColor: "oklch(99% 0.008 75)",
           fillOpacity: 1,
           weight: destacada ? 4 : 2.5,

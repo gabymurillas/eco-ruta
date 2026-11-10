@@ -192,6 +192,59 @@ body:has(.tema-admin[data-tema="oscuro"]) {
   filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.85) saturate(0.5);
 }
 
+/*
+ * Colores de ruta sobre el mapa oscuro: los mismos tonos, más claros. Validados
+ * contra --color-fondo oscuro (contraste >= 3:1, daltonismo y saturación). Los
+ * marcadores de unidad no cambian: su borde blanco ya los separa del fondo.
+ */
+.tema-admin[data-tema="oscuro"] {
+  --ruta-teal: oklch(66% 0.11 195);
+  --ruta-mostaza: oklch(66% 0.14 75);
+  --ruta-ciruela: oklch(64% 0.14 340);
+  --ruta-oliva: oklch(66% 0.13 145);
+  --ruta-indigo: oklch(64% 0.13 265);
+}
+
+.tema-admin[data-tema="oscuro"] .ruta-teal {
+  stroke: var(--ruta-teal);
+}
+
+.tema-admin[data-tema="oscuro"] .ruta-mostaza {
+  stroke: var(--ruta-mostaza);
+}
+
+.tema-admin[data-tema="oscuro"] .ruta-ciruela {
+  stroke: var(--ruta-ciruela);
+}
+
+.tema-admin[data-tema="oscuro"] .ruta-oliva {
+  stroke: var(--ruta-oliva);
+}
+
+.tema-admin[data-tema="oscuro"] .ruta-indigo {
+  stroke: var(--ruta-indigo);
+}
+
+.tema-admin[data-tema="oscuro"] .ruta-teal.ruta-relleno {
+  fill: var(--ruta-teal);
+}
+
+.tema-admin[data-tema="oscuro"] .ruta-mostaza.ruta-relleno {
+  fill: var(--ruta-mostaza);
+}
+
+.tema-admin[data-tema="oscuro"] .ruta-ciruela.ruta-relleno {
+  fill: var(--ruta-ciruela);
+}
+
+.tema-admin[data-tema="oscuro"] .ruta-oliva.ruta-relleno {
+  fill: var(--ruta-oliva);
+}
+
+.tema-admin[data-tema="oscuro"] .ruta-indigo.ruta-relleno {
+  fill: var(--ruta-indigo);
+}
+
 .tema-admin[data-tema="oscuro"] .leaflet-container {
   background: var(--color-fondo);
 }

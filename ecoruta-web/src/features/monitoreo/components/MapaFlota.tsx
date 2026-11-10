@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { colorDeRuta } from "@/domain/colores";
+import { colorDeRutaAdaptable } from "@/domain/colores";
 import type {
   ParadaEnMapa,
   RutaEnMapa,
@@ -64,7 +64,7 @@ function LeyendaDeRutas({ rutas }: { rutas: readonly RutaEnMapa[] }) {
             <span
               aria-hidden="true"
               className="h-1 w-4 shrink-0 rounded-full"
-              style={{ backgroundColor: colorDeRuta(ruta.color) }}
+              style={{ backgroundColor: colorDeRutaAdaptable(ruta.color) }}
             />
             <span className="truncate">{ruta.nombre}</span>
           </li>

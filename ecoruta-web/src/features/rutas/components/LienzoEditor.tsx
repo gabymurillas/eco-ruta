@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { Marker, Polyline, Popup, Tooltip } from "react-leaflet";
 import { CapturarClics } from "@/components/mapa/ControlesDeMapa";
 import { Mapa } from "@/components/mapa/Mapa";
-import { colorDeRuta } from "@/domain/colores";
+import { claseDeRuta, colorDeRuta, colorDeRutaAdaptable } from "@/domain/colores";
 import type { Punto } from "@/domain/mapa";
 import { etiquetaDePunto } from "@/domain/trazado";
 import type { PuntoClave } from "../hooks/useEditorDeRuta";
@@ -36,7 +36,9 @@ type Props = {
  */
 export function LienzoEditor(props: Props) {
   const { color, linea, puntos, paradas, onClicEnMapa } = props;
-  const tono = colorDeRuta(color);
+  // Los puntos y paradas son HTML: aceptan la variable que cambia con el tema.
+  // La línea es SVG: lleva el color fijo y una clase que el tema oscuro aclara.
+  const tono = colorDeRutaAdaptable(color);
   // Se encuadra una sola vez, al abrir. La línea cambia con cada punto que el
   // admin agrega o mueve: si el encuadre la siguiera, el mapa se alejaría a toda
   // la ruta en cada clic y perdería el zoom con el que el admin estaba trabajando.
@@ -52,7 +54,7 @@ export function LienzoEditor(props: Props) {
       {linea.length >= 2 && (
         <Polyline
           positions={linea.map((punto) => [punto.lat, punto.lng])}
-          pathOptions={{ color: tono, weight: 5, opacity: 0.9, lineJoin: "round", lineCap: "round" }}
+          pathOptions={{ color: colorDeRuta(color), className: claseDeRuta(color), weight: 5, opacity: 0.9, lineJoin: "round", lineCap: "round" }}
         />
       )}
 
