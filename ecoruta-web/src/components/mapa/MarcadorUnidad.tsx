@@ -3,7 +3,13 @@
 import { DivIcon, type Marker as MarcadorLeaflet } from "leaflet";
 import { useEffect, useMemo, useRef } from "react";
 import { Marker, Popup } from "react-leaflet";
-import { colorDeRuta, tintaSobreColorDeRuta } from "@/domain/colores";
+import {
+  colorDeRuta,
+  colorDeRutaAdaptable,
+  glifoSobreColorDeRutaAdaptable,
+  necesitaContorno,
+  tintaSobreColorDeRuta,
+} from "@/domain/colores";
 import { svgDeIcono } from "@/domain/iconos";
 
 type Props = {
@@ -19,6 +25,12 @@ type Props = {
   /** Elegida desde otra parte de la pantalla: se resalta y abre su ficha. */
   seleccionado?: boolean;
   alElegir?: () => void;
+  /**
+   * Web del ciudadano: sigue el modo oscuro del teléfono (colores de ruta más
+   * claros, glifo oscuro y aro del color de la superficie). El panel no lo usa:
+   * ahí el marcador conserva su tono y su aro crema en los dos temas.
+   */
+  adaptable?: boolean;
 };
 
 const DIAMETRO = 40;
@@ -34,11 +46,12 @@ export function MarcadorUnidad({
   detalle,
   seleccionado = false,
   alElegir,
+  adaptable = false,
 }: Props) {
   const referencia = useRef<MarcadorLeaflet>(null);
   const marcador = useMemo(
-    () => construirMarcador({ color, icono, transmitiendo, seleccionado }),
-    [color, icono, transmitiendo, seleccionado],
+    () => construirMarcador({ color, icono, transmitiendo, seleccionado, adaptable }),
+    [color, icono, transmitiendo, seleccionado, adaptable],
   );
 
   useEffect(() => {
@@ -76,9 +89,13 @@ function construirMarcador({
   icono,
   transmitiendo,
   seleccionado,
-}: Pick<Props, "color" | "icono" | "transmitiendo" | "seleccionado">): DivIcon {
-  const relleno = colorDeRuta(color);
-  const tinta = tintaSobreColorDeRuta(color);
+  adaptable,
+}: Pick<Props, "color" | "icono" | "transmitiendo" | "seleccionado" | "adaptable">): DivIcon {
+  const relleno = adaptable ? colorDeRutaAdaptable(color) : colorDeRuta(color);
+  const tinta = adaptable ? glifoSobreColorDeRutaAdaptable(color) : tintaSobreColorDeRuta(color);
+  const aro = adaptable ? "var(--color-superficie)" : "oklch(99% 0.008 75)";
+  const contorno =
+    adaptable && necesitaContorno(color) ? "box-shadow:inset 0 0 0 1.5px var(--contorno-mostaza);" : "";
   // Anillo de selección en terracota profundo: marca la interacción, no un estado
   // de la unidad (mismo criterio que la parada elegida en la web del ciudadano).
   const anillo = seleccionado ? "outline:3px solid oklch(48% 0.15 35);outline-offset:1px;" : "";
@@ -94,7 +111,7 @@ function construirMarcador({
     html: `
       <span style="position:relative;display:flex;width:${DIAMETRO}px;height:${DIAMETRO}px;align-items:center;justify-content:center;opacity:${transmitiendo ? 1 : 0.55}">
         ${halo}
-        <span style="position:relative;display:flex;width:${DIAMETRO}px;height:${DIAMETRO}px;align-items:center;justify-content:center;border-radius:999px;background:${relleno};border:3px solid oklch(99% 0.008 75);color:${tinta};${anillo}">
+        <span style="position:relative;display:flex;width:${DIAMETRO}px;height:${DIAMETRO}px;align-items:center;justify-content:center;border-radius:999px;background:${relleno};border:3px solid ${aro};color:${tinta};${anillo}${contorno}">
           ${svgDeIcono(icono, 20)}
         </span>
       </span>

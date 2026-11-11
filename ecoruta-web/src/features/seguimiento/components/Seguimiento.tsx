@@ -1,15 +1,36 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Boton } from "@/components/ui/Boton";
-import { evaluarLlegada } from "@/domain/llegadas";
 import { useLlegadas, type EstadoLlegadas } from "../hooks/useLlegadas";
 import { useMiParada, type Fase } from "../hooks/useMiParada";
+import { useTrazados } from "../hooks/useTrazados";
+import { hayUnidadEnVivo, paradasDelMapa, unidadesDelMapa } from "../mapa-de-seguimiento";
 import type { ParadaConRutas } from "../types";
 import { Bienvenida } from "./Bienvenida";
+import { Cabecera } from "./Cabecera";
 import { EstadoSinUbicacion } from "./EstadoSinUbicacion";
+import { HojaInferior } from "./HojaInferior";
 import { ParadaMasLejos } from "./ParadaMasLejos";
 import { SelectorDeParada } from "./SelectorDeParada";
 import { VistaParada } from "./VistaParada";
+
+/**
+ * Leaflet toca `window` al importarse, así que el lienzo queda fuera del render del
+ * servidor. En Next 16 `ssr: false` solo se permite dentro de un componente cliente,
+ * y este lo es.
+ */
+const LienzoSeguimiento = dynamic(
+  () => import("./LienzoSeguimiento").then((modulo) => modulo.LienzoSeguimiento),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex size-full items-start justify-center bg-fondo pt-10">
+        <p className="text-sm text-tinta-media">Cargando el mapa…</p>
+      </div>
+    ),
+  },
+);
 
 type Props = {
   umbralSinSenalS: number;
@@ -17,73 +38,56 @@ type Props = {
   penalizacionIncidenciaPct: number;
 };
 
-export function Seguimiento({
-  umbralSinSenalS,
-  radioAproximacionM,
-  penalizacionIncidenciaPct,
-}: Props) {
+/**
+ * Mapa a pantalla completa, una cabecera delgada arriba y la hoja de tres
+ * alturas encima (en escritorio, una columna a la derecha). El mapa está en
+ * todas las fases: antes de tener parada muestra la ciudad.
+ */
+export function Seguimiento(props: Props) {
   const miParada = useMiParada();
-  const { fase } = miParada;
-  const llegadas = useLlegadas(
-    fase.tipo === "parada" ? fase.parada.paradaId : null,
-  );
+  const { fase, ubicacion } = miParada;
+  const parada = fase.tipo === "parada" ? fase.parada : null;
+  const llegadas = useLlegadas(parada?.paradaId ?? null);
+  const trazados = useTrazados(parada ? parada.rutas.map((ruta) => ruta.rutaId) : []);
+  const otras = miParada.cercanas?.ok ? miParada.cercanas.datos : [];
 
-  // En escritorio la columna se queda del ancho de un teléfono grande: estirada,
-  // la lista de llegadas y el mapa pierden la lectura de un vistazo.
   return (
-    <div className="flex min-h-dvh flex-col bg-fondo text-tinta">
-      <header className="mx-auto flex w-full max-w-xl items-center justify-between gap-3 px-5 pb-4 pt-14">
-        <div className="flex flex-col gap-0.5">
-          <span className="font-serif text-[22px] font-black tracking-tight">
-            EcoRuta
-          </span>
-          <span className="text-xs font-semibold tracking-wide text-tinta-suave">
-            San Juan de los Morros
-          </span>
+    <div className="tema-ciudadano flex h-dvh flex-col overflow-hidden bg-fondo text-tinta">
+      <Cabecera
+        enVivo={parada !== null && hayUnidadEnVivo(llegadas.llegadas, llegadas.falla, props.umbralSinSenalS)}
+      />
+
+      <main className="relative flex min-h-0 flex-1">
+        <div className="absolute inset-0 lg:static lg:flex-1">
+          <LienzoSeguimiento
+            ubicacion={ubicacion.estado === "concedida" ? ubicacion.ubicacion : null}
+            paradas={parada ? paradasDelMapa(parada, otras) : []}
+            unidades={parada ? unidadesDelMapa(llegadas.llegadas ?? [], props.umbralSinSenalS) : []}
+            trazados={trazados}
+          />
         </div>
 
-        {fase.tipo === "parada" &&
-          hayUnidadEnVivo(llegadas, umbralSinSenalS) && (
-            <span className="flex h-9 items-center gap-2 rounded-full border-[0.5px] border-borde bg-superficie px-4">
-              {/* "En vivo" es un estado, no identidad: por regla del sistema usa verde. */}
-              <span
-                aria-hidden="true"
-                className="pulso-en-vivo size-[7px] rounded-full bg-exito"
-              />
-              <span className="text-[13px] font-bold">En vivo</span>
-            </span>
-          )}
-      </header>
-
-      <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 rounded-t-[20px] border-t-[0.5px] sm:border-x-[0.5px] border-borde bg-superficie px-5 pb-8 pt-6">
-        <Contenido
-          miParada={miParada}
-          llegadas={llegadas}
-          umbralSinSenalS={umbralSinSenalS}
-          radioAproximacionM={radioAproximacionM}
-          penalizacionIncidenciaPct={penalizacionIncidenciaPct}
-        />
+        {/* La clave reinicia la altura al cambiar de fase: con parada abre abajo,
+            para ver el mapa; lo demás abre a media altura, para leerse entero. */}
+        <HojaInferior
+          key={fase.tipo}
+          nivelInicial={fase.tipo === "parada" ? "baja" : "media"}
+          etiqueta={parada ? `Tu parada: ${parada.nombre}` : "Tu parada"}
+        >
+          <Contenido miParada={miParada} llegadas={llegadas} {...props} />
+        </HojaInferior>
       </main>
     </div>
   );
 }
 
-type PropsContenido = {
+type PropsContenido = Props & {
   miParada: ReturnType<typeof useMiParada>;
   llegadas: EstadoLlegadas;
-  umbralSinSenalS: number;
-  radioAproximacionM: number;
-  penalizacionIncidenciaPct: number;
 };
 
-function Contenido({
-  miParada,
-  llegadas,
-  umbralSinSenalS,
-  radioAproximacionM,
-  penalizacionIncidenciaPct,
-}: PropsContenido) {
-  const { fase, ubicacion, cercanas, elegida } = miParada;
+function Contenido({ miParada, llegadas, ...ajustes }: PropsContenido) {
+  const { fase, cercanas, elegida } = miParada;
 
   // Si el ciudadano ya tiene parada, cualquier pantalla intermedia (buscar,
   // elegir, ubicación negada) le deja volver a ella.
@@ -102,13 +106,11 @@ function Contenido({
     case "bienvenida":
     case "buscando":
       return elegida ? (
-        <p className="text-sm text-tinta-media">
-          Buscando paradas cerca de ti…
-        </p>
+        <p className="text-sm text-tinta-media">Buscando paradas cerca de ti…</p>
       ) : (
         <Bienvenida
           buscando={fase.tipo === "buscando"}
-          radioAproximacionM={radioAproximacionM}
+          radioAproximacionM={ajustes.radioAproximacionM}
           alUsarUbicacion={miParada.pedirUbicacion}
         />
       );
@@ -140,23 +142,16 @@ function Contenido({
         <VistaParada
           parada={fase.parada}
           otrasParadas={cercanas?.ok ? cercanas.datos : []}
-          ubicacion={
-            ubicacion.estado === "concedida" ? ubicacion.ubicacion : null
-          }
           llegadas={llegadas}
-          umbralSinSenalS={umbralSinSenalS}
-          radioAproximacionM={radioAproximacionM}
-          penalizacionIncidenciaPct={penalizacionIncidenciaPct}
+          {...ajustes}
           alCambiar={miParada.abrirSelector}
+          alElegir={miParada.elegir}
         />
       );
   }
 }
 
-type FaseContratiempo = Extract<
-  Fase,
-  { tipo: "sin_ubicacion" | "sin_paradas" | "error" }
->;
+type FaseContratiempo = Extract<Fase, { tipo: "sin_ubicacion" | "sin_paradas" | "error" }>;
 
 /** Lo que impide mostrar paradas. Si ya tenía una, puede volver a ella. */
 function Contratiempo({
@@ -177,9 +172,7 @@ function Contratiempo({
           {fase.mensaje}
         </p>
       ) : (
-        <EstadoSinUbicacion
-          motivo={fase.tipo === "sin_paradas" ? "sin_paradas" : fase.motivo}
-        />
+        <EstadoSinUbicacion motivo={fase.tipo === "sin_paradas" ? "sin_paradas" : fase.motivo} />
       )}
 
       {fase.tipo === "sin_paradas" && fase.masCercana && (
@@ -187,7 +180,7 @@ function Contratiempo({
       )}
 
       {puedeReintentar(fase) && (
-        <Boton onClick={alReintentar} className="self-start">
+        <Boton onClick={alReintentar} className="w-full">
           Intentar de nuevo
         </Boton>
       )}
@@ -210,24 +203,5 @@ function puedeReintentar(fase: FaseContratiempo): boolean {
   return (
     fase.tipo === "error" ||
     (fase.tipo === "sin_ubicacion" && fase.motivo !== "no_disponible")
-  );
-}
-
-/** Con el último refresco fallido no se puede afirmar «en vivo». */
-function hayUnidadEnVivo(
-  { llegadas, falla }: EstadoLlegadas,
-  umbralSinSenalS: number,
-): boolean {
-  if (falla || !llegadas) {
-    return false;
-  }
-
-  return llegadas.some(
-    (llegada) =>
-      evaluarLlegada({
-        enViaje: llegada.viaje_id !== null,
-        segundosSinSenal: llegada.segundos_sin_senal,
-        umbralSinSenalS,
-      }).tipo === "en_camino",
   );
 }

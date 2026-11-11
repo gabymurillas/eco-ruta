@@ -15,10 +15,10 @@ type Props = {
  */
 export function ParadaMasLejos({ parada, alElegir }: Props) {
   return (
-    <section className="flex flex-col gap-3 rounded-[18px] border-[0.5px] border-borde bg-fondo p-4">
+    <section className="flex flex-col gap-3 rounded-[18px] border border-borde bg-fondo p-4">
       <p className="text-sm leading-relaxed text-tinta-media">
         La más cercana es{" "}
-        <strong className="font-serif font-bold text-tinta">
+        <strong className="font-bold text-tinta">
           {parada.nombre}
         </strong>
         , a {formatearDistancia(parada.distanciaM)} de ti.

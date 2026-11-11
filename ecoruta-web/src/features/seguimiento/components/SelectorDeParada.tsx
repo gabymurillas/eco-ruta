@@ -1,5 +1,5 @@
 import { Boton } from "@/components/ui/Boton";
-import { colorDeRuta } from "@/domain/colores";
+import { colorDeRutaAdaptable } from "@/domain/colores";
 import { formatearDistancia } from "@/domain/formato";
 import type { ParadaConRutas } from "../types";
 
@@ -23,7 +23,7 @@ export function SelectorDeParada({
 }: Props) {
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="font-serif text-[20px] font-black leading-tight tracking-tight">
+      <h2 className="text-[20px] font-extrabold leading-tight tracking-tight">
         Elige tu parada
       </h2>
 
@@ -42,7 +42,7 @@ export function SelectorDeParada({
                 }`}
               >
                 <span className="flex items-baseline justify-between gap-3">
-                  <span className="font-serif text-[15px] font-bold">
+                  <span className="text-[15px] font-bold">
                     {parada.nombre}
                   </span>
                   <span className="shrink-0 text-[13px] font-semibold text-tinta-suave">
@@ -85,7 +85,7 @@ function ChipsDeRuta({ parada }: { parada: ParadaConRutas }) {
           <span
             aria-hidden="true"
             className="size-2 rounded-full"
-            style={{ backgroundColor: colorDeRuta(ruta.color) }}
+            style={{ backgroundColor: colorDeRutaAdaptable(ruta.color) }}
           />
           {ruta.nombre}
         </span>

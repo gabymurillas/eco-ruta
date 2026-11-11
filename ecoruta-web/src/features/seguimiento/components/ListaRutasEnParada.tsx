@@ -1,4 +1,4 @@
-import { colorDeRuta, tintaSobreColorDeRuta } from "@/domain/colores";
+import { colorDeRutaAdaptable, glifoSobreColorDeRutaAdaptable } from "@/domain/colores";
 import type { RutaEnParada } from "../types";
 import { IconoRuta } from "@/components/ui/IconoRuta";
 
@@ -20,20 +20,20 @@ export function ListaRutasEnParada({ rutas }: Props) {
       {rutas.map((ruta) => (
         <li
           key={ruta.rutaId}
-          className="flex h-[62px] items-center gap-3 rounded-2xl border-[0.5px] border-borde-suave bg-superficie px-4"
+          className="flex h-[62px] items-center gap-3 rounded-2xl border border-borde-suave bg-superficie px-4"
         >
           <span
             className="flex size-[34px] shrink-0 items-center justify-center rounded-full"
             style={{
-              backgroundColor: colorDeRuta(ruta.color),
-              color: tintaSobreColorDeRuta(ruta.color),
+              backgroundColor: colorDeRutaAdaptable(ruta.color),
+              color: glifoSobreColorDeRutaAdaptable(ruta.color),
             }}
           >
             <IconoRuta icono={ruta.icono} />
           </span>
 
           <div className="flex flex-1 flex-col gap-[2px]">
-            <span className="font-serif text-sm font-bold">{ruta.nombre}</span>
+            <span className="text-sm font-bold">{ruta.nombre}</span>
             <span className="text-xs font-semibold text-tinta-suave">
               {ruta.tipo ?? "Servicio sin tipo declarado"}
             </span>

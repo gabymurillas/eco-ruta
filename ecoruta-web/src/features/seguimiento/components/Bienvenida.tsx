@@ -19,7 +19,7 @@ export function Bienvenida({
 }: Props) {
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="font-serif text-[24px] font-black leading-tight tracking-tight">
+      <h1 className="text-[24px] font-extrabold leading-tight tracking-tight">
         Encuentra tu parada
       </h1>
 

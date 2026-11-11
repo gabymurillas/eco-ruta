@@ -1,4 +1,3 @@
-import { clienteNavegador } from "@/lib/supabase/client";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 import { exito, falloRegistrado, type Resultado } from "./resultado";
@@ -9,9 +8,9 @@ export type RutaDeMapa =
 /**
  * Geometría de las rutas activas para dibujar el mapa.
  *
- * Hay dos variantes porque las llaman dos superficies distintas: el admin desde un
- * Server Component (con sesión en cookies) y el ciudadano desde el navegador (sin
- * autenticarse). La consulta es la misma; cambia solo de qué cliente sale.
+ * Esta es la del admin, desde un Server Component (con sesión en cookies). La del
+ * ciudadano, desde el navegador, vive en `mapa-publico.service.ts`: un componente
+ * cliente no puede importar este archivo, que arrastra `next/headers`.
  */
 export async function obtenerRutasDeMapa(): Promise<Resultado<RutaDeMapa[]>> {
   const supabase = await crearClienteServidor();
@@ -20,20 +19,6 @@ export async function obtenerRutasDeMapa(): Promise<Resultado<RutaDeMapa[]>> {
   if (error) {
     return falloRegistrado(
       "rutas_para_mapa (servidor)",
-      error,
-      "No se pudo cargar el trazado de las rutas.",
-    );
-  }
-
-  return exito(data ?? []);
-}
-
-export async function obtenerRutasDeMapaPublicas(): Promise<Resultado<RutaDeMapa[]>> {
-  const { data, error } = await clienteNavegador().rpc("rutas_para_mapa");
-
-  if (error) {
-    return falloRegistrado(
-      "rutas_para_mapa (navegador)",
       error,
       "No se pudo cargar el trazado de las rutas.",
     );

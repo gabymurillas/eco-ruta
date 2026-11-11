@@ -12,8 +12,9 @@
 @theme {
   --color-fondo: oklch(97% 0.015 75);
   --color-superficie: oklch(99% 0.008 75);
-  --color-borde: oklch(85% 0.02 60);
-  --color-borde-suave: oklch(90% 0.015 60);
+  /* Bordes de 1 px y marcados: con sol directo, el de 0,5 px y 85 % se perdía. */
+  --color-borde: oklch(74% 0.025 60);
+  --color-borde-suave: oklch(83% 0.02 60);
   /* Solo campos de formulario: su contorno es lo que los identifica y debe llegar a 3:1. */
   --color-borde-campo: oklch(63% 0.02 60);
 
@@ -25,10 +26,10 @@
   --color-marca-profundo: oklch(48% 0.15 35);
   --color-marca-tenue: oklch(95% 0.03 35);
 
-  --color-ruta-teal: oklch(52% 0.11 195);
+  --color-ruta-teal: oklch(52% 0.1 208);
   --color-ruta-mostaza: oklch(70% 0.14 75);
   --color-ruta-ciruela: oklch(48% 0.13 340);
-  --color-ruta-oliva: oklch(50% 0.1 145);
+  --color-ruta-oliva: oklch(50% 0.13 140);
   --color-ruta-indigo: oklch(48% 0.12 265);
 
   --color-exito: oklch(52% 0.13 155);
@@ -49,8 +50,10 @@
   --color-menu-texto: #cfe0e4;
   --color-menu-grupo: #8fb0b9;
 
-  --font-sans: var(--font-source-sans), system-ui, sans-serif;
-  --font-serif: var(--font-merriweather), Georgia, serif;
+  /* Una sola familia en la web del ciudadano. `serif` se conserva como nombre del
+     rol (títulos y cifras) para no tocar cada clase: hoy también es Montserrat. */
+  --font-sans: var(--font-montserrat), system-ui, sans-serif;
+  --font-serif: var(--font-montserrat), system-ui, sans-serif;
 }
 
 body {
@@ -272,4 +275,102 @@ body:has(.tema-admin[data-tema="oscuro"]) {
 .tema-admin[data-tema="oscuro"] .leaflet-popup-tip {
   background: var(--color-superficie);
   color: var(--color-tinta);
+}
+
+/*
+  Web del ciudadano en modo oscuro: sigue la preferencia del teléfono. Fondo casi
+  negro (#020202) y grises neutros, elegidos por la autora. Vive en
+  `.tema-ciudadano` para no tocar el panel, que tiene su propio tema.
+
+  Las rutas se aclaran (mismo tono) para pasar 3:1 sobre el negro, y su ícono va
+  en tinta oscura: un glifo blanco sobre un relleno claro no contrasta.
+*/
+/* Contorno de la mostaza: el único tono claro necesita un borde para separarse de la crema. */
+.tema-ciudadano {
+  --contorno-mostaza: oklch(42% 0.08 70);
+}
+
+@media (prefers-color-scheme: dark) {
+  .tema-ciudadano {
+    --color-fondo: #020202;
+    --color-superficie: #121212;
+    --color-borde: #3a3a3a;
+    --color-borde-suave: #262626;
+    --color-borde-campo: #7a7a7a;
+
+    --color-tinta: oklch(94% 0.012 75);
+    --color-tinta-media: oklch(79% 0.015 70);
+    --color-tinta-suave: oklch(74% 0.015 70);
+
+    --color-marca: oklch(72% 0.13 40);
+    --color-marca-profundo: oklch(74% 0.12 40);
+    --color-marca-tenue: oklch(26% 0.05 40);
+
+    --color-exito: oklch(74% 0.15 155);
+    --color-advertencia: oklch(78% 0.14 75);
+    --color-advertencia-fondo: oklch(22% 0.04 70);
+    --color-advertencia-borde: oklch(45% 0.08 70);
+    --color-advertencia-tinta: oklch(86% 0.1 80);
+    --color-error: oklch(72% 0.16 25);
+    --color-info: oklch(72% 0.12 240);
+    --color-ubicacion: oklch(72% 0.14 250);
+
+    --ruta-teal: oklch(72% 0.11 210);
+    --ruta-mostaza: oklch(80% 0.14 85);
+    --ruta-ciruela: oklch(70% 0.14 340);
+    --ruta-oliva: oklch(72% 0.15 140);
+    --ruta-indigo: oklch(70% 0.12 265);
+    --glifo-ruta: #0a0a0a;
+    --contorno-mostaza: #020202;
+
+    color-scheme: dark;
+  }
+
+  body:has(.tema-ciudadano) {
+    background: #020202;
+  }
+
+  .tema-ciudadano .leaflet-container {
+    background: #0b0b0b;
+  }
+
+  .tema-ciudadano .leaflet-tile-pane {
+    filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(0.9) saturate(0.4);
+  }
+
+  .tema-ciudadano .ruta-teal { stroke: var(--ruta-teal); }
+  .tema-ciudadano .ruta-mostaza { stroke: var(--ruta-mostaza); }
+  .tema-ciudadano .ruta-ciruela { stroke: var(--ruta-ciruela); }
+  .tema-ciudadano .ruta-oliva { stroke: var(--ruta-oliva); }
+  .tema-ciudadano .ruta-indigo { stroke: var(--ruta-indigo); }
+  .tema-ciudadano .ruta-teal.ruta-relleno { fill: var(--ruta-teal); }
+  .tema-ciudadano .ruta-mostaza.ruta-relleno { fill: var(--ruta-mostaza); }
+  .tema-ciudadano .ruta-ciruela.ruta-relleno { fill: var(--ruta-ciruela); }
+  .tema-ciudadano .ruta-oliva.ruta-relleno { fill: var(--ruta-oliva); }
+  .tema-ciudadano .ruta-indigo.ruta-relleno { fill: var(--ruta-indigo); }
+
+  .tema-ciudadano .leaflet-control-attribution {
+    background: rgb(18 18 18 / 0.85);
+    color: var(--color-tinta-media);
+  }
+
+  .tema-ciudadano .leaflet-control-attribution a {
+    color: var(--color-marca);
+  }
+
+  .tema-ciudadano .leaflet-popup-content-wrapper,
+  .tema-ciudadano .leaflet-popup-tip {
+    background: var(--color-superficie);
+    color: var(--color-tinta);
+  }
+}
+
+.tema-ciudadano .leaflet-bar a {
+  background: var(--color-superficie);
+  border-color: var(--color-borde);
+  color: var(--color-tinta);
+}
+
+.tema-ciudadano .leaflet-bar a:hover {
+  background: var(--color-marca-tenue);
 }

@@ -1,6 +1,6 @@
 import { Boton } from "@/components/ui/Boton";
 import { IconoRuta } from "@/components/ui/IconoRuta";
-import { colorDeRuta, tintaSobreColorDeRuta } from "@/domain/colores";
+import { colorDeRutaAdaptable, glifoSobreColorDeRutaAdaptable } from "@/domain/colores";
 import type { Aviso } from "@/domain/avisos";
 import {
   estimarCaminataMinutos,
@@ -27,8 +27,9 @@ type Props = {
  * nombre, para que el ciudadano la relacione con su chip. Nunca terracota: es
  * un estado, no identidad.
  *
- * El z-index pasa el 1000 de los controles de Leaflet: el aviso va por encima
- * del mapa, no debajo.
+ * Aparece arriba, bajo la cabecera: abajo está la hoja con la parada, y el
+ * aviso no debe taparla. El z-index pasa el de la hoja y el de los controles
+ * de Leaflet.
  */
 export function AvisoDeParada(props: Props) {
   const { aviso, parada, ruta, alDescartar } = props;
@@ -37,24 +38,24 @@ export function AvisoDeParada(props: Props) {
   return (
     <div
       role="alert"
-      className={`fixed inset-x-4 bottom-6 z-[1100] mx-auto flex max-w-md flex-col gap-4 rounded-3xl border bg-superficie p-5 ${
+      className={`fixed inset-x-4 top-[calc(4.25rem+env(safe-area-inset-top))] z-[1200] mx-auto flex max-w-md flex-col gap-3 rounded-[20px] border-[1.5px] bg-superficie p-4 lg:right-auto lg:left-6 lg:mx-0 lg:w-[26rem] ${
         viene ? "border-exito" : "border-advertencia-borde"
       }`}
     >
       <div className="flex items-center gap-3.5">
         <span
           aria-hidden="true"
-          className="flex size-14 shrink-0 items-center justify-center rounded-full"
+          className="flex size-12 shrink-0 items-center justify-center rounded-full"
           style={{
-            backgroundColor: colorDeRuta(ruta?.color ?? null),
-            color: tintaSobreColorDeRuta(ruta?.color ?? null),
+            backgroundColor: colorDeRutaAdaptable(ruta?.color ?? null),
+            color: glifoSobreColorDeRutaAdaptable(ruta?.color ?? null),
           }}
         >
-          <IconoRuta icono={ruta?.icono ?? null} tamano={27} />
+          <IconoRuta icono={ruta?.icono ?? null} tamano={24} />
         </span>
 
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <span className="font-serif text-[17px] font-bold leading-tight">
+          <span className="text-[17px] font-bold leading-tight">
             {titulo(viene, ruta?.nombre ?? "Tu unidad")}
           </span>
           <span className="text-[13px] font-semibold text-tinta-media">
@@ -70,7 +71,7 @@ export function AvisoDeParada(props: Props) {
         </p>
       )}
 
-      <Boton onClick={alDescartar} className="w-full">
+      <Boton variante="secundario" onClick={alDescartar} className="w-full">
         Entendido
       </Boton>
     </div>

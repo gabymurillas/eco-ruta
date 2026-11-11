@@ -124,4 +124,4 @@ y adopción ciudadana.
 - El color nunca es el único portador de significado (nombre de ruta e ícono siempre presentes),
   pensando en el daltonismo rojo-verde.
 - Objetivos táctiles de 48 px como mínimo; foco visible; `prefers-reduced-motion` respetado.
-- Lectura de un vistazo bajo el sol: cifras grandes en serif de alto contraste.
+- Lectura de un vistazo bajo el sol: cifras grandes y gruesas de alto contraste.

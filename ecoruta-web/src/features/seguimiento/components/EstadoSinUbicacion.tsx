@@ -30,7 +30,7 @@ export function EstadoSinUbicacion({ motivo }: Props) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex size-14 items-center justify-center rounded-full border-[0.5px] border-borde bg-fondo text-tinta-suave">
+      <div className="flex size-14 items-center justify-center rounded-full border border-borde bg-fondo text-tinta-suave">
         <svg
           width="26"
           height="26"
@@ -48,7 +48,7 @@ export function EstadoSinUbicacion({ motivo }: Props) {
         </svg>
       </div>
 
-      <h2 className="font-serif text-[22px] font-black leading-tight tracking-tight">
+      <h2 className="text-[22px] font-extrabold leading-tight tracking-tight">
         {titulo}
       </h2>
       <p className="text-sm leading-relaxed text-tinta-media">{detalle}</p>

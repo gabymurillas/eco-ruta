@@ -40,7 +40,8 @@ evaluación académica del jurado de la UNERG. Ver [propiedad-intelectual.md](pr
 
 | Fuente | Licencia | Uso |
 |---|---|---|
-| Merriweather | SIL Open Font License 1.1 | Web (Google Fonts vía `next/font`) y app (incluida en el APK, con su licencia en `assets/licenses/`) |
+| Montserrat | SIL Open Font License 1.1 | Web del ciudadano (Google Fonts vía `next/font`), desde 2026-11-11 |
+| Merriweather | SIL Open Font License 1.1 | App (incluida en el APK, con su licencia en `assets/licenses/`); la web la usó hasta 2026-11-11 |
 | Source Sans 3 | SIL Open Font License 1.1 | Ídem |
 
 ## 5. Datos y servicios

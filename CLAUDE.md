@@ -83,7 +83,7 @@ tesis como versión mínima, con respaldo al cálculo simple.
 
 **Diseño.** [`DESIGN.md`](DESIGN.md) es normativo. Las tres reglas que más se rompen: el
 terracota de marca nunca es color de ruta ni de estado; el color nunca va solo (siempre con
-nombre o ícono); sin sombras ni degradados. Merriweather + Source Sans 3; nunca Inter ni Roboto.
+nombre o ícono); sin sombras ni degradados. Web del ciudadano: solo Montserrat; panel: Figtree; nunca Inter ni Roboto.
 Tuteo y sentence case.
 
 ---

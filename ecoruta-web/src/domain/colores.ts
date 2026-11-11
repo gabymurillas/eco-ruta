@@ -12,10 +12,11 @@
  */
 
 const PALETA: Record<string, string> = {
-  teal: "oklch(52% 0.11 195)",
+  // En el borde de la gama sRGB: con croma 0,11 y tono 195 se recortaba y se veía apagado.
+  teal: "oklch(52% 0.10 208)",
   mostaza: "oklch(70% 0.14 75)",
   ciruela: "oklch(48% 0.13 340)",
-  oliva: "oklch(50% 0.10 145)",
+  oliva: "oklch(50% 0.13 140)",
   indigo: "oklch(48% 0.12 265)",
 };
 
@@ -81,4 +82,19 @@ export function colorDeRutaAdaptable(token: string | null): string {
 export function claseDeRuta(token: string | null): string {
   const clave = token?.toLowerCase();
   return clave && clave in PALETA ? `ruta-${clave}` : "";
+}
+
+/**
+ * Glifo sobre el relleno de ruta en la web del ciudadano, que sigue el modo oscuro
+ * del teléfono: ahí las rutas se aclaran y el glifo pasa a tinta oscura
+ * (`--glifo-ruta`, definido en globals.css). Mostaza lleva tinta oscura siempre.
+ */
+export function glifoSobreColorDeRutaAdaptable(token: string | null): string {
+  const tinta = tintaSobreColorDeRuta(token);
+  return tinta === TINTA_OSCURA ? tinta : `var(--glifo-ruta, ${tinta})`;
+}
+
+/** Mostaza es el único tono que necesita contorno para separarse del fondo claro. */
+export function necesitaContorno(token: string | null): boolean {
+  return Boolean(token && TOKENS_CON_GLIFO_OSCURO.has(token.toLowerCase()));
 }
