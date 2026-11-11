@@ -3,7 +3,7 @@
 | Campo | Valor |
 |---|---|
 | Método | STRIDE por activo, con controles existentes y brechas |
-| Última revisión | 2026-11-04 |
+| Última revisión | 2026-11-10 |
 | Próxima revisión | Antes de la defensa y antes de cualquier piloto |
 
 ## 1. Activos
@@ -13,9 +13,10 @@
 | Posición en vivo de las unidades | Alta (seguridad de choferes) | `posiciones`, Realtime |
 | Historial de recorridos | Alta (revela patrones) | `posiciones`, `viajes` |
 | Ubicación del ciudadano | Alta (personal) | Navegador; parámetro de la RPC `paradas_cercanas` |
-| Credenciales del admin | Crítica | Supabase Auth |
+| Credenciales del admin y del operador | Crítica | Supabase Auth |
+| Quién tiene acceso al panel y con qué rol | Crítica (integridad) | `app_metadata.rol` en Supabase Auth; solo lo escribe `gestionar-equipo` |
 | Sesión del dispositivo | Alta | Android Keystore; Supabase Auth |
-| Clave `service_role` | Crítica | Solo en las Edge Functions y la sesión local del CLI |
+| Clave `service_role` | Crítica | Solo en las Edge Functions y la sesión local del CLI; nunca en la web ni en Vercel |
 | Configuración (rutas, paradas, parámetros) | Media (integridad) | Tablas del admin |
 | Texto libre de incidencias | Media (puede contener datos personales) | `incidencias.descripcion` |
 
@@ -27,6 +28,7 @@
 | Bromista o vándalo | Avisos falsos, desorden | Intenta escribir sin autorización |
 | Quien roba un teléfono de unidad | Revenderlo o usar su sesión | Acceso físico al dispositivo |
 | Atacante oportunista | Tomar el admin o extraer datos | Credenciales filtradas, ingeniería inversa del APK |
+| Personal con acceso al panel | Cambiar la configuración sin autorización, o conservar el acceso después de salir | Sesión válida de operador, o de alguien dado de baja |
 | Abuso involuntario | Agotar las cuotas gratuitas | Raspado de datos o tráfico alto |
 
 ## 3. Amenazas y controles
@@ -46,6 +48,12 @@
 | A11 | Denial of service | Bloqueo por uso de OSM, OSRM o Photon | Volumen bajo; URLs configurables | TS-06 (vigilar) |
 | A12 | Tampering | Desinformación por un tiempo estimado engañoso | Rotulado «estimado»; estado «sin señal»; penalización por incidencia | — |
 | A13 | Information disclosure | Filtración de `service_role` | Solo en el servidor; nunca en el repositorio | Rotación documentada en [respuesta a incidentes](respuesta-a-incidentes.md) |
+| A14 | Elevation of privilege | Un operador cambia la configuración, lee un código de vinculación o se sube el rol | RLS (`sql/17`): el operador solo lee, y solo cambia el estado de una incidencia; no ve dispositivos con código pendiente. El rol vive en `app_metadata` y solo lo escribe `gestionar-equipo`, que exige admin. Probado por rol en un clúster desechable | — |
+| A15 | Elevation of privilege | Llamar a `gestionar-equipo` sin ser admin, o con un token de cuando sí lo era | La función consulta la cuenta en Auth (`getUser`) en cada llamada: usa el rol vigente, no el del token | — |
+| A16 | Elevation of privilege | Una cuenta dada de baja o degradada sigue actuando | La web consulta el rol vigente en cada petición; borrar la cuenta revoca sesiones y tokens de renovación | **TS-11**: el token de acceso ya emitido sigue valiendo ante RLS hasta que vence |
+| A17 | Denial of service | Dejar el panel sin administradores | Reglas de `_dominio/equipo.ts`: nadie se modifica a sí mismo; siempre queda un admin que ya aceptó su invitación | Dos admins que se degradan entre sí en el mismo instante (carrera): se recupera desde el SQL Editor |
+| A18 | Spoofing | Invitar un correo donde alguien ya creó una cuenta con su propia contraseña | Solo se invita a correos sin cuenta: nunca se le da rol a una cuenta existente | Cerrar el registro público en Supabase (arquitectura § 7) |
+| A19 | Spoofing | El enlace de invitación lo abre otro (correo reenviado o buzón comprometido) | Un solo uso; vence; el admin ve «Invitación pendiente» y puede cancelarla | Un filtro de correo que «visita» los enlaces puede gastar el enlace antes que la persona: se reenvía |
 
 ## 4. Riesgos aceptados
 

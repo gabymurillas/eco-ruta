@@ -1,6 +1,7 @@
 import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { exigirAdminOVolver } from "@/features/autenticacion/guardas";
 import { FormularioRuta } from "@/features/rutas/components/FormularioRuta";
 import { obtenerRutas } from "@/services/rutas.service";
 
@@ -13,6 +14,8 @@ export const dynamic = "force-dynamic";
 export default async function DatosDeRutaPage({
   params,
 }: PageProps<"/admin/rutas/[id]/datos">) {
+  await exigirAdminOVolver("/admin/rutas");
+
   const { id } = await params;
   const rutas = await obtenerRutas();
 

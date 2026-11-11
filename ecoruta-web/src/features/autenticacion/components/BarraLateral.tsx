@@ -1,4 +1,5 @@
 import { LogoAdmin } from "@/components/ui/LogoAdmin";
+import { NOMBRE_DE_ROL, type RolDelPanel } from "@/domain/roles";
 import type { Tema } from "@/domain/tema";
 import { BotonTema } from "@/features/tema/components/BotonTema";
 import { salir } from "../acciones";
@@ -6,6 +7,7 @@ import { MenuAdmin } from "./MenuAdmin";
 
 type Props = {
   correo: string;
+  rol: RolDelPanel;
   tema: Tema;
 };
 
@@ -16,14 +18,14 @@ type Props = {
  * bordes ni sombras. Queda fija a la altura de la ventana para que cerrar
  * sesión nunca termine fuera de la pantalla en una página larga.
  */
-export function BarraLateral({ correo, tema }: Props) {
+export function BarraLateral({ correo, rol, tema }: Props) {
   const iniciales = correo.slice(0, 2).toUpperCase();
 
   return (
     <aside className="sticky top-0 flex h-dvh w-62 shrink-0 flex-col overflow-y-auto bg-menu px-4 pt-6 pb-4 text-white">
       <LogoAdmin subtitulo="Panel de gestión" className="px-1.5 pb-4" />
 
-      <MenuAdmin />
+      <MenuAdmin rol={rol} />
 
       <div className="flex-1" />
 
@@ -37,7 +39,7 @@ export function BarraLateral({ correo, tema }: Props) {
           {iniciales}
         </span>
         <div className="flex min-w-0 flex-1 flex-col">
-          <span className="text-[13px] font-semibold">Administración</span>
+          <span className="text-[13px] font-semibold">{NOMBRE_DE_ROL[rol]}</span>
           <span className="truncate text-xs text-menu-texto">{correo}</span>
         </div>
         <form action={salir}>

@@ -7,7 +7,7 @@ import type { useEditorDeParadas } from "../hooks/useEditorDeParadas";
 type Editor = ReturnType<typeof useEditorDeParadas>;
 
 /** El catálogo, con un filtro: en una ciudad hay decenas de paradas. */
-export function ListaDeParadas({ editor }: { editor: Editor }) {
+export function ListaDeParadas({ editor, soloLectura }: { editor: Editor; soloLectura: boolean }) {
   const [filtro, setFiltro] = useState("");
   const texto = filtro.trim().toLowerCase();
   const visibles = editor.paradas.filter((parada) => parada.nombre.toLowerCase().includes(texto));
@@ -17,7 +17,9 @@ export function ListaDeParadas({ editor }: { editor: Editor }) {
     <aside aria-label="Paradas de la ciudad" className="flex w-[300px] shrink-0 flex-col gap-2.5 overflow-hidden rounded-2xl border border-borde bg-superficie p-3.5">
       {editor.paradas.length === 0 ? (
         <p className="p-1 text-[13px] text-tinta-media">
-          Todavía no hay paradas. Busca un lugar o toca «Nueva parada» para colocar la primera.
+          {soloLectura
+            ? "Todavía no hay paradas. Las coloca un administrador."
+            : "Todavía no hay paradas. Busca un lugar o toca «Nueva parada» para colocar la primera."}
         </p>
       ) : (
         <>

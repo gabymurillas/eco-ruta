@@ -1,6 +1,7 @@
 import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import { trazadoALatLng } from "@/domain/mapa";
 import { radioMinimoSugeridoM } from "@/domain/parametros";
+import { puedeEditarElPanel } from "@/features/autenticacion/guardas";
 import { EditorDeParadas } from "@/features/paradas/components/EditorDeParadas";
 import { obtenerParadasDeLaCiudad } from "@/services/catalogo-paradas.service";
 import { obtenerRutasDeMapa } from "@/services/mapa.service";
@@ -13,10 +14,11 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function ParadasPage() {
-  const [paradas, rutas, parametros] = await Promise.all([
+  const [paradas, rutas, parametros, puedeEditar] = await Promise.all([
     obtenerParadasDeLaCiudad(),
     obtenerRutasDeMapa(),
     obtenerValoresDeParametros(),
+    puedeEditarElPanel(),
   ]);
 
   if (!paradas.ok) {
@@ -39,6 +41,7 @@ export default async function ParadasPage() {
       }
       radioPorDefectoM={radioMinimoM}
       radioMinimoM={radioMinimoM}
+      soloLectura={!puedeEditar}
     />
   );
 }

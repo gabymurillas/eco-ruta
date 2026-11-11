@@ -73,9 +73,36 @@ Parámetros previstos por el PRD (todavía no existen): `eta_historico_min_viaje
 |---|---|---|
 | Público (`anon`) | Sin sesión | Leer rutas y unidades activas, paradas, posiciones usables **de viajes abiertos**, viajes abiertos, incidencias activas, avisos y parámetros |
 | Dispositivo | JWT con `app_metadata.unidad_id` | Insertar posiciones e incidencias de **su** unidad; gestionar **sus** viajes |
+| Operador | JWT con `app_metadata.rol = 'operador'` | Leer todo lo que lee el admin (también rutas inactivas, viajes cerrados e incidencias resueltas), salvo los dispositivos con un código de vinculación pendiente. Cambiar **solo** `activa` y `resuelta_at` de una incidencia. Nada más |
 | Admin | JWT con `app_metadata.rol = 'admin'` | Todo |
 
 `app_metadata` solo se escribe desde el servidor; `user_metadata` nunca autoriza nada.
+
+### Roles del panel (ADR-0015, `sql/17`)
+
+| Función | Devuelve verdadero si… |
+|---|---|
+| `es_admin()` | `app_metadata.rol = 'admin'` |
+| `es_operador()` | `app_metadata.rol = 'operador'` |
+| `unidad_del_dispositivo()` | (no es booleana) devuelve `app_metadata.unidad_id` |
+
+| Qué | Admin | Operador |
+|---|---|---|
+| Monitoreo, históricos, ver rutas, paradas y unidades | ✅ | ✅ (lectura) |
+| Marcar una incidencia como resuelta | ✅ | ✅ |
+| Editar otros campos de una incidencia, o borrarla | ✅ | ❌ (disparador `incidencias_solo_estado_para_operador`) |
+| Crear, editar o borrar rutas, trazados, paradas, unidades y parámetros | ✅ | ❌ |
+| Generar o leer un código de vinculación | ✅ | ❌ (la política `operador_lee_dispositivos` esconde la fila mientras tenga código) |
+| `eliminar_unidad` | ✅ | ❌ |
+| Gestionar el equipo (Edge Function `gestionar-equipo`) | ✅ | ❌ |
+
+Por qué un disparador y no solo la política: RLS filtra filas, no columnas. Con la política
+`operador_atiende_incidencias` a secas, el operador podría reescribir la descripción o la ruta
+de una incidencia. El disparador compara la fila vieja con la nueva y solo acepta cambios en
+`activa` y `resuelta_at`.
+
+Las cuentas del panel no tienen tabla propia: viven en Supabase Auth y se listan y modifican
+solo con la Edge Function `gestionar-equipo`, que exige rol admin.
 
 La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 
@@ -94,6 +121,8 @@ La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 | `resumen_por_ruta(dias)` | RPC | Históricos del admin: viajes, duración, cobertura e incidencias (y cuántas siguen activas) por ruta. En `sql/15` |
 | `viajes_grabados`, `recorrido_de_viaje` | RPC | Trazado desde un viaje grabado |
 | `estado_flota` | RPC | Monitoreo |
+| `es_admin`, `es_operador`, `unidad_del_dispositivo` | Auxiliares, invoker | Leen los claims de `app_metadata` para RLS (`sql/03`, `sql/17`) |
+| `incidencias_solo_estado_para_operador` | Disparador | Limita al operador a cambiar el estado de una incidencia (`sql/17`) |
 | `canjear_codigo_de_vinculacion`, `registrar_auth_de_dispositivo`, `registrar_salud_del_dispositivo`, `eliminar_unidad` | RPC, **definer** | Vinculación y ciclo de vida del dispositivo (`sql/06`) |
 | `posiciones_para_suavizar`, `estado_de_geocercas` | RPC, definer | Uso exclusivo de `registrar-posicion` (`sql/07`) |
 
@@ -101,5 +130,7 @@ La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 
 `01_schema` → `02_parametros` → `03_rls` → `04_funciones` → `06_vinculacion` → `07_geocercas`
 → `08_incidencia_otro` → `09_avisos_parada` → `10_paradas_de_ciudad` → `11_trazado_asistido` →
-`12_realtime_monitoreo` → `13_exposicion_solo_en_servicio` → `14_tiempo_estimado`. `05_consultas_historicos` es documentación. Se aplican a mano en
+`12_realtime_monitoreo` → `13_exposicion_solo_en_servicio` → `14_tiempo_estimado` →
+`15_historicos_por_ruta` → `16_historicos_periodo_y_cobertura` → `17_roles_del_panel`.
+`05_consultas_historicos` es documentación. Se aplican a mano en
 Supabase.

@@ -13,6 +13,11 @@ type Props = {
   radioMinimoM: number;
 };
 
+type PropsFicha = Props & {
+  /** El operador ve los datos de la parada, sin campos ni botones de guardar. */
+  soloLectura?: boolean;
+};
+
 const RADIO_MAXIMO_M = 300;
 const PASO_RADIO_M = 5;
 const DECIMALES_COORDENADA = 6;
@@ -23,11 +28,15 @@ const CLASE_CAMPO = "h-10 border-[1.5px] text-sm";
  * mientras tanto el admin puede arrastrar el pin, tocar otro punto del mapa o
  * cambiar los datos sin que la base cambie.
  */
-export function FichaDeParada({ editor, radioMinimoM }: Props) {
+export function FichaDeParada({ editor, radioMinimoM, soloLectura = false }: PropsFicha) {
   const { ficha, estadoFicha } = editor;
 
   if (!ficha) {
     return null;
+  }
+
+  if (soloLectura) {
+    return <FichaDeLectura editor={editor} />;
   }
 
   const nueva = ficha.paradaId === null;
@@ -83,6 +92,48 @@ export function FichaDeParada({ editor, radioMinimoM }: Props) {
       {!nueva && <RutasQuePasan rutas={editor.original?.rutas ?? []} />}
 
       {eliminando ? <ConfirmarEliminar editor={editor} nombre={ficha.nombre} /> : <Acciones editor={editor} nueva={nueva} />}
+    </section>
+  );
+}
+
+/** La misma parada, solo para mirar: datos fijos y un botón para cerrar. */
+function FichaDeLectura({ editor }: { editor: Editor }) {
+  const { ficha } = editor;
+
+  if (!ficha) {
+    return null;
+  }
+
+  const datos = [
+    { titulo: "Latitud", valor: ficha.lat.toFixed(DECIMALES_COORDENADA) },
+    { titulo: "Longitud", valor: ficha.lng.toFixed(DECIMALES_COORDENADA) },
+    { titulo: "Radio de la geocerca", valor: `${ficha.radioM} m` },
+    { titulo: "Avisos a los ciudadanos", valor: ficha.notifica ? "Activados" : "Apagados" },
+  ];
+
+  return (
+    <section
+      aria-label={ficha.nombre}
+      className="flex flex-col gap-3 rounded-2xl border border-borde bg-superficie p-4 shadow-[0_6px_24px_rgb(0_0_0/0.14)]"
+    >
+      <h2 className="truncate text-[19px] font-extrabold">{ficha.nombre}</h2>
+
+      <dl className="grid grid-cols-2 gap-x-2.5 gap-y-3">
+        {datos.map(({ titulo, valor }) => (
+          <div key={titulo}>
+            <dt className="text-[12.5px] font-semibold text-tinta-media">{titulo}</dt>
+            <dd className="text-sm font-bold">{valor}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <RutasQuePasan rutas={editor.original?.rutas ?? []} />
+
+      <div className="flex justify-end">
+        <button type="button" onClick={editor.cancelar} className={BOTON_PANEL_SECUNDARIO}>
+          Cerrar
+        </button>
+      </div>
     </section>
   );
 }

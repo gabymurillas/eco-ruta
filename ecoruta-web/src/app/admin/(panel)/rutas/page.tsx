@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import { agruparPorTipo, claveDeTipo, type GrupoDeTipo } from "@/domain/fichas-rutas";
+import { puedeEditarElPanel } from "@/features/autenticacion/guardas";
 import { TarjetaRuta } from "@/features/rutas/components/TarjetaRuta";
 import { obtenerFichasDeRutas } from "@/services/fichas-rutas.service";
 
@@ -13,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 export default async function RutasPage({ searchParams }: PageProps<"/admin/rutas">) {
   const tipoElegido = [(await searchParams).tipo].flat()[0] ?? "";
-  const resultado = await obtenerFichasDeRutas();
+  const [resultado, puedeEditar] = await Promise.all([obtenerFichasDeRutas(), puedeEditarElPanel()]);
 
   if (!resultado.ok) {
     return <FallaDeCarga mensaje={resultado.error} />;
@@ -31,6 +32,7 @@ export default async function RutasPage({ searchParams }: PageProps<"/admin/ruta
         <p className="text-sm text-tinta-media">
           {rutas.length === 1 ? "1 ruta" : `${rutas.length} rutas`} · {conTrazado} con trazado
         </p>
+        {puedeEditar && (
         <Link
           href="/admin/rutas/nueva"
           className="ml-auto flex h-10 items-center gap-2 rounded-[10px] bg-marca-profundo px-4 text-sm font-semibold text-superficie transition-[filter] duration-200 ease-out hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo"
@@ -40,6 +42,7 @@ export default async function RutasPage({ searchParams }: PageProps<"/admin/ruta
           </svg>
           Nueva ruta
         </Link>
+        )}
       </header>
 
       {/* Con un solo tipo, filtrar no separa nada. */}
@@ -49,12 +52,14 @@ export default async function RutasPage({ searchParams }: PageProps<"/admin/ruta
 
       {rutas.length === 0 ? (
         <p className="rounded-2xl border border-borde bg-superficie p-6 text-sm text-tinta-media">
-          Todavía no hay rutas. Crea la primera, dibuja su trazado y los ciudadanos podrán verla.
+          {puedeEditar
+            ? "Todavía no hay rutas. Crea la primera, dibuja su trazado y los ciudadanos podrán verla."
+            : "Todavía no hay rutas. Las crea un administrador."}
         </p>
       ) : (
         <div className="grid gap-4 xl:grid-cols-2">
           {visibles.map((ruta) => (
-            <TarjetaRuta key={ruta.id} ruta={ruta} />
+            <TarjetaRuta key={ruta.id} ruta={ruta} puedeEditar={puedeEditar} />
           ))}
         </div>
       )}

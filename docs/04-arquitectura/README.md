@@ -4,7 +4,7 @@
 |---|---|
 | Estado | Aprobado |
 | Responsable | Gabrieli Murillas Ramírez |
-| Última revisión | 2026-11-04 |
+| Última revisión | 2026-11-10 |
 
 | Documento | Contenido |
 |---|---|
@@ -21,7 +21,7 @@
 ```mermaid
 flowchart LR
   C([Ciudadano<br/>sin cuenta]) -->|consulta su parada| W[EcoRuta<br/>web pública]
-  A([Administrador<br/>alcaldía]) -->|configura y monitorea| P[EcoRuta<br/>admin]
+  A([Administrador y operador<br/>alcaldía]) -->|configura y monitorea| P[EcoRuta<br/>admin]
   CH([Chofer]) -->|inicia y finaliza| D[App del<br/>dispositivo]
   W & P & D --> B[(Backend<br/>Supabase)]
   W & P --> OSM[Teselas OSM]
@@ -39,6 +39,7 @@ flowchart LR
 | Base de datos | PostgreSQL + PostGIS (Supabase) | Modelo, RLS y funciones geoespaciales | `sql/` |
 | Edge Function `vincular-dispositivo` | Deno/TypeScript, `verify_jwt=false` | Canje del código; graba `app_metadata.unidad_id` | `supabase/functions/` |
 | Edge Function `registrar-posicion` | Deno/TypeScript, `verify_jwt=true` | Recibe la telemetría y evalúa geocercas y avisos de forma síncrona | `supabase/functions/` |
+| Edge Function `gestionar-equipo` | Deno/TypeScript, `verify_jwt=true`; exige rol admin | Lista, invita, cambia el rol y quita el acceso de las cuentas del panel ([ADR-0015](adr/0015-roles-del-panel-y-equipo.md)) | `supabase/functions/` |
 | Realtime | Supabase Realtime | Difunde posiciones, viajes, incidencias y avisos | `sql/12_realtime_monitoreo.sql` |
 | Hospedaje web | Vercel (equipo eva-projecs, proyecto eco-ruta) | Despliegue de `master` | — |
 
@@ -81,13 +82,49 @@ Admin → «Vincular» → código de 5 caracteres (10 min, un solo uso) → el 
   renovación del token vuelve a escribir las cookies con 400 días.
 - **Recuperación:** `/admin/recuperar` → `resetPasswordForEmail` (respuesta neutra: no revela
   si la cuenta existe, ni siquiera por el límite de envíos) → enlace del correo →
-  `/admin/auth/confirmar` (canjea `code` o `token_hash`; solo cuentas con rol admin; sesión
+  `/admin/auth/confirmar` (canjea `code` o `token_hash`; solo cuentas con rol del panel; sesión
   corta; pone la marca de un solo uso `ecoruta-recuperacion`, 15 min) →
   `/admin/restablecer` (exige la marca) → contraseña nueva → panel.
 - Con la plantilla de correo por defecto llega un `code` (PKCE): el enlace solo sirve en el
   mismo navegador donde se pidió, y solo el más reciente.
 
-### 3.4 Consulta del ciudadano
+### 3.4 Equipo del panel: roles e invitaciones
+
+Dos roles ([ADR-0015](adr/0015-roles-del-panel-y-equipo.md)): **admin** (todo) y **operador**
+(monitorea y atiende incidencias; el resto en lectura). El detalle de permisos está en el
+[modelo de datos](modelo-de-datos.md#roles-del-panel-adr-0015-sql17).
+
+```mermaid
+sequenceDiagram
+  participant A as Admin (navegador)
+  participant N as Next.js (Server Action)
+  participant F as gestionar-equipo
+  participant Au as Supabase Auth
+  participant I as Persona invitada
+  A->>N: Invitar correo + rol
+  N->>N: exigirAdministrador() (rol vigente en Auth)
+  N->>F: POST {accion: "invitar"} con el token de la sesión
+  F->>Au: getUser(token) → ¿rol admin?
+  F->>Au: inviteUserByEmail (service_role) y app_metadata.rol
+  Au-->>I: Correo con enlace (token_hash, type=invite)
+  I->>N: GET /admin/auth/confirmar?token_hash=…&type=invite
+  N->>Au: verifyOtp(invite) → sesión corta
+  N-->>I: /admin/restablecer → crea su contraseña → panel
+```
+
+- **La clave `service_role` no entra en la web.** La web solo reenvía el token de la sesión; la
+  función lo valida contra Auth y recién entonces usa su clave.
+- **Tres barreras por cada acción de escritura:** la interfaz no muestra el botón al operador;
+  la Server Action llama a `exigirAdministrador()`; RLS rechaza la escritura en la base.
+- **Reglas del equipo** (`supabase/functions/_dominio/equipo.ts`, puras): nadie cambia su propio
+  rol ni se quita el acceso; siempre queda un admin que ya aceptó su invitación; solo se
+  listan y modifican cuentas con rol `admin` u `operador`, nunca las de los teléfonos.
+- **Quitar el acceso borra la cuenta.** Caen sus sesiones; el token de acceso que ya tenía
+  vale hasta su vencimiento (una hora por defecto, brecha TS-11).
+- **El enlace de invitación exige la plantilla con `token_hash`** (§ 7): la invitación la abre
+  otra persona en otro navegador, y con la plantilla por defecto el enlace no llega al servidor.
+
+### 3.5 Consulta del ciudadano
 
 Ubicación del navegador → RPC `paradas_cercanas(lat, lng)` → selección de la parada →
 `llegadas_a_parada` (tiempo estimado) → suscripción Realtime a `avisos_parada` de esa parada.
@@ -119,7 +156,57 @@ Solo `services/` importa Supabase. Las reglas completas y los límites de tamañ
 |---|---|---|
 | Producción web | `eco-ruta-nine.vercel.app` | Push a `master`; `autoAssignCustomDomains` debe estar encendido |
 | Backend | Supabase `yumfwnqvmcitjnskazgx` | Las migraciones de `sql/` se aplican a mano (SQL Editor o CLI) |
-| Edge Functions | `npx supabase functions deploy <f>` | — |
+| Edge Functions | `npx supabase functions deploy <f> --remote=yumfwnqvmcitjnskazgx --use-api --yes` | `vincular-dispositivo`, `registrar-posicion`, `gestionar-equipo` |
 | Pruebas de SQL | Clúster desechable de Postgres 17 + PostGIS | Ver la guía del repositorio |
 | Supabase Auth | *Authentication → URL Configuration → Redirect URLs* | Debe incluir `https://eco-ruta-nine.vercel.app/admin/auth/confirmar` (y la de `localhost`). Si falta, Supabase manda el enlace de recuperación a la *Site URL* sin avisar y nadie lo canjea |
 | Correo de Supabase | SMTP por defecto o propio | El SMTP por defecto solo entrega a correos de miembros del equipo de Supabase y con límite por hora. Para cuentas del ente gestor hace falta SMTP propio. Los rechazos quedan en el registro de Vercel (`[ecoruta] restablecer contraseña`), no en pantalla |
+
+## 7. Configurar Supabase para el equipo del panel
+
+Pasos de una sola vez, en el panel de Supabase del proyecto `yumfwnqvmcitjnskazgx`. Sin ellos
+la sección Equipo carga, pero las invitaciones no se pueden aceptar.
+
+1. **Aplicar la migración de roles.** `sql/17_roles_del_panel.sql` en el SQL Editor, o
+   `npx supabase db query --remote=yumfwnqvmcitjnskazgx --yes -f sql/17_roles_del_panel.sql`.
+   Es idempotente.
+2. **Desplegar la función.**
+   `npx supabase functions deploy gestionar-equipo --remote=yumfwnqvmcitjnskazgx --use-api --yes`.
+   No necesita secretos nuevos: Supabase le inyecta `SUPABASE_URL` y
+   `SUPABASE_SERVICE_ROLE_KEY`. Se deja `verify_jwt` encendido (el valor por defecto).
+3. **Plantilla del correo de invitación.** *Authentication → Emails → Templates → Invite user*.
+   El enlace del cuerpo tiene que ser exactamente este (el resto del texto es libre):
+
+   ```html
+   <h2>Te invitaron al panel de EcoRuta San Juan</h2>
+   <p>Abre este enlace para crear tu contraseña:</p>
+   <p><a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=invite">Crear mi contraseña</a></p>
+   ```
+
+   Por qué: la plantilla por defecto usa `{{ .ConfirmationURL }}`, que pasa por Supabase y
+   devuelve la sesión en el fragmento de la dirección (`#access_token=…`). El fragmento no
+   viaja al servidor, así que `/admin/auth/confirmar` no tendría nada que canjear. Con
+   `token_hash` el enlace llega directo a la web y sirve desde cualquier navegador.
+4. **(Recomendado) La misma idea en *Reset password*:**
+   `<a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=recovery">`. Con eso el enlace
+   de recuperación deja de depender del navegador donde se pidió (§ 3.3).
+5. **Redirect URLs.** *Authentication → URL Configuration → Redirect URLs* debe incluir
+   `https://eco-ruta-nine.vercel.app/admin/auth/confirmar` y
+   `http://localhost:3000/admin/auth/confirmar` (ya hacían falta para la recuperación). Si la
+   dirección no está en la lista, `{{ .RedirectTo }}` cae a la *Site URL* y el enlace del
+   correo abre la portada en vez de la pantalla de contraseña.
+6. **Vigencia del enlace.** *Authentication → Providers → Email → Email OTP Expiration*. Una
+   invitación suele abrirse horas después: conviene subirla a 86400 s (24 h, el máximo). Si
+   vence, el admin la reenvía desde Equipo.
+7. **Cerrar el registro público.** *Authentication → Providers → Email →* desactivar *Allow new
+   users to sign up*. Las invitaciones siguen funcionando; lo que se cierra es que cualquiera
+   cree cuentas (sin rol, y por eso sin acceso, pero ocupan correos que luego no se pueden
+   invitar).
+8. **SMTP propio.** El SMTP por defecto de Supabase solo entrega a correos de miembros del
+   equipo de Supabase y con un límite de pocos correos por hora (§ 6). Para invitar a personal
+   de la alcaldía hace falta configurar un SMTP propio en *Authentication → Emails → SMTP
+   Settings*.
+9. **Primer administrador.** Las cuentas admin que ya existen no cambian. Si hiciera falta crear
+   una a mano: *Authentication → Users → Add user* y, en el SQL Editor,
+   `update auth.users set raw_app_meta_data = raw_app_meta_data || '{"rol":"admin"}' where email = '…';`.
+
+La web no necesita variables de entorno nuevas en Vercel.

@@ -1,10 +1,13 @@
+import { cache } from "react";
+import { leerRolDelPanel, puedeAdministrar, type RolDelPanel } from "@/domain/roles";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { exito, fallo, falloRegistrado, type Resultado } from "./resultado";
 
-export type Administrador = {
+/** Quien tiene la sesión abierta en el panel, con el rol que decide qué puede hacer. */
+export type SesionDelPanel = {
   id: string;
   correo: string;
-  esAdmin: boolean;
+  rol: RolDelPanel;
 };
 
 type Credenciales = {
@@ -14,8 +17,14 @@ type Credenciales = {
   mantener: boolean;
 };
 
-/** Lo que trae el enlace del correo de recuperación: según la plantilla, uno u otro. */
-export type EnlaceDeRecuperacion = { codigo: string } | { tokenHash: string };
+/** De qué correo viene el enlace: «olvidé la contraseña» o la invitación al equipo. */
+export type MotivoDelEnlace = "recovery" | "invite";
+
+/**
+ * Lo que trae el enlace del correo. Un `code` (PKCE) solo existe en la
+ * recuperación; con `token_hash` el motivo dice qué clase de enlace canjear.
+ */
+export type EnlaceDelCorreo = { codigo: string } | { tokenHash: string; motivo: MotivoDelEnlace };
 
 const LONGITUD_MINIMA_CONTRASENA = 8;
 
@@ -23,7 +32,7 @@ export async function iniciarSesion({
   correo,
   contrasena,
   mantener,
-}: Credenciales): Promise<Resultado<Administrador>> {
+}: Credenciales): Promise<Resultado<SesionDelPanel>> {
   const supabase = await crearClienteServidor({ sesionCorta: !mantener });
 
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -37,14 +46,14 @@ export async function iniciarSesion({
     return fallo("Correo o contraseña incorrectos.");
   }
 
-  const administrador = aAdministrador(data.user);
+  const sesion = aSesionDelPanel(data.user);
 
-  if (!administrador.esAdmin) {
+  if (!sesion) {
     await supabase.auth.signOut();
-    return fallo("Esta cuenta no tiene permisos de administración.");
+    return fallo("Esta cuenta no tiene acceso al panel.");
   }
 
-  return exito(administrador);
+  return exito(sesion);
 }
 
 export async function cerrarSesion(): Promise<void> {
@@ -80,27 +89,32 @@ export async function solicitarRestablecimiento(correo: string, urlDeRetorno: st
 }
 
 /**
- * Canjea el enlace del correo por una sesión de recuperación.
+ * Canjea el enlace del correo —recuperación o invitación— por una sesión que solo
+ * sirve para elegir la contraseña.
  *
- * Con la plantilla por defecto llega un `code` (PKCE): solo se puede canjear en el
- * mismo navegador donde se pidió, porque la otra mitad quedó en una cookie. Con la
- * plantilla que manda `token_hash` el enlace sirve desde cualquier navegador.
+ * Con la plantilla por defecto de recuperación llega un `code` (PKCE): solo se
+ * puede canjear en el mismo navegador donde se pidió, porque la otra mitad quedó
+ * en una cookie. Con la plantilla que manda `token_hash` el enlace sirve desde
+ * cualquier navegador. Una invitación la abre otra persona en otro equipo, así
+ * que solo funciona con `token_hash`: ver «Configurar Supabase» en
+ * docs/04-arquitectura/README.md.
  */
-export async function confirmarRecuperacion(enlace: EnlaceDeRecuperacion): Promise<Resultado<null>> {
+export async function confirmarEnlaceDelCorreo(enlace: EnlaceDelCorreo): Promise<Resultado<null>> {
   // Sesión corta: nace de un correo, y nadie eligió «Mantener la sesión».
   const supabase = await crearClienteServidor({ sesionCorta: true });
   const { data, error } =
     "codigo" in enlace
       ? await supabase.auth.exchangeCodeForSession(enlace.codigo)
-      : await supabase.auth.verifyOtp({ type: "recovery", token_hash: enlace.tokenHash });
+      : await supabase.auth.verifyOtp({ type: enlace.motivo, token_hash: enlace.tokenHash });
 
   if (error || !data.user) {
     return fallo("El enlace venció o ya se usó. Pide uno nuevo.");
   }
 
-  // Igual que al ingresar: una cuenta sin rol de administración no se queda con
-  // sesión en el panel. Se responde como un enlace inválido, sin dar detalles.
-  if (!aAdministrador(data.user).esAdmin) {
+  // Igual que al ingresar: una cuenta sin rol del panel (la de un teléfono, por
+  // ejemplo) no se queda con sesión. Se responde como un enlace inválido, sin
+  // dar detalles.
+  if (!aSesionDelPanel(data.user)) {
     await supabase.auth.signOut();
     return fallo("El enlace venció o ya se usó. Pide uno nuevo.");
   }
@@ -131,19 +145,40 @@ export async function cambiarContrasena(nueva: string): Promise<Resultado<null>>
   return exito(null);
 }
 
-/** Devuelve null si no hay sesión válida. Valida el token contra Supabase, no la cookie. */
-export async function obtenerAdministrador(): Promise<Administrador | null> {
+/**
+ * Devuelve null si no hay sesión válida o la cuenta no tiene rol del panel.
+ *
+ * Valida el token contra Supabase, no la cookie: el rol que devuelve es el que la
+ * cuenta tiene ahora, así que un cambio de rol o una baja se notan en la
+ * siguiente petición aunque el token viejo siga vigente.
+ *
+ * `cache` lo comparte dentro de una misma petición: el layout, la página y sus
+ * guardas preguntan lo mismo y Supabase se consulta una sola vez.
+ */
+export const obtenerSesionDelPanel = cache(async (): Promise<SesionDelPanel | null> => {
   const supabase = await crearClienteServidor();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return null;
+  return user ? aSesionDelPanel(user) : null;
+});
+
+/**
+ * Para las Server Actions que solo puede usar un administrador. Una acción se
+ * puede invocar sin pasar por la página, así que el botón oculto no alcanza.
+ * RLS la frenaría igual; esto responde antes y con un mensaje claro.
+ */
+export async function exigirAdministrador(): Promise<Resultado<SesionDelPanel>> {
+  const sesion = await obtenerSesionDelPanel();
+
+  if (!sesion) {
+    return fallo("Tu sesión venció. Vuelve a entrar.");
   }
 
-  const administrador = aAdministrador(user);
-  return administrador.esAdmin ? administrador : null;
+  return puedeAdministrar(sesion.rol)
+    ? exito(sesion)
+    : fallo("Tu rol no permite hacer este cambio. Pídeselo a un administrador.");
 }
 
 type UsuarioSupabase = {
@@ -156,10 +191,8 @@ type UsuarioSupabase = {
  * El rol vive en `app_metadata`, que solo se modifica desde el servidor.
  * `user_metadata` no sirve: el propio usuario puede editarlo y se auto-nombraría admin.
  */
-function aAdministrador(usuario: UsuarioSupabase): Administrador {
-  return {
-    id: usuario.id,
-    correo: usuario.email ?? "",
-    esAdmin: usuario.app_metadata?.rol === "admin",
-  };
+function aSesionDelPanel(usuario: UsuarioSupabase): SesionDelPanel | null {
+  const rol = leerRolDelPanel(usuario.app_metadata?.rol);
+
+  return rol ? { id: usuario.id, correo: usuario.email ?? "", rol } : null;
 }

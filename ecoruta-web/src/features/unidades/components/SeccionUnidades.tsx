@@ -12,6 +12,8 @@ type Props = {
   unidades: readonly FichaUnidad[];
   rutas: readonly OpcionDeRuta[];
   umbralBateriaPct: number;
+  /** Falso para el operador: ve la flota y la salud de los teléfonos, sin acciones. */
+  puedeEditar: boolean;
 };
 
 type Panel = { modo: "ninguno" } | { modo: "nueva" } | { modo: AccionDeFila; unidadId: string };
@@ -19,7 +21,7 @@ type Panel = { modo: "ninguno" } | { modo: "nueva" } | { modo: AccionDeFila; uni
 const NINGUNO: Panel = { modo: "ninguno" };
 const ESTADO_INICIAL: EstadoUnidades = {};
 
-export function SeccionUnidades({ unidades, rutas, umbralBateriaPct }: Props) {
+export function SeccionUnidades({ unidades, rutas, umbralBateriaPct, puedeEditar }: Props) {
   const [panel, setPanel] = useState<Panel>(NINGUNO);
   const [busqueda, setBusqueda] = useState("");
   const vinculadas = unidades.filter((unidad) => unidad.vinculado).length;
@@ -44,12 +46,14 @@ export function SeccionUnidades({ unidades, rutas, umbralBateriaPct }: Props) {
         </p>
         <div className="ml-auto flex items-center gap-2">
           {unidades.length > 0 && <Buscador valor={busqueda} onCambio={setBusqueda} />}
-          <button type="button" onClick={() => setPanel({ modo: "nueva" })} className={BOTON_PANEL_PRINCIPAL}>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Nueva unidad
-          </button>
+          {puedeEditar && (
+            <button type="button" onClick={() => setPanel({ modo: "nueva" })} className={BOTON_PANEL_PRINCIPAL}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Nueva unidad
+            </button>
+          )}
         </div>
       </header>
 
@@ -63,10 +67,12 @@ export function SeccionUnidades({ unidades, rutas, umbralBateriaPct }: Props) {
             hayUnidades={unidades.length > 0}
             elegidaId={elegidaId}
             umbralBateriaPct={umbralBateriaPct}
-            onAccion={(unidadId, modo) => setPanel({ modo, unidadId })}
+            onAccion={puedeEditar ? (unidadId, modo) => setPanel({ modo, unidadId }) : null}
           />
         </section>
 
+        {/* El panel lateral es solo de escritura: sin permiso, la tabla usa todo el ancho. */}
+        {puedeEditar && (
         <aside className="w-[330px] shrink-0 overflow-y-auto rounded-2xl border border-borde bg-superficie p-5">
           <ContenidoPanel
             panel={panel}
@@ -79,6 +85,7 @@ export function SeccionUnidades({ unidades, rutas, umbralBateriaPct }: Props) {
             }
           />
         </aside>
+        )}
       </div>
     </div>
   );
@@ -95,14 +102,17 @@ function TablaUnidades({
   hayUnidades: boolean;
   elegidaId: string | null;
   umbralBateriaPct: number;
-  onAccion: (unidadId: string, accion: AccionDeFila) => void;
+  /** Null cuando quien mira no puede editar: la columna de acciones no se dibuja. */
+  onAccion: ((unidadId: string, accion: AccionDeFila) => void) | null;
 }) {
   if (unidades.length === 0) {
     return (
       <p className="p-6 text-sm text-tinta-media">
         {hayUnidades
           ? "Ninguna unidad coincide con la búsqueda."
-          : "Todavía no hay unidades. Crea la primera con «Nueva unidad» y vincula el teléfono que va en ella."}
+          : onAccion
+            ? "Todavía no hay unidades. Crea la primera con «Nueva unidad» y vincula el teléfono que va en ella."
+            : "Todavía no hay unidades. Las crea un administrador."}
       </p>
     );
   }
@@ -115,7 +125,7 @@ function TablaUnidades({
           <th scope="col" className="border-b border-borde px-4 py-2.5">Unidad y ruta</th>
           <th scope="col" className="border-b border-borde px-4 py-2.5">Teléfono</th>
           <th scope="col" className="border-b border-borde px-4 py-2.5">Batería</th>
-          <th scope="col" className="border-b border-borde px-4 py-2.5 text-right">Acciones</th>
+          {onAccion && <th scope="col" className="border-b border-borde px-4 py-2.5 text-right">Acciones</th>}
         </tr>
       </thead>
       <tbody>
@@ -125,7 +135,7 @@ function TablaUnidades({
             unidad={unidad}
             elegida={unidad.id === elegidaId}
             umbralBateriaPct={umbralBateriaPct}
-            onAccion={(accion) => onAccion(unidad.id, accion)}
+            onAccion={onAccion && ((accion) => onAccion(unidad.id, accion))}
           />
         ))}
       </tbody>

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { TOKENS_DE_COLOR } from "@/domain/colores";
 import { ICONOS_DISPONIBLES } from "@/domain/iconos";
+import { exigirAdministrador } from "@/services/auth.service";
 import { actualizarRuta, crearRuta } from "@/services/rutas.service";
 
 export type EstadoRuta = {
@@ -14,6 +15,12 @@ export async function guardarRuta(
   _estadoPrevio: EstadoRuta,
   datos: FormData,
 ): Promise<EstadoRuta> {
+  const permiso = await exigirAdministrador();
+
+  if (!permiso.ok) {
+    return { error: permiso.error };
+  }
+
   const id = String(datos.get("id") ?? "");
   const nombre = String(datos.get("nombre") ?? "").trim();
   const tipo = String(datos.get("tipo") ?? "").trim() || null;

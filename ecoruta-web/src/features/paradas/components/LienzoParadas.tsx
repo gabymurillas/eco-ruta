@@ -23,7 +23,8 @@ type Props = {
   destino: Destino | null;
   onClicEnMapa: (punto: Punto) => void;
   onSeleccionarParada: (paradaId: string) => void;
-  onMoverFicha: (punto: Punto) => void;
+  /** Null en solo lectura: el pin de la parada abierta no se arrastra. */
+  onMoverFicha: ((punto: Punto) => void) | null;
 };
 
 /**
@@ -99,7 +100,7 @@ function MarcadorDeParada({ punto, sinRuta, etiqueta, onClic }: PropsMarcador) {
  * vista. El radio va en metros y Leaflet lo reescala con el zoom, así se calibra
  * viendo su tamaño real sobre la calle.
  */
-function ParadaEnFicha({ ficha, onMover }: { ficha: Ficha; onMover: (punto: Punto) => void }) {
+function ParadaEnFicha({ ficha, onMover }: { ficha: Ficha; onMover: ((punto: Punto) => void) | null }) {
   const icono = useMemo(() => construirIcono({ editando: true, sinRuta: false }), []);
 
   return (
@@ -118,12 +119,12 @@ function ParadaEnFicha({ ficha, onMover }: { ficha: Ficha; onMover: (punto: Punt
       <Marker
         position={[ficha.lat, ficha.lng]}
         icon={icono}
-        draggable
+        draggable={onMover !== null}
         alt={ficha.nombre}
         eventHandlers={{
           dragend: (evento) => {
             const { lat, lng } = evento.target.getLatLng();
-            onMover({ lat, lng });
+            onMover?.({ lat, lng });
           },
         }}
       >

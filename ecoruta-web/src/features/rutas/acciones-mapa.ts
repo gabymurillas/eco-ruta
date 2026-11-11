@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import type { Punto } from "@/domain/mapa";
 import type { PuntoClave } from "@/domain/trazado";
+import { exigirAdministrador } from "@/services/auth.service";
 import {
   guardarTrazado,
   obtenerParadasDeRuta,
@@ -26,6 +27,12 @@ export async function guardarTrazadoDeRuta(
   coordenadas: [number, number][],
   puntosClave: PuntoClave[],
 ): Promise<ResultadoTrazado> {
+  const permiso = await exigirAdministrador();
+
+  if (!permiso.ok) {
+    return { ok: false, error: permiso.error };
+  }
+
   if (coordenadas.length === 1) {
     return { ok: false, error: "Un trazado necesita al menos dos puntos." };
   }

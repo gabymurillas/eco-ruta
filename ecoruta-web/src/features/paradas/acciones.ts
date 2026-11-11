@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { radioMinimoSugeridoM } from "@/domain/parametros";
+import { exigirAdministrador } from "@/services/auth.service";
 import {
   actualizarParada,
   crearParada,
@@ -19,6 +20,12 @@ export type ResultadoAccion = {
 type DatosDeParada = Pick<ParadaDeLaCiudad, "nombre" | "lat" | "lng" | "radioM" | "notifica">;
 
 export async function agregarParada(datos: DatosDeParada): Promise<ResultadoAccion> {
+  const permiso = await exigirAdministrador();
+
+  if (!permiso.ok) {
+    return { ok: false, error: permiso.error };
+  }
+
   const nombre = datos.nombre.trim();
   const invalida = await validarParada(nombre, datos.radioM);
 
@@ -40,6 +47,12 @@ export async function guardarParada(
   paradaId: string,
   datos: DatosDeParada,
 ): Promise<ResultadoAccion> {
+  const permiso = await exigirAdministrador();
+
+  if (!permiso.ok) {
+    return { ok: false, error: permiso.error };
+  }
+
   const nombre = datos.nombre.trim();
   const invalida = await validarParada(nombre, datos.radioM);
 
@@ -58,6 +71,12 @@ export async function guardarParada(
 }
 
 export async function eliminarParada(paradaId: string): Promise<ResultadoAccion> {
+  const permiso = await exigirAdministrador();
+
+  if (!permiso.ok) {
+    return { ok: false, error: permiso.error };
+  }
+
   const resultado = await borrarParada(paradaId);
 
   if (!resultado.ok) {

@@ -16,7 +16,8 @@ type Props = {
   unidad: FichaUnidad;
   elegida: boolean;
   umbralBateriaPct: number;
-  onAccion: (accion: AccionDeFila) => void;
+  /** Null para quien solo puede mirar: la fila no lleva botones. */
+  onAccion: ((accion: AccionDeFila) => void) | null;
 };
 
 const TEXTO_VINCULAR: Record<EstadoTelefono, string> = {
@@ -69,6 +70,7 @@ export function FilaUnidad({ unidad, elegida, umbralBateriaPct, onAccion }: Prop
         />
       </td>
 
+      {onAccion && (
       <td className="px-4 py-3">
         <div className="flex justify-end gap-1.5 whitespace-nowrap">
           <button
@@ -107,6 +109,7 @@ export function FilaUnidad({ unidad, elegida, umbralBateriaPct, onAccion }: Prop
           </button>
         </div>
       </td>
+      )}
     </tr>
   );
 }

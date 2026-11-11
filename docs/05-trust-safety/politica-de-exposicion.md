@@ -11,21 +11,23 @@
 
 ## Matriz de visibilidad
 
-| Dato | Público (ciudadano) | Dispositivo | Admin |
-|---|---|---|---|
-| Rutas activas: trazado, color, ícono, horario | ✅ | ✅ | ✅ |
-| Paradas | ✅ | ✅ | ✅ |
-| Nombre de la unidad y su ruta | ✅ | Solo la suya | ✅ |
-| Posición en vivo | ✅ **solo durante un viaje activo** | Solo la suya (escritura) | ✅ |
-| Recorridos de viajes terminados | ❌ | ❌ | ✅ (90 días) |
-| Viajes abiertos (en servicio o no) | ✅ | Solo los suyos | ✅ |
-| Avisos «se acerca» y «ya pasó» | ✅ | — | ✅ |
-| Incidencias activas: tipo y ruta | ✅ | Inserta las suyas | ✅ |
-| Texto libre de incidencias | ❌ (objetivo; hoy ✅, TS-03) | Inserta | ✅ |
-| Batería y última señal del teléfono | ❌ | Escribe | ✅ |
-| Identidad del chofer | **No existe en el sistema** | — | — |
-| Ubicación del ciudadano | Solo en su navegador | — | ❌ |
-| Parámetros calibrables | ✅ (lectura) | ✅ (lectura) | ✅ |
+| Dato | Público (ciudadano) | Dispositivo | Operador | Admin |
+|---|---|---|---|---|
+| Rutas activas: trazado, color, ícono, horario | ✅ | ✅ | ✅ (también inactivas) | ✅ |
+| Paradas | ✅ | ✅ | ✅ | ✅ |
+| Nombre de la unidad y su ruta | ✅ | Solo la suya | ✅ | ✅ |
+| Posición en vivo | ✅ **solo durante un viaje activo** | Solo la suya (escritura) | ✅ | ✅ |
+| Recorridos de viajes terminados | ❌ | ❌ | ✅ (90 días) | ✅ (90 días) |
+| Viajes abiertos (en servicio o no) | ✅ | Solo los suyos | ✅ | ✅ |
+| Avisos «se acerca» y «ya pasó» | ✅ | — | ✅ | ✅ |
+| Incidencias activas: tipo y ruta | ✅ | Inserta las suyas | ✅; las resuelve | ✅ |
+| Texto libre de incidencias | ❌ (objetivo; hoy ✅, TS-03) | Inserta | ✅ (lectura) | ✅ |
+| Batería y última señal del teléfono | ❌ | Escribe | ✅ | ✅ |
+| Identidad del chofer | **No existe en el sistema** | — | — | — |
+| Ubicación del ciudadano | Solo en su navegador | — | ❌ | ❌ |
+| Parámetros calibrables | ✅ (lectura) | ✅ (lectura) | ✅ (lectura) | ✅ |
+| Código de vinculación de un teléfono | ❌ | ❌ | ❌ | ✅ |
+| Cuentas del panel (correo, rol, último ingreso) | ❌ | ❌ | ❌ | ✅ (por `gestionar-equipo`) |
 
 ## Reglas
 

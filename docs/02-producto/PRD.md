@@ -5,9 +5,9 @@
 | Campo | Valor |
 |---|---|
 | Estado | Aprobado para el alcance de la tesis |
-| Versión | 1.0 |
+| Versión | 1.1 |
 | Responsable del producto | Gabrieli Murillas Ramírez (autora; equipo de una persona) |
-| Última revisión | 2026-11-04 |
+| Última revisión | 2026-11-10 |
 | Hito | Defensa del proyecto de grado (UNERG), antes del 31-12-2026; fecha exacta por confirmar |
 | Fuentes | Entrevista de producto (2026-11-04) · `CLAUDE.md` · Análisis de factibilidad (julio de 2026) · código en `master` |
 | Relacionados | [Visión](../01-vision/vision.md) · [PRODUCT.md](../../PRODUCT.md) · [DESIGN.md](../../DESIGN.md) · [Arquitectura](../04-arquitectura/README.md) · [Trust & Safety](../05-trust-safety/README.md) · [Legal](../06-legal/README.md) |
@@ -97,7 +97,7 @@ responde a ellos (ver [§11](#11-riesgos) y [ADR](../04-arquitectura/adr/README.
 | Pagos, cobro de pasaje o boletería | Fuera del problema |
 | Elección manual de ruta o parada sin ubicación | **Decisión definitiva**: la ubicación es el único camino |
 | Evaluación o ranking de choferes | El sistema no vigila personas (ver [Trust & Safety](../05-trust-safety/README.md)) |
-| Roles múltiples o varios entes en el admin | Un solo rol admin basta para la tesis |
+| Varios entes en el admin (multiorganización) | Un solo ente basta para la tesis ([ADR-0014](../04-arquitectura/adr/0014-plataforma-multiorganizacion.md)). Sí hay dos roles dentro del ente: admin y operador (ADM-18, ADM-19) |
 | Modelo predictivo con aprendizaje automático | Solo una versión mínima con historial por franja (CIU-09) |
 
 ## 4. Usuarios y personas
@@ -116,10 +116,11 @@ Vive en una urbanización por donde el camión pasa sin horario fijo. **Trabajo 
 No conoce la ciudad. **Trabajo por hacer:** «Quiero saber qué rutas pasan por la parada más
 cercana y cuándo llegan.»
 
-### P4 — Operador de la alcaldía *(administrador)*
-Trabaja en escritorio. Configura rutas, paradas y unidades, vincula los teléfonos y vigila la
-flota. **Trabajo por hacer:** «Quiero ver qué unidades están en servicio, cuáles perdieron señal
-y qué incidencias hay.»
+### P4 — Personal de la alcaldía *(administrador y operador)*
+Trabaja en escritorio. El **administrador** configura rutas, paradas y unidades, vincula los
+teléfonos y decide quién entra al panel. El **operador** vigila la flota y atiende las
+incidencias, sin poder cambiar la configuración. **Trabajo por hacer:** «Quiero ver qué
+unidades están en servicio, cuáles perdieron señal y qué incidencias hay.»
 
 ### P5 — Chofer *(usuario indirecto)*
 No tiene cuenta. Interactúa con el teléfono de la unidad: iniciar, finalizar y reportar
@@ -202,6 +203,8 @@ revoca la sesión del teléfono.
 | ADM-15 | Históricos: velocidad típica por ruta y franja (insumo de CIU-09) | P1 | ⬜ |
 | ADM-16 | Ver el recorrido real de un viaje y sus desvíos sobre el trazado | P2 | ⬜ |
 | ADM-17 | Resolver (cerrar) incidencias | P1 | 🟡 (sección `/admin/incidencias` hecha; falta probarla con un reporte real) |
+| ADM-18 | Equipo: invitar por correo con un rol, listar las cuentas del panel (rol, último ingreso, invitación pendiente), cambiar el rol y quitar el acceso. Solo un admin; nadie se modifica a sí mismo; siempre queda un admin | P1 | 🟡 (código listo; falta aplicar `sql/17`, desplegar `gestionar-equipo` y configurar la plantilla de invitación: [arquitectura § 7](../04-arquitectura/README.md#7-configurar-supabase-para-el-equipo-del-panel)) |
+| ADM-19 | Rol operador: monitoreo, históricos y lectura de rutas, paradas y unidades; resuelve incidencias; no crea, edita ni borra nada más. Lo impone RLS, no solo la interfaz | P1 | 🟡 (ídem ADM-18) |
 
 ### 6.3 App del dispositivo de ruta (`DIS`) — repositorio aparte
 
@@ -333,4 +336,5 @@ al cálculo simple.
 
 | Versión | Fecha | Cambio |
 |---|---|---|
+| 1.1 | 2026-11-10 | Roles del panel: se agregan ADM-18 (Equipo) y ADM-19 (rol operador); «roles múltiples» sale de los no-objetivos ([ADR-0015](../04-arquitectura/adr/0015-roles-del-panel-y-equipo.md)) |
 | 1.0 | 2026-11-04 | Primera versión, a partir de la entrevista de producto. Incorpora el tiempo estimado con historial (versión mínima) al alcance de la tesis; antes era trabajo futuro |

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { exigirAdminOVolver } from "@/features/autenticacion/guardas";
 import { FormularioRuta } from "@/features/rutas/components/FormularioRuta";
 import { obtenerRutas } from "@/services/rutas.service";
 
@@ -7,6 +8,8 @@ export const metadata = {
 };
 
 export default async function NuevaRutaPage() {
+  await exigirAdminOVolver("/admin/rutas");
+
   const rutas = await obtenerRutas();
 
   return (

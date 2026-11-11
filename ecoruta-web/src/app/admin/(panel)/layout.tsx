@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { COOKIE_TEMA, leerTema } from "@/domain/tema";
 import { BarraLateral } from "@/features/autenticacion/components/BarraLateral";
-import { obtenerAdministrador } from "@/services/auth.service";
+import { obtenerSesionDelPanel } from "@/services/auth.service";
 
 /**
  * Marco y guard de todo el panel.
@@ -13,12 +13,13 @@ import { obtenerAdministrador } from "@/services/auth.service";
  * El layout de /admin existe, pero solo pone la fuente, la paleta y el tema.
  *
  * El proxy ya redirige a quien no tenga sesion; esto verifica ademas que la cuenta
- * tenga rol de administracion, y es la ultima barrera antes de RLS.
+ * tenga un rol del panel (admin u operador), y es la ultima barrera antes de RLS.
+ * Lo que cada rol puede hacer lo deciden las paginas, las acciones y, al final, RLS.
  */
 export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
-  const administrador = await obtenerAdministrador();
+  const sesion = await obtenerSesionDelPanel();
 
-  if (!administrador) {
+  if (!sesion) {
     redirect("/admin/ingreso");
   }
 
@@ -26,7 +27,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
 
   return (
     <div className="flex min-h-dvh">
-      <BarraLateral correo={administrador.correo} tema={tema} />
+      <BarraLateral correo={sesion.correo} rol={sesion.rol} tema={tema} />
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* El panel es de escritorio: el mapa, la tabla y el editor no caben en un

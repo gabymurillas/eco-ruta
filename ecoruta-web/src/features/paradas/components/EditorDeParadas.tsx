@@ -27,6 +27,8 @@ type Props = {
   trazados: readonly TrazadoVisible[];
   radioPorDefectoM: number;
   radioMinimoM: number;
+  /** Para el operador: ve el catálogo y cada parada en el mapa, sin poder cambiarlas. */
+  soloLectura: boolean;
 };
 
 /**
@@ -34,7 +36,7 @@ type Props = {
  * sobre el mapa: la parada se edita mirando la calle donde está, sin que el
  * mapa pierda ancho.
  */
-export function EditorDeParadas({ trazados, ...datos }: Props) {
+export function EditorDeParadas({ trazados, soloLectura, ...datos }: Props) {
   const editor = useEditorDeParadas(datos);
   const cantidad = editor.paradas.length;
 
@@ -51,6 +53,7 @@ export function EditorDeParadas({ trazados, ...datos }: Props) {
           {editor.colocando && !editor.ficha && (
             <span className="text-[13px] font-bold text-tinta-media">Toca el mapa donde va la parada</span>
           )}
+          {!soloLectura && (
           <button
             type="button"
             onClick={editor.colocando ? editor.cancelar : editor.empezarAColocar}
@@ -67,16 +70,17 @@ export function EditorDeParadas({ trazados, ...datos }: Props) {
               </>
             )}
           </button>
+          )}
         </div>
       </header>
 
       <div className="flex min-h-0 flex-1 gap-4">
-        <ListaDeParadas editor={editor} />
+        <ListaDeParadas editor={editor} soloLectura={soloLectura} />
 
         <section
           aria-label="Mapa de paradas"
           className={`relative min-w-0 flex-1 overflow-hidden rounded-2xl border border-borde ${
-            editor.colocando || editor.ficha ? "[&_.leaflet-container]:cursor-crosshair" : ""
+            !soloLectura && (editor.colocando || editor.ficha) ? "[&_.leaflet-container]:cursor-crosshair" : ""
           }`}
         >
           <Lienzo
@@ -84,20 +88,23 @@ export function EditorDeParadas({ trazados, ...datos }: Props) {
             trazados={trazados}
             ficha={editor.ficha}
             destino={editor.destino}
-            onClicEnMapa={editor.clicEnMapa}
+            onClicEnMapa={soloLectura ? ignorar : editor.clicEnMapa}
             onSeleccionarParada={editor.seleccionarParada}
-            onMoverFicha={(punto) => editor.cambiarFicha(punto)}
+            onMoverFicha={soloLectura ? null : (punto) => editor.cambiarFicha(punto)}
           />
 
           {/* Sobre el mapa: Leaflet usa z-index hasta 1000 en sus controles. Va
               corrido a la derecha para no tapar los botones de zoom. */}
-          <div className="absolute top-4 left-16 z-[1000] w-[380px] max-w-[calc(100%-80px)]">
-            <BuscadorDeLugares alElegir={editor.elegirLugar} />
-          </div>
+          {/* Elegir un lugar abre el borrador de una parada nueva: sin permiso, no va. */}
+          {!soloLectura && (
+            <div className="absolute top-4 left-16 z-[1000] w-[380px] max-w-[calc(100%-80px)]">
+              <BuscadorDeLugares alElegir={editor.elegirLugar} />
+            </div>
+          )}
 
           {editor.ficha && (
             <div className="absolute top-4 right-4 z-[1000] max-h-[calc(100%-32px)] w-[340px] overflow-y-auto">
-              <FichaDeParada editor={editor} radioMinimoM={datos.radioMinimoM} />
+              <FichaDeParada editor={editor} radioMinimoM={datos.radioMinimoM} soloLectura={soloLectura} />
             </div>
           )}
         </section>
@@ -105,3 +112,5 @@ export function EditorDeParadas({ trazados, ...datos }: Props) {
     </div>
   );
 }
+
+function ignorar() {}

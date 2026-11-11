@@ -11,7 +11,7 @@ const CLASE_BOTON =
 const BOTON_SECUNDARIO = `${CLASE_BOTON} border-[1.5px] border-borde-campo hover:bg-fondo`;
 const BOTON_PRINCIPAL = `${CLASE_BOTON} bg-marca-profundo text-superficie hover:brightness-110`;
 
-export function TarjetaRuta({ ruta }: { ruta: FichaRuta }) {
+export function TarjetaRuta({ ruta, puedeEditar }: { ruta: FichaRuta; puedeEditar: boolean }) {
   const conTrazado = ruta.trazado.length >= 2;
 
   return (
@@ -45,11 +45,13 @@ export function TarjetaRuta({ ruta }: { ruta: FichaRuta }) {
           <Recorrido paradas={ruta.paradas} color={ruta.color} />
         ) : (
           <p className="text-[13px] text-tinta-media">
-            Dibuja el trazado para que la ruta pase por las paradas cercanas y los ciudadanos vean
-            su tiempo estimado.
+            {puedeEditar
+              ? "Dibuja el trazado para que la ruta pase por las paradas cercanas y los ciudadanos vean su tiempo estimado."
+              : "Sin trazado la ruta no pasa por ninguna parada y los ciudadanos no ven su tiempo estimado."}
           </p>
         )}
 
+        {puedeEditar && (
         <div className="mt-auto flex gap-2">
           <Link href={`/admin/rutas/${ruta.id}`} className={conTrazado ? BOTON_SECUNDARIO : BOTON_PRINCIPAL}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -68,6 +70,7 @@ export function TarjetaRuta({ ruta }: { ruta: FichaRuta }) {
             <span className="sr-only"> de {ruta.nombre}</span>
           </Link>
         </div>
+        )}
       </div>
     </article>
   );

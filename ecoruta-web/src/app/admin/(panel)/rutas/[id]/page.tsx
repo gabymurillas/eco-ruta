@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import { trazadoALatLng } from "@/domain/mapa";
+import { exigirAdminOVolver } from "@/features/autenticacion/guardas";
 import { EditorDeRuta } from "@/features/rutas/components/EditorDeRuta";
 import { obtenerParadasDeLaCiudad } from "@/services/catalogo-paradas.service";
 import { obtenerValoresDeParametros } from "@/services/parametros.service";
@@ -18,6 +19,10 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function EditorDeRutaPage({ params }: PageProps<"/admin/rutas/[id]">) {
+  // El editor es de escritura de punta a punta. El operador ve el trazado y las
+  // paradas de cada ruta en la lista de rutas.
+  await exigirAdminOVolver("/admin/rutas");
+
   const { id } = await params;
 
   const [ruta, paradas, ciudad, puntosClave, viajes, parametros] = await Promise.all([

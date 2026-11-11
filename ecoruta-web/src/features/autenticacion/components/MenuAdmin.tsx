@@ -3,11 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { puedeAdministrar, type RolDelPanel } from "@/domain/roles";
 
 type Seccion = {
   href: string;
   titulo: string;
   icono: ReactNode;
+  /** Solo la ve un administrador: el operador no tiene nada que hacer ahí. */
+  soloAdmin?: boolean;
 };
 
 type Grupo = {
@@ -80,6 +83,7 @@ const GRUPOS: Grupo[] = [
       {
         href: "/admin/parametros",
         titulo: "Parámetros",
+        soloAdmin: true,
         icono: (
           <>
             <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
@@ -88,19 +92,31 @@ const GRUPOS: Grupo[] = [
           </>
         ),
       },
+      {
+        href: "/admin/equipo",
+        titulo: "Equipo",
+        soloAdmin: true,
+        icono: (
+          <>
+            <circle cx="9" cy="8" r="3.5" />
+            <path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8" />
+          </>
+        ),
+      },
     ],
   },
 ];
 
-export function MenuAdmin() {
+export function MenuAdmin({ rol }: { rol: RolDelPanel }) {
   const rutaActual = usePathname();
+  const visible = (seccion: Seccion) => !seccion.soloAdmin || puedeAdministrar(rol);
 
   return (
     <nav aria-label="Secciones de administración" className="flex flex-col">
       {GRUPOS.map((grupo) => (
         <div key={grupo.titulo} className="flex flex-col gap-0.5">
           <p className="px-2.5 pt-3.5 pb-1.5 text-xs font-semibold text-menu-grupo">{grupo.titulo}</p>
-          {grupo.secciones.map((seccion) => (
+          {grupo.secciones.filter(visible).map((seccion) => (
             <EnlaceSeccion
               key={seccion.href}
               seccion={seccion}

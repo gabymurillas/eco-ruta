@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { DEFINICIONES, validarParametros } from "@/domain/parametros";
+import { exigirAdministrador } from "@/services/auth.service";
 import { guardarParametros } from "@/services/parametros.service";
 
 export type EstadoGuardado = {
@@ -14,6 +15,12 @@ export async function guardar(
   _estadoPrevio: EstadoGuardado,
   datos: FormData,
 ): Promise<EstadoGuardado> {
+  const permiso = await exigirAdministrador();
+
+  if (!permiso.ok) {
+    return { error: permiso.error };
+  }
+
   const valores = new Map<string, number>();
 
   for (const definicion of DEFINICIONES) {

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { exigirAdministrador } from "@/services/auth.service";
 import {
   actualizarUnidad,
   crearUnidad,
@@ -19,6 +20,12 @@ export async function vincular(
   _estadoPrevio: EstadoUnidades,
   datos: FormData,
 ): Promise<EstadoUnidades> {
+  const permiso = await exigirAdministrador();
+
+  if (!permiso.ok) {
+    return { error: permiso.error };
+  }
+
   const unidadId = String(datos.get("unidadId") ?? "");
 
   if (!unidadId) {
@@ -40,6 +47,12 @@ export async function agregarUnidad(
   _estadoPrevio: EstadoUnidades,
   datos: FormData,
 ): Promise<EstadoUnidades> {
+  const permiso = await exigirAdministrador();
+
+  if (!permiso.ok) {
+    return { error: permiso.error };
+  }
+
   const nombre = String(datos.get("nombre") ?? "").trim();
   const rutaId = String(datos.get("rutaId") ?? "") || null;
 
@@ -61,6 +74,12 @@ export async function editarUnidad(
   _estadoPrevio: EstadoUnidades,
   datos: FormData,
 ): Promise<EstadoUnidades> {
+  const permiso = await exigirAdministrador();
+
+  if (!permiso.ok) {
+    return { error: permiso.error };
+  }
+
   const unidadId = String(datos.get("unidadId") ?? "");
   const nombre = String(datos.get("nombre") ?? "").trim();
   const rutaId = String(datos.get("rutaId") ?? "") || null;
@@ -85,6 +104,12 @@ export async function editarUnidad(
 }
 
 export async function eliminar(unidadId: string): Promise<{ error?: string }> {
+  const permiso = await exigirAdministrador();
+
+  if (!permiso.ok) {
+    return { error: permiso.error };
+  }
+
   const resultado = await eliminarUnidad(unidadId);
 
   if (!resultado.ok) {

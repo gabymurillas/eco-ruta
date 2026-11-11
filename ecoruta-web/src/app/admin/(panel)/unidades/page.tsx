@@ -1,6 +1,7 @@
 import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import { estadoDelTelefono, segundosDesde } from "@/domain/unidades";
 import { estaVigente } from "@/domain/vinculacion";
+import { puedeEditarElPanel } from "@/features/autenticacion/guardas";
 import { SeccionUnidades } from "@/features/unidades/components/SeccionUnidades";
 import { obtenerValoresDeParametros } from "@/services/parametros.service";
 import { obtenerRutas } from "@/services/rutas.service";
@@ -13,10 +14,11 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function UnidadesPage() {
-  const [resultado, rutas, parametros] = await Promise.all([
+  const [resultado, rutas, parametros, puedeEditar] = await Promise.all([
     obtenerUnidades(),
     obtenerRutas(),
     obtenerValoresDeParametros(),
+    puedeEditarElPanel(),
   ]);
 
   if (!resultado.ok) {
@@ -28,6 +30,7 @@ export default async function UnidadesPage() {
       unidades={conEstadoDelTelefono(resultado.datos, parametros.sin_senal_umbral_s)}
       rutas={(rutas.ok ? rutas.datos : []).map((ruta) => ({ id: ruta.id, nombre: ruta.nombre }))}
       umbralBateriaPct={parametros.bateria_alerta_pct}
+      puedeEditar={puedeEditar}
     />
   );
 }

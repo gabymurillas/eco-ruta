@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { leerRolDelPanel } from "@/domain/roles";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/entorno";
 import { ajustarVencimiento, COOKIE_SESION_CORTA } from "@/lib/supabase/sesion-corta";
 
@@ -51,10 +52,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(destino);
   }
 
-  // Solo una cuenta de administración salta el ingreso. Otra con sesión (un admin
-  // al que le quitaron el rol) iría al panel, el panel la devolvería aquí y el
-  // proxy otra vez al panel: un bucle de redirecciones sin salida.
-  if (esIngreso && user?.app_metadata?.rol === "admin") {
+  // Solo una cuenta del panel (admin u operador) salta el ingreso. Otra con sesión
+  // (alguien a quien le quitaron el rol) iría al panel, el panel la devolvería
+  // aquí y el proxy otra vez al panel: un bucle de redirecciones sin salida.
+  if (esIngreso && leerRolDelPanel(user?.app_metadata?.rol)) {
     const destino = request.nextUrl.clone();
     destino.pathname = "/admin";
     return NextResponse.redirect(destino);

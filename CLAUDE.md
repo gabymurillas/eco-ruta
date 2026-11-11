@@ -27,7 +27,7 @@ Este archivo solo contiene lo que un agente necesita para trabajar en el código
 | Superficie | Quién la usa | Tecnología | Login |
 |---|---|---|---|
 | Web del usuario | Ciudadano | Next.js (rutas públicas) | No |
-| Web de administración | Ente gestor | Next.js (`/admin`) | Sí |
+| Web de administración | Ente gestor (admin y operador) | Next.js (`/admin`) | Sí |
 | App de la ruta | Teléfono dedicado en el vehículo | Android nativo (Kotlin + Compose), **otro repositorio** | Vinculación única |
 | Backend | — | Supabase (PostgreSQL + PostGIS, Auth, Realtime, Edge Functions) | — |
 
@@ -44,7 +44,7 @@ ecoruta/
 ├── docs/                ← documentación (fuente de verdad)
 ├── diseno/              ← maquetas .dc.html y foto de identidad
 ├── sql/                 ← esquema, RLS, funciones y migraciones (se aplican a mano)
-├── supabase/functions/  ← _dominio/, vincular-dispositivo/, registrar-posicion/
+├── supabase/functions/  ← _dominio/, vincular-dispositivo/, registrar-posicion/, gestionar-equipo/
 └── ecoruta-web/         ← Next.js: público + /admin
 ```
 
@@ -72,7 +72,11 @@ tesis como versión mínima, con respaldo al cálculo simple.
 **Seguridad**
 - El ciudadano nunca se autentica. Todas las tablas tienen RLS. Sin excepciones.
 - Un dispositivo solo escribe datos de su unidad (RLS contra `app_metadata.unidad_id`).
-- **`service_role` jamás entra en la web ni en el APK.**
+- **`service_role` jamás entra en la web ni en el APK.** Lo que la necesite (como gestionar las
+  cuentas del panel) va en una Edge Function que verifica quién llama.
+- El panel tiene dos roles en `app_metadata.rol`: `admin` y `operador` (ADR-0015). El operador
+  solo lee y resuelve incidencias: una tabla o función nueva debe decidir qué puede hacer cada
+  uno, en RLS y no solo en la interfaz.
 - Al público solo se le muestran unidades en viaje activo (ADR-0012). Cualquier dato público
   nuevo exige actualizar la política de exposición.
 - Nunca commitear `.env` ni `.env.local`.
