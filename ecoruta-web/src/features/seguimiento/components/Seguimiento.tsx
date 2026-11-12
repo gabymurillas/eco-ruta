@@ -1,8 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import type { ComponentProps } from "react";
 import { Boton } from "@/components/ui/Boton";
 import { useCamaraDelMapa } from "../hooks/useCamaraDelMapa";
+import { useCaminata } from "../hooks/useCaminata";
 import { useLlegadas, type EstadoLlegadas } from "../hooks/useLlegadas";
 import { useMiParada, type Fase } from "../hooks/useMiParada";
 import { useTrazados } from "../hooks/useTrazados";
@@ -58,6 +60,12 @@ export function Seguimiento(props: Props) {
   const filas = llegadas.llegadas ?? [];
   const camaraDelMapa = useCamaraDelMapa(parada?.paradaId ?? null, filas, props);
   const { camara, seguida } = camaraDelMapa;
+  const caminata = useCaminata(parada?.paradaId ?? null);
+  const pedirCaminata = async () => {
+    if (ubicacionViva && parada && (await caminata.pedir(ubicacionViva, parada))) {
+      camaraDelMapa.verCaminata();
+    }
+  };
 
   return (
     <div className="tema-ciudadano flex h-dvh flex-col overflow-hidden bg-fondo text-tinta">
@@ -75,6 +83,7 @@ export function Seguimiento(props: Props) {
             camara={camara}
             rutaSeguidaId={seguida?.rutaId ?? null}
             unidadSeguidaId={seguida?.unidadId ?? null}
+            caminata={caminata.estado.tipo === "lista" ? caminata.estado.caminata.linea : []}
             alMoverAMano={camaraDelMapa.alMoverAMano}
           />
 
@@ -107,7 +116,16 @@ export function Seguimiento(props: Props) {
           }
         >
           <ContextoSeguirRuta.Provider value={{ seguida, seguir: camaraDelMapa.seguir }}>
-            <Contenido miParada={miParada} llegadas={llegadas} {...props} />
+            <Contenido
+              miParada={miParada}
+              llegadas={llegadas}
+              caminata={
+                ubicacionViva
+                  ? { estado: caminata.estado, alPedir: pedirCaminata, alOcultar: caminata.ocultar }
+                  : null
+              }
+              {...props}
+            />
           </ContextoSeguirRuta.Provider>
         </HojaInferior>
       </main>
@@ -118,9 +136,10 @@ export function Seguimiento(props: Props) {
 type PropsContenido = Props & {
   miParada: ReturnType<typeof useMiParada>;
   llegadas: EstadoLlegadas;
+  caminata: ComponentProps<typeof VistaParada>["caminata"];
 };
 
-function Contenido({ miParada, llegadas, ...ajustes }: PropsContenido) {
+function Contenido({ miParada, llegadas, caminata, ...ajustes }: PropsContenido) {
   const { fase, cercanas, elegida } = miParada;
 
   // Si el ciudadano ya tiene parada, cualquier pantalla intermedia (buscar,
@@ -177,6 +196,7 @@ function Contenido({ miParada, llegadas, ...ajustes }: PropsContenido) {
           parada={fase.parada}
           otrasParadas={cercanas?.ok ? cercanas.datos : []}
           llegadas={llegadas}
+          caminata={caminata}
           {...ajustes}
           alCambiar={miParada.abrirSelector}
           alElegir={miParada.elegir}

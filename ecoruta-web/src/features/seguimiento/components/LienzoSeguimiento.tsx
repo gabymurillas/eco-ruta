@@ -1,7 +1,7 @@
 "use client";
 
 import { Mapa } from "@/components/mapa/Mapa";
-import { MarcadorParada, MarcadorUbicacion, TrazadoRuta } from "@/components/mapa/CapasDeRuta";
+import { CaminoAPie, MarcadorParada, MarcadorUbicacion, TrazadoRuta } from "@/components/mapa/CapasDeRuta";
 import { MarcadorUnidad } from "@/components/mapa/MarcadorUnidad";
 import { ZOOM_PARADA, type Punto } from "@/domain/mapa";
 import type { TrazadoVisible } from "../hooks/useTrazados";
@@ -36,6 +36,8 @@ type Props = {
   /** La ruta que el ciudadano tocó: su trazado resalta y las demás se atenúan. */
   rutaSeguidaId: string | null;
   unidadSeguidaId: string | null;
+  /** El camino a pie hasta la parada, si el ciudadano lo pidió. */
+  caminata: readonly Punto[];
   alMoverAMano: () => void;
 };
 
@@ -81,6 +83,7 @@ export function LienzoSeguimiento(props: Props) {
         ubicacion={ubicacion}
         unidad={unidadSeguida}
         trazado={trazadoSeguido?.puntos ?? []}
+        caminata={props.caminata}
         margenInferiorPx={margenInferiorPx}
         alMoverAMano={props.alMoverAMano}
       />
@@ -94,6 +97,8 @@ export function LienzoSeguimiento(props: Props) {
           secundario={rutaSeguidaId !== null && trazado.rutaId !== rutaSeguidaId}
         />
       ))}
+
+      <CaminoAPie puntos={props.caminata} />
 
       {paradas.map((parada) => (
         <MarcadorParada

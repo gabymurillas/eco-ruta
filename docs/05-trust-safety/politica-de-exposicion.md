@@ -40,4 +40,10 @@
    ruta y franja, que no permiten reconstruir un recorrido individual.
 5. **Mínimo en tránsito.** La ubicación del ciudadano se usa para buscar paradas y no se guarda.
    Objetivo: redondearla en el cliente antes de enviarla (TS-09).
+   - **«Cómo llegar» (CIU-21):** solo cuando el ciudadano lo toca, su posición y la de la parada
+     pasan por una Server Action de EcoRuta hacia openrouteservice (HeiGIT, Alemania) para
+     calcular el camino a pie. EcoRuta no la guarda; HeiGIT la procesa según su propia política.
+     La acción rechaza puntos a más de 25 km del centro de San Juan o a más de 6 km entre sí.
+   - **Ubicación en vivo (CIU-19):** con el permiso ya concedido, el punto azul se actualiza con
+     `watchPosition` dentro del navegador; esas posiciones no se envían a ningún servidor.
 6. **Cambios.** Agregar un dato visible al público exige actualizar esta matriz.

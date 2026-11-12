@@ -52,6 +52,7 @@ evaluación académica del jurado de la UNERG. Ver [propiedad-intelectual.md](pr
 | Teselas `tile.openstreetmap.org` | Política de uso de teselas de la OSMF | Volumen bajo, agente de usuario válido, sin descarga masiva. Para un piloto hay que pasar a un proveedor propio o comercial |
 | Photon (Komoot) | Servicio público de uso razonable; datos de OSM (ODbL) | Atribución a OSM. Solo en el admin, con espera entre pulsaciones |
 | OSRM (`router.project-osrm.org`) | Servidor de demostración; uso no intensivo | Atribución a OSM. Solo en el admin |
+| openrouteservice (HeiGIT, `api.heigit.org`) | Plan gratuito con clave: 2.000 caminos al día, 40 por minuto; datos de OSM (ODbL) | «Camino: © openrouteservice.org by HeiGIT · datos © OpenStreetMap». ✅ Junto al resultado de «Cómo llegar» (`ComoLlegar.tsx`). La clave vive en `ORS_API_KEY` (servidor; secreta en Vercel) |
 
 ## 6. Fotografía y herramientas
 

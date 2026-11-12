@@ -183,7 +183,7 @@ revoca la sesión del teléfono.
 | CIU-18 | Mostrar al público solo unidades en viaje activo; sin recorridos pasados | P0 | ✅ (cierra TS-01; `sql/13`) |
 | CIU-19 | Botón «Ir a mi ubicación» sobre el mapa; el punto azul sigue al ciudadano mientras camina (solo en el navegador, la posición no se envía) | P1 | ✅ |
 | CIU-20 | **Seguir una ruta:** tocar una llegada o una ruta de la parada resalta su trazado y la cámara acompaña a la unidad; si el ciudadano mueve el mapa, la cámara se suelta y puede volver con un toque | P1 | ✅ (falta verlo con una unidad real) |
-| CIU-21 | **Cómo llegar a pie** a la parada más cercana, con el camino dibujado | P1 | ⬜ (necesita clave de openrouteservice) |
+| CIU-21 | **Cómo llegar a pie** a la parada, con el camino por las calles dibujado en el mapa, la distancia y los minutos | P1 | ✅ (openrouteservice desde una Server Action; ver la política de exposición) |
 | CIU-22 | **Cómo llegar a cualquier punto** tocando el mapa: caminar a una parada, tomar una ruta, bajarse y caminar | P2 | ⬜ (necesita el sentido de cada ruta en la base) |
 
 ### 6.2 Web de administración (`ADM`)

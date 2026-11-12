@@ -51,6 +51,7 @@ export function useCamaraDelMapa(
       ),
     dejarDeSeguir: () => cambiar({ seguida: null, camara: { modo: "libre", vez: 0 } }),
     volverALaRuta: () => cambiar({ camara: { modo: "ruta", vez: 0 } }, true),
+    verCaminata: () => cambiar({ camara: { modo: "caminata", vez: 0 } }, true),
     irAMiUbicacion: () => cambiar({ camara: { modo: "ubicacion", vez: 0 } }, true),
     alMoverAMano: () => {
       if (camara.modo !== "libre") {

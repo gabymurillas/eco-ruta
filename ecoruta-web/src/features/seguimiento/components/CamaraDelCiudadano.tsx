@@ -11,8 +11,9 @@ import { ZOOM_PARADA, type Punto } from "@/domain/mapa";
  * - `libre`: el ciudadano movió el mapa con el dedo; nada lo vuelve a mover solo.
  * - `ubicacion`: centrada en el ciudadano, y lo acompaña si camina.
  * - `ruta`: acompaña a la unidad que sigue (o muestra el trazado si no hay unidad).
+ * - `caminata`: encuadra el camino a pie hasta la parada.
  */
-export type ModoCamara = "auto" | "libre" | "ubicacion" | "ruta";
+export type ModoCamara = "auto" | "libre" | "ubicacion" | "ruta" | "caminata";
 
 export type Camara = {
   modo: ModoCamara;
@@ -25,6 +26,7 @@ type Props = {
   ubicacion: Punto | null;
   unidad: Punto | null;
   trazado: readonly Punto[];
+  caminata: readonly Punto[];
   /** Lo que tapa la hoja abajo: el punto que se sigue queda centrado en lo visible. */
   margenInferiorPx: number;
   alMoverAMano: () => void;
@@ -40,6 +42,7 @@ export function CamaraDelCiudadano({
   ubicacion,
   unidad,
   trazado,
+  caminata,
   margenInferiorPx,
   alMoverAMano,
 }: Props) {
@@ -58,14 +61,14 @@ export function CamaraDelCiudadano({
   });
 
   // Los datos más recientes, para que el efecto de abajo dependa solo del toque.
-  const actual = useRef({ ubicacion, unidad, trazado, margenInferiorPx });
+  const actual = useRef({ ubicacion, unidad, trazado, caminata, margenInferiorPx });
   useEffect(() => {
-    actual.current = { ubicacion, unidad, trazado, margenInferiorPx };
+    actual.current = { ubicacion, unidad, trazado, caminata, margenInferiorPx };
   });
 
   // Al entrar a un modo (o volver a tocar su botón): un vuelo.
   useEffect(() => {
-    const { ubicacion, unidad, trazado, margenInferiorPx } = actual.current;
+    const { ubicacion, unidad, trazado, caminata, margenInferiorPx } = actual.current;
 
     if (camara.modo === "ubicacion" && ubicacion) {
       volando.current = ir(mapa, ubicacion, margenInferiorPx, "vuelo");
@@ -74,18 +77,13 @@ export function CamaraDelCiudadano({
     if (camara.modo === "ruta") {
       if (unidad) {
         volando.current = ir(mapa, unidad, margenInferiorPx, "vuelo");
-      } else if (trazado.length > 1) {
-        mapa.flyToBounds(
-          trazado.map(({ lat, lng }) => [lat, lng]),
-          {
-            paddingTopLeft: [MARGEN_PX, MARGEN_PX],
-            paddingBottomRight: [MARGEN_PX, MARGEN_PX + margenInferiorPx],
-            maxZoom: ZOOM_PARADA,
-            duration: DURACION_VUELO_S,
-            animate: !sinMovimiento(),
-          },
-        );
+      } else {
+        volando.current = encuadrarLinea(mapa, trazado, margenInferiorPx);
       }
+    }
+
+    if (camara.modo === "caminata") {
+      volando.current = encuadrarLinea(mapa, caminata, margenInferiorPx);
     }
   }, [camara.modo, camara.vez, mapa]);
 
@@ -133,6 +131,28 @@ function ir(
   }
 
   return false;
+}
+
+/** Deja a la vista una línea entera (un trazado o el camino a pie). */
+function encuadrarLinea(mapa: MapaLeaflet, linea: readonly Punto[], margenInferiorPx: number): boolean {
+  if (linea.length < 2) {
+    return false;
+  }
+
+  const animar = !sinMovimiento();
+
+  mapa.flyToBounds(
+    linea.map(({ lat, lng }) => [lat, lng]),
+    {
+      paddingTopLeft: [MARGEN_PX, MARGEN_PX],
+      paddingBottomRight: [MARGEN_PX, MARGEN_PX + margenInferiorPx],
+      maxZoom: ZOOM_PARADA + 1,
+      duration: DURACION_VUELO_S,
+      animate: animar,
+    },
+  );
+
+  return animar;
 }
 
 function sinMovimiento(): boolean {

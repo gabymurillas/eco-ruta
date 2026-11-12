@@ -6,6 +6,9 @@ import { Circle, CircleMarker, Marker, Polyline, Popup, Tooltip } from "react-le
 import { claseDeRuta, colorDeRuta } from "@/domain/colores";
 import type { Punto } from "@/domain/mapa";
 
+/** Reservado a lo que es del ciudadano (su punto y su camino): ninguna ruta lo usa. */
+const AZUL_UBICACION = "oklch(55% 0.15 250)";
+
 type PropsTrazado = {
   puntos: readonly Punto[];
   color: string | null;
@@ -26,6 +29,30 @@ export function TrazadoRuta({ puntos, color, secundario = false }: PropsTrazado)
         className: claseDeRuta(color),
         weight: secundario ? 4 : 5,
         opacity: secundario ? 0.45 : 0.9,
+        lineCap: "round",
+        lineJoin: "round",
+      }}
+    />
+  );
+}
+
+/**
+ * El camino a pie del ciudadano: punteado y en el azul de su ubicación, porque
+ * es suyo y no de una ruta. Así no se confunde con un trazado.
+ */
+export function CaminoAPie({ puntos }: { puntos: readonly Punto[] }) {
+  if (puntos.length < 2) {
+    return null;
+  }
+
+  return (
+    <Polyline
+      positions={puntos.map((punto) => [punto.lat, punto.lng])}
+      pathOptions={{
+        color: AZUL_UBICACION,
+        weight: 6,
+        opacity: 0.95,
+        dashArray: "1 11",
         lineCap: "round",
         lineJoin: "round",
       }}
@@ -109,7 +136,6 @@ type PropsUbicacion = {
  * nadie confunda su propia posición con la de una unidad.
  */
 export function MarcadorUbicacion({ lat, lng, exactitudM }: PropsUbicacion) {
-  const azul = "oklch(55% 0.15 250)";
 
   const punto = useMemo(
     () =>
@@ -117,7 +143,7 @@ export function MarcadorUbicacion({ lat, lng, exactitudM }: PropsUbicacion) {
         className: "",
         iconSize: [18, 18],
         iconAnchor: [9, 9],
-        html: `<span style="display:block;width:18px;height:18px;border-radius:999px;background:${azul};border:3px solid oklch(99% 0.008 75)"></span>`,
+        html: `<span style="display:block;width:18px;height:18px;border-radius:999px;background:${AZUL_UBICACION};border:3px solid oklch(99% 0.008 75)"></span>`,
       }),
     [],
   );
@@ -128,8 +154,8 @@ export function MarcadorUbicacion({ lat, lng, exactitudM }: PropsUbicacion) {
         center={[lat, lng]}
         radius={exactitudM}
         pathOptions={{
-          color: azul,
-          fillColor: azul,
+          color: AZUL_UBICACION,
+          fillColor: AZUL_UBICACION,
           fillOpacity: 0.12,
           weight: 1,
         }}
