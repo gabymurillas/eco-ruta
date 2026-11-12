@@ -21,3 +21,30 @@ export async function obtenerRutasDeMapaPublicas(): Promise<Resultado<RutaDeMapa
 
   return exito(data ?? []);
 }
+
+export type HorarioDeRuta = { rutaId: string; nombre: string; horario: string };
+
+/**
+ * Horario de servicio que el admin escribió en cada ruta (texto libre). Solo
+ * vuelven las rutas activas que tienen uno: la política pública ya filtra por
+ * `activa`.
+ */
+export async function obtenerHorariosDeRutas(
+  rutaIds: readonly string[],
+): Promise<Resultado<HorarioDeRuta[]>> {
+  const { data, error } = await clienteNavegador()
+    .from("rutas")
+    .select("id, nombre, horario")
+    .in("id", [...rutaIds])
+    .not("horario", "is", null);
+
+  if (error) {
+    return falloRegistrado("horarios de rutas (navegador)", error, "No se pudo cargar el horario.");
+  }
+
+  return exito(
+    (data ?? [])
+      .filter((fila) => fila.horario && fila.horario.trim() !== "")
+      .map((fila) => ({ rutaId: fila.id, nombre: fila.nombre, horario: fila.horario!.trim() })),
+  );
+}

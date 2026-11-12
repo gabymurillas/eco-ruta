@@ -1,22 +1,32 @@
 import { formatearMinutos } from "@/domain/formato";
 import { describirAntiguedad, type EstadoLlegada, type TiempoLlegada } from "@/domain/llegadas";
+import { useHorarios } from "../hooks/useHorarios";
 import type { EstadoLlegadas } from "../hooks/useLlegadas";
 import {
   evaluarLlegadas,
   type AjustesDeLlegada,
   type LlegadaEvaluada,
 } from "../llegadas-ordenadas";
+import type { RutaEnParada } from "../types";
 import { CirculoRuta } from "./CirculoRuta";
 import { useHoja } from "./HojaInferior";
 
-type Props = AjustesDeLlegada & { estado: EstadoLlegadas };
+type Props = AjustesDeLlegada & {
+  estado: EstadoLlegadas;
+  /** Las rutas de la parada: con ninguna unidad en camino, se muestra su horario. */
+  rutas: readonly RutaEnParada[];
+};
 
 /**
  * La llegada más próxima en grande, que es lo que se ve con la hoja abajo; el
  * resto debajo, ordenado por tiempo. «Estimado» acompaña siempre a la cifra.
  */
-export function ListaLlegadas({ estado, ...ajustes }: Props) {
+export function ListaLlegadas({ estado, rutas, ...ajustes }: Props) {
   const { llegadas, falla } = estado;
+  const horarios = useHorarios(
+    rutas.map((ruta) => ruta.rutaId),
+    llegadas !== null && llegadas.length === 0,
+  );
 
   if (llegadas === null) {
     return falla ? (
@@ -40,6 +50,7 @@ export function ListaLlegadas({ estado, ...ajustes }: Props) {
         <p className="text-sm leading-relaxed text-tinta-media">
           Si sale una, aparece aquí sola. No hace falta recargar.
         </p>
+        {horarios.length > 0 && <Horarios horarios={horarios} rutas={rutas} />}
       </div>
     );
   }
@@ -212,5 +223,34 @@ function AvisoSenalPerdida({ estado }: { estado: EstadoLlegada }) {
         ? `Última posición ${antiguedad}. Puede seguir en camino, pero no podemos confirmarlo.`
         : "Inició el recorrido pero todavía no envía su posición."}
     </p>
+  );
+}
+
+/** El horario lo escribe la alcaldía en texto libre: se muestra tal cual. */
+function Horarios({
+  horarios,
+  rutas,
+}: {
+  horarios: ReturnType<typeof useHorarios>;
+  rutas: readonly RutaEnParada[];
+}) {
+  return (
+    <ul className="mt-2 flex flex-col gap-2.5 rounded-2xl border border-borde-suave px-3.5 py-3">
+      {horarios.map((horario) => {
+        const ruta = rutas.find((actual) => actual.rutaId === horario.rutaId);
+
+        return (
+          <li key={horario.rutaId} className="flex items-center gap-3">
+            <CirculoRuta color={ruta?.color ?? null} icono={ruta?.icono ?? null} />
+            <span className="flex min-w-0 flex-col gap-0.5">
+              <span className="truncate text-[15px] font-bold">{horario.nombre}</span>
+              <span className="text-[13px] font-semibold text-tinta-suave">
+                Horario: {horario.horario}
+              </span>
+            </span>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

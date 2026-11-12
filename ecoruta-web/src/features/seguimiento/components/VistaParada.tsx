@@ -55,6 +55,7 @@ export function VistaParada(props: Props) {
       ) : (
         <ListaLlegadas
           estado={props.llegadas}
+          rutas={parada.rutas}
           umbralSinSenalS={props.umbralSinSenalS}
           penalizacionIncidenciaPct={props.penalizacionIncidenciaPct}
         />

@@ -172,11 +172,11 @@ revoca la sesión del teléfono.
 | CIU-07 | Aviso «ya pasó» tras la salida confirmada por histéresis, una sola vez por viaje | P0 | ✅ (ídem) |
 | CIU-08 | Explicar una vez las limitaciones (avisos solo con la página abierta) | P0 | ✅ |
 | CIU-09 | **Tiempo estimado con historial (versión mínima):** usar la velocidad típica de la ruta en esa franja horaria cuando haya suficientes viajes; si no, el cálculo simple. Ver [ADR-0011](../04-arquitectura/adr/0011-eta-estimado-con-historial.md) | P1 | ⬜ |
-| CIU-10 | Mostrar el estado «sin señal» de una unidad, atenuada y sin halo | P0 | 🟡 (maqueta `SenalPerdida`; validar en la web pública) |
+| CIU-10 | Mostrar el estado «sin señal» de una unidad, atenuada y sin halo | P0 | 🟡 (hecho en la lista y en el mapa: «Sin confirmar», última posición y marcador atenuado sin halo; falta verlo con una unidad real) |
 | CIU-11 | Indicar cuando una incidencia activa afecta el tiempo estimado | P1 | ✅ (margen `penalizacion_incidencia_pct` y aviso en la fila) |
 | CIU-12 | Sin ubicación: mensaje explicativo, sin elección manual | P0 | ✅ |
 | CIU-13 | Sin paradas a 1,5 km: mostrar la más cercana y su distancia | P1 | ✅ |
-| CIU-14 | Estado vacío: no hay unidades en servicio en mi parada | P0 | 🟡 (maqueta `SinUnidades`) |
+| CIU-14 | Estado vacío: no hay unidades en servicio en mi parada | P0 | 🟡 (hecho: mensaje y horario de cada ruta de la parada; «última unidad vista» de la maqueta queda fuera por TS-01, el público no lee viajes cerrados; falta verlo con una parada con rutas) |
 | CIU-15 | **Portada (landing)** con la foto de los Morros: qué es, cómo funciona y botón para ver mi parada | P1 | ⬜ |
 | CIU-16 | **Detalle de ruta** `/ruta/[id]`: trazado, paradas, unidades en vivo y horario | P1 | ⬜ (maqueta `RutaDetalle`) |
 | CIU-17 | Vista previa al compartir (Open Graph) | P2 | ✅ |
