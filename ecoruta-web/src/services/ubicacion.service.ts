@@ -1,4 +1,4 @@
-import type { EstadoUbicacion } from "@/features/seguimiento/types";
+import type { EstadoUbicacion, Ubicacion } from "@/features/seguimiento/types";
 
 const TIEMPO_MAXIMO_MS = 10_000;
 
@@ -49,4 +49,29 @@ export async function ubicacionYaPermitida(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+/**
+ * Sigue la posición mientras la página está abierta, para que el punto azul se
+ * mueva con el ciudadano. Solo se usa cuando ya dio permiso: nunca pregunta.
+ * Devuelve la función que deja de vigilar.
+ */
+export function vigilarUbicacion(alMoverse: (ubicacion: Ubicacion) => void): () => void {
+  if (typeof navigator === "undefined" || !navigator.geolocation) {
+    return () => {};
+  }
+
+  const id = navigator.geolocation.watchPosition(
+    (posicion) =>
+      alMoverse({
+        lat: posicion.coords.latitude,
+        lng: posicion.coords.longitude,
+        exactitudM: posicion.coords.accuracy,
+      }),
+    // Un fallo suelto del GPS no borra la última posición buena.
+    () => {},
+    { enableHighAccuracy: true, maximumAge: 5_000 },
+  );
+
+  return () => navigator.geolocation.clearWatch(id);
 }

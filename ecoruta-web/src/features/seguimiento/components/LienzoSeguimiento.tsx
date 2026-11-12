@@ -5,6 +5,7 @@ import { MarcadorParada, MarcadorUbicacion, TrazadoRuta } from "@/components/map
 import { MarcadorUnidad } from "@/components/mapa/MarcadorUnidad";
 import { ZOOM_PARADA, type Punto } from "@/domain/mapa";
 import type { TrazadoVisible } from "../hooks/useTrazados";
+import { CamaraDelCiudadano, type Camara } from "./CamaraDelCiudadano";
 
 export type ParadaVisible = {
   id: string;
@@ -31,6 +32,11 @@ type Props = {
   paradas: readonly ParadaVisible[];
   unidades: readonly UnidadVisible[];
   trazados: readonly TrazadoVisible[];
+  camara: Camara;
+  /** La ruta que el ciudadano tocó: su trazado resalta y las demás se atenúan. */
+  rutaSeguidaId: string | null;
+  unidadSeguidaId: string | null;
+  alMoverAMano: () => void;
 };
 
 /** Lo que tapa la hoja en su altura baja (15,5 rem) más un respiro. */
@@ -47,10 +53,16 @@ const ESCRITORIO = "(min-width: 1024px)";
  * En el teléfono la hoja tapa la parte de abajo: el encuadre la descuenta y el
  * crédito de OpenStreetMap sube a la esquina de arriba.
  */
-export function LienzoSeguimiento({ ubicacion, paradas, unidades, trazados }: Props) {
+export function LienzoSeguimiento(props: Props) {
+  const { ubicacion, paradas, unidades, trazados, camara, rutaSeguidaId } = props;
   // Este componente solo se monta en el navegador (import dinámico sin SSR).
   const escritorio = window.matchMedia(ESCRITORIO).matches;
-  const encuadrar: Punto[] = [
+  const margenInferiorPx = escritorio ? 0 : ALTO_HOJA_BAJA_PX;
+  const unidadSeguida = unidades.find((unidad) => unidad.id === props.unidadSeguidaId) ?? null;
+  const trazadoSeguido = trazados.find((trazado) => trazado.rutaId === rutaSeguidaId);
+
+  // Solo en modo automático el mapa se re-encuadra solo; en los demás manda la cámara.
+  const encuadrar: Punto[] = camara.modo !== "auto" ? [] : [
     ...(ubicacion ? [{ lat: ubicacion.lat, lng: ubicacion.lng }] : []),
     ...paradas.filter((parada) => parada.destacada).map(({ lat, lng }) => ({ lat, lng })),
     ...unidades.map(({ lat, lng }) => ({ lat, lng })),
@@ -61,11 +73,26 @@ export function LienzoSeguimiento({ ubicacion, paradas, unidades, trazados }: Pr
       encuadrar={encuadrar}
       zoom={ZOOM_PARADA}
       className="size-full"
-      margenInferiorPx={escritorio ? 0 : ALTO_HOJA_BAJA_PX}
+      margenInferiorPx={margenInferiorPx}
       atribucionArriba={!escritorio}
     >
-      {trazados.map((trazado) => (
-        <TrazadoRuta key={trazado.rutaId} puntos={trazado.puntos} color={trazado.color} />
+      <CamaraDelCiudadano
+        camara={camara}
+        ubicacion={ubicacion}
+        unidad={unidadSeguida}
+        trazado={trazadoSeguido?.puntos ?? []}
+        margenInferiorPx={margenInferiorPx}
+        alMoverAMano={props.alMoverAMano}
+      />
+
+      {/* La seguida se dibuja al final para quedar encima de las otras. */}
+      {ordenarSeguidaAlFinal(trazados, rutaSeguidaId).map((trazado) => (
+        <TrazadoRuta
+          key={trazado.rutaId}
+          puntos={trazado.puntos}
+          color={trazado.color}
+          secundario={rutaSeguidaId !== null && trazado.rutaId !== rutaSeguidaId}
+        />
       ))}
 
       {paradas.map((parada) => (
@@ -98,5 +125,11 @@ export function LienzoSeguimiento({ ubicacion, paradas, unidades, trazados }: Pr
         <MarcadorUbicacion lat={ubicacion.lat} lng={ubicacion.lng} exactitudM={ubicacion.exactitudM} />
       )}
     </Mapa>
+  );
+}
+
+function ordenarSeguidaAlFinal(trazados: readonly TrazadoVisible[], rutaSeguidaId: string | null) {
+  return [...trazados].sort(
+    (a, b) => Number(a.rutaId === rutaSeguidaId) - Number(b.rutaId === rutaSeguidaId),
   );
 }

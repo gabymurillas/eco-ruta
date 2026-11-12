@@ -21,6 +21,12 @@ export function useHoja(): ContextoHoja {
 type Props = {
   nivelInicial: NivelHoja;
   etiqueta: string;
+  /**
+   * Botones que flotan sobre el mapa pegados al borde de la hoja, para que suban
+   * y bajen con ella. Con la hoja arriba se esconden: no queda mapa que mover.
+   * En escritorio van en la esquina del mapa, junto a la columna.
+   */
+  flotante?: ReactNode;
   children: ReactNode;
 };
 
@@ -31,7 +37,7 @@ type Props = {
  *
  * Solo el asa arrastra: el contenido conserva su scroll normal.
  */
-export function HojaInferior({ nivelInicial, etiqueta, children }: Props) {
+export function HojaInferior({ nivelInicial, etiqueta, flotante, children }: Props) {
   const [nivel, setNivel] = useState<NivelHoja>(nivelInicial);
   const hoja = useRef<HTMLElement>(null);
 
@@ -52,6 +58,16 @@ export function HojaInferior({ nivelInicial, etiqueta, children }: Props) {
         style={{ "--alto-hoja": ALTOS[nivel] } as CSSProperties}
         className="absolute inset-x-0 bottom-0 z-[1100] flex h-[var(--alto-hoja)] flex-col rounded-t-[28px] border-x border-t border-borde bg-superficie transition-[height] duration-300 ease-out data-[arrastrando=true]:transition-none lg:static lg:h-full lg:w-[440px] lg:shrink-0 lg:rounded-none lg:border-t-0 lg:border-r-0 lg:border-l"
       >
+        {flotante && (
+          <div
+            className={`absolute right-3 bottom-full mb-3 flex flex-col items-end gap-2 lg:fixed lg:right-[calc(440px+1.5rem)] lg:bottom-6 lg:mb-0 ${
+              nivel === "alta" ? "max-lg:hidden" : ""
+            }`}
+          >
+            {flotante}
+          </div>
+        )}
+
         <button
           type="button"
           aria-label={nivel === "alta" ? "Mostrar menos" : "Mostrar más"}

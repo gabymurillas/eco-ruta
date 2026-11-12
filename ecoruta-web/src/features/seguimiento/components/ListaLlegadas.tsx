@@ -7,6 +7,7 @@ import {
   type AjustesDeLlegada,
   type LlegadaEvaluada,
 } from "../llegadas-ordenadas";
+import { useSeguirRuta } from "../seguir-ruta";
 import type { RutaEnParada } from "../types";
 import { CirculoRuta } from "./CirculoRuta";
 import { useHoja } from "./HojaInferior";
@@ -109,16 +110,31 @@ function Resto({ resto, total }: { resto: LlegadaEvaluada[]; total: number }) {
   );
 }
 
+/**
+ * Tocar una llegada lleva el mapa a esa unidad y la sigue mientras avanza; la
+ * hoja baja para dejar ver el mapa. Es un botón entero: dentro solo hay texto.
+ */
 function Llegada({ llegada, grande = false }: { llegada: LlegadaEvaluada; grande?: boolean }) {
   const { fila, estado, tiempo } = llegada;
   const apagado = estado.tipo !== "en_camino" || tiempo.tipo === "ya_paso";
+  const { seguida, seguir } = useSeguirRuta();
+  const { cambiarNivel } = useHoja();
+  const siguiendo = seguida?.unidadId === fila.unidad_id;
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className={`flex items-center ${grande ? "gap-3.5" : "gap-3"}`}>
+    <button
+      type="button"
+      aria-pressed={siguiendo}
+      onClick={() => {
+        seguir(fila.ruta_id, fila.unidad_id);
+        cambiarNivel("baja");
+      }}
+      className="-m-1.5 flex flex-col gap-2 rounded-xl p-1.5 text-left hover:bg-marca-tenue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo aria-pressed:bg-marca-tenue"
+    >
+      <span className={`flex items-center ${grande ? "gap-3.5" : "gap-3"}`}>
         <CirculoRuta color={fila.ruta_color} icono={fila.ruta_icono} grande={grande} apagado={apagado} />
 
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span
             className={`truncate font-extrabold tracking-tight ${grande ? "text-[19px]" : "text-[15px]"} ${
               apagado ? "text-tinta-media" : ""
@@ -130,18 +146,18 @@ function Llegada({ llegada, grande = false }: { llegada: LlegadaEvaluada; grande
             {fila.unidad_nombre}
             {fila.ultima_parada && ` · pasó por ${fila.ultima_parada}`}
           </span>
-        </div>
+        </span>
 
         <TiempoEstimado estado={estado} tiempo={tiempo} grande={grande} />
-      </div>
+      </span>
 
       {estado.tipo === "senal_perdida" && <AvisoSenalPerdida estado={estado} />}
       {tiempo.tipo === "minutos" && tiempo.conIncidencia && (
-        <p className="text-xs font-semibold text-advertencia-tinta">
+        <span className="block text-xs font-semibold text-advertencia-tinta">
           Hay una incidencia en esta ruta: el tiempo estimado ya suma un margen por ella.
-        </p>
+        </span>
       )}
-    </div>
+    </button>
   );
 }
 
@@ -214,7 +230,7 @@ function AvisoSenalPerdida({ estado }: { estado: EstadoLlegada }) {
     estado.tipo === "senal_perdida" ? describirAntiguedad(estado.segundosSinSenal) : null;
 
   return (
-    <p className="flex items-start gap-2 text-xs font-semibold leading-snug text-advertencia-tinta">
+    <span className="flex items-start gap-2 text-xs font-semibold leading-snug text-advertencia-tinta">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className="mt-px shrink-0" aria-hidden="true">
         <circle cx="12" cy="12" r="8.5" />
         <path d="M12 7.5V12l3 1.8" />
@@ -222,7 +238,7 @@ function AvisoSenalPerdida({ estado }: { estado: EstadoLlegada }) {
       {antiguedad
         ? `Última posición ${antiguedad}. Puede seguir en camino, pero no podemos confirmarlo.`
         : "Inició el recorrido pero todavía no envía su posición."}
-    </p>
+    </span>
   );
 }
 

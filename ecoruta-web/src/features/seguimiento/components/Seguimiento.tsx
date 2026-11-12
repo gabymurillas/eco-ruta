@@ -2,13 +2,17 @@
 
 import dynamic from "next/dynamic";
 import { Boton } from "@/components/ui/Boton";
+import { useCamaraDelMapa } from "../hooks/useCamaraDelMapa";
 import { useLlegadas, type EstadoLlegadas } from "../hooks/useLlegadas";
 import { useMiParada, type Fase } from "../hooks/useMiParada";
 import { useTrazados } from "../hooks/useTrazados";
+import { useUbicacionViva } from "../hooks/useUbicacionViva";
 import { hayUnidadEnVivo, paradasDelMapa, unidadesDelMapa } from "../mapa-de-seguimiento";
-import type { ParadaConRutas } from "../types";
+import { ContextoSeguirRuta } from "../seguir-ruta";
+import type { ParadaConRutas, ParadaElegida } from "../types";
 import { Bienvenida } from "./Bienvenida";
 import { Cabecera } from "./Cabecera";
+import { AvisoSiguiendo, BotonMiUbicacion } from "./ControlesDelMapa";
 import { EstadoSinUbicacion } from "./EstadoSinUbicacion";
 import { HojaInferior } from "./HojaInferior";
 import { ParadaMasLejos } from "./ParadaMasLejos";
@@ -50,6 +54,10 @@ export function Seguimiento(props: Props) {
   const llegadas = useLlegadas(parada?.paradaId ?? null);
   const trazados = useTrazados(parada ? parada.rutas.map((ruta) => ruta.rutaId) : []);
   const otras = miParada.cercanas?.ok ? miParada.cercanas.datos : [];
+  const ubicacionViva = useUbicacionViva(ubicacion.estado === "concedida" ? ubicacion.ubicacion : null);
+  const filas = llegadas.llegadas ?? [];
+  const camaraDelMapa = useCamaraDelMapa(parada?.paradaId ?? null, filas, props);
+  const { camara, seguida } = camaraDelMapa;
 
   return (
     <div className="tema-ciudadano flex h-dvh flex-col overflow-hidden bg-fondo text-tinta">
@@ -58,13 +66,29 @@ export function Seguimiento(props: Props) {
       />
 
       <main className="relative flex min-h-0 flex-1">
-        <div className="absolute inset-0 lg:static lg:flex-1">
+        <div className="absolute inset-0 lg:relative lg:flex-1">
           <LienzoSeguimiento
-            ubicacion={ubicacion.estado === "concedida" ? ubicacion.ubicacion : null}
+            ubicacion={ubicacionViva}
             paradas={parada ? paradasDelMapa(parada, otras) : []}
-            unidades={parada ? unidadesDelMapa(llegadas.llegadas ?? [], props.umbralSinSenalS) : []}
+            unidades={parada ? unidadesDelMapa(filas, props.umbralSinSenalS) : []}
             trazados={trazados}
+            camara={camara}
+            rutaSeguidaId={seguida?.rutaId ?? null}
+            unidadSeguidaId={seguida?.unidadId ?? null}
+            alMoverAMano={camaraDelMapa.alMoverAMano}
           />
+
+          {parada && seguida && (
+            <div className="absolute top-7 left-14 z-[1050] lg:top-3 max-w-[calc(100%-4.25rem)] lg:max-w-md">
+              <AvisoSiguiendo
+                ruta={rutaDe(parada, seguida.rutaId)}
+                unidadNombre={filas.find((fila) => fila.unidad_id === seguida.unidadId)?.unidad_nombre ?? null}
+                suelto={camara.modo !== "ruta"}
+                alVolver={camaraDelMapa.volverALaRuta}
+                alCerrar={camaraDelMapa.dejarDeSeguir}
+              />
+            </div>
+          )}
         </div>
 
         {/* La clave reinicia la altura al cambiar de fase: con parada abre abajo,
@@ -73,8 +97,18 @@ export function Seguimiento(props: Props) {
           key={fase.tipo}
           nivelInicial={fase.tipo === "parada" ? "baja" : "media"}
           etiqueta={parada ? `Tu parada: ${parada.nombre}` : "Tu parada"}
+          flotante={
+            ubicacionViva && (
+              <BotonMiUbicacion
+                activo={camara.modo === "ubicacion"}
+                alTocar={camaraDelMapa.irAMiUbicacion}
+              />
+            )
+          }
         >
-          <Contenido miParada={miParada} llegadas={llegadas} {...props} />
+          <ContextoSeguirRuta.Provider value={{ seguida, seguir: camaraDelMapa.seguir }}>
+            <Contenido miParada={miParada} llegadas={llegadas} {...props} />
+          </ContextoSeguirRuta.Provider>
         </HojaInferior>
       </main>
     </div>
@@ -203,5 +237,18 @@ function puedeReintentar(fase: FaseContratiempo): boolean {
   return (
     fase.tipo === "error" ||
     (fase.tipo === "sin_ubicacion" && fase.motivo !== "no_disponible")
+  );
+}
+
+/** La ruta seguida siempre es de la parada: se tocó en su lista o en sus chips. */
+function rutaDe(parada: ParadaElegida, rutaId: string) {
+  return (
+    parada.rutas.find((ruta) => ruta.rutaId === rutaId) ?? {
+      rutaId,
+      nombre: "Ruta",
+      tipo: null,
+      icono: null,
+      color: "",
+    }
   );
 }
