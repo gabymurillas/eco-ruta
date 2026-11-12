@@ -1,12 +1,16 @@
 "use client";
 
-import { DivIcon } from "leaflet";
-import { useMemo } from "react";
+import { DivIcon, type Marker as MarcadorLeaflet } from "leaflet";
+import { useMemo, useRef } from "react";
 import { Circle, CircleMarker, Marker, Polyline, Popup, Tooltip } from "react-leaflet";
 import { claseDeRuta, colorDeRuta } from "@/domain/colores";
 import type { Punto } from "@/domain/mapa";
+import { useNombreDeMarcador } from "./useNombreDeMarcador";
 
-/** Reservado a lo que es del ciudadano (su punto y su camino): ninguna ruta lo usa. */
+/**
+ * Reservado a lo que es del ciudadano (su punto y su camino): ninguna ruta lo usa.
+ * Es el respaldo; el color real lo pone el tema con las clases `ubicacion-*`.
+ */
 const AZUL_UBICACION = "oklch(55% 0.15 250)";
 
 type PropsTrazado = {
@@ -50,6 +54,7 @@ export function CaminoAPie({ puntos }: { puntos: readonly Punto[] }) {
       positions={puntos.map((punto) => [punto.lat, punto.lng])}
       pathOptions={{
         color: AZUL_UBICACION,
+        className: "ubicacion-trazo",
         weight: 6,
         opacity: 0.95,
         dashArray: "1 11",
@@ -136,6 +141,8 @@ type PropsUbicacion = {
  * nadie confunda su propia posición con la de una unidad.
  */
 export function MarcadorUbicacion({ lat, lng, exactitudM }: PropsUbicacion) {
+  const referencia = useRef<MarcadorLeaflet>(null);
+  useNombreDeMarcador(referencia, "Tu ubicación");
 
   const punto = useMemo(
     () =>
@@ -143,7 +150,7 @@ export function MarcadorUbicacion({ lat, lng, exactitudM }: PropsUbicacion) {
         className: "",
         iconSize: [18, 18],
         iconAnchor: [9, 9],
-        html: `<span style="display:block;width:18px;height:18px;border-radius:999px;background:${AZUL_UBICACION};border:3px solid oklch(99% 0.008 75)"></span>`,
+        html: `<span style="display:block;width:18px;height:18px;border-radius:999px;background:var(--color-ubicacion, ${AZUL_UBICACION});border:3px solid oklch(99% 0.008 75)"></span>`,
       }),
     [],
   );
@@ -158,9 +165,10 @@ export function MarcadorUbicacion({ lat, lng, exactitudM }: PropsUbicacion) {
           fillColor: AZUL_UBICACION,
           fillOpacity: 0.12,
           weight: 1,
+          className: "ubicacion-trazo ubicacion-relleno",
         }}
       />
-      <Marker position={[lat, lng]} icon={punto} alt="Tu ubicación">
+      <Marker ref={referencia} position={[lat, lng]} icon={punto}>
         <Popup>Estás aquí, con una precisión de {Math.round(exactitudM)} m.</Popup>
       </Marker>
     </>

@@ -45,7 +45,7 @@ export function ListaLlegadas({ estado, rutas, ...ajustes }: Props) {
   if (llegadas.length === 0) {
     return (
       <div className="flex flex-col gap-1.5">
-        <p className="text-[19px] font-extrabold leading-tight tracking-tight">
+        <p className="text-[1.1875rem] font-extrabold leading-tight tracking-tight">
           Ninguna unidad va hacia tu parada ahora
         </p>
         <p className="text-sm leading-relaxed text-tinta-media">
@@ -83,7 +83,7 @@ function Resto({ resto, total }: { resto: LlegadaEvaluada[]; total: number }) {
         <button
           type="button"
           onClick={() => cambiarNivel("media")}
-          className="flex h-12 shrink-0 items-center justify-center gap-1.5 rounded-full border border-borde text-[15px] font-bold hover:bg-marca-tenue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo lg:hidden"
+          className="flex h-12 shrink-0 items-center justify-center gap-1.5 rounded-full border border-borde text-[0.9375rem] font-bold hover:bg-marca-tenue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo lg:hidden"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="m18 15-6-6-6 6" />
@@ -94,14 +94,11 @@ function Resto({ resto, total }: { resto: LlegadaEvaluada[]; total: number }) {
 
       <div className="h-px shrink-0 bg-borde-suave" />
 
-      <ul className="flex flex-col gap-2.5">
+      {/* Filas separadas por una línea, no tarjetas: la hoja ya es la superficie.
+          «Sin señal» se distingue por su texto y su reloj, no por un borde. */}
+      <ul className="-mt-1.5 flex flex-col divide-y divide-borde-suave">
         {resto.map((llegada) => (
-          <li
-            key={llegada.fila.unidad_id}
-            className={`rounded-2xl border px-3.5 py-3 ${
-              llegada.estado.tipo === "senal_perdida" ? "border-advertencia-borde" : "border-borde-suave"
-            }`}
-          >
+          <li key={llegada.fila.unidad_id} className="py-3 last:pb-0">
             <Llegada llegada={llegada} />
           </li>
         ))}
@@ -136,7 +133,7 @@ function Llegada({ llegada, grande = false }: { llegada: LlegadaEvaluada; grande
 
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span
-            className={`truncate font-extrabold tracking-tight ${grande ? "text-[19px]" : "text-[15px]"} ${
+            className={`line-clamp-2 font-extrabold leading-tight tracking-tight break-words ${grande ? "text-[1.1875rem]" : "text-[0.9375rem]"} ${
               apagado ? "text-tinta-media" : ""
             }`}
           >
@@ -192,7 +189,7 @@ function TiempoEstimado({
 
   return (
     <span className="flex shrink-0 flex-col items-end leading-none">
-      <span className={`font-extrabold tabular-nums tracking-tight ${grande ? "text-[40px]" : "text-[22px]"}`}>
+      <span className={`font-extrabold tabular-nums tracking-tight ${grande ? "text-[2.5rem]" : "text-[1.375rem]"}`}>
         {cifra(tiempo.minutos)}
       </span>
       <span className="pt-1 text-xs font-bold text-tinta-suave">estimado</span>
@@ -216,7 +213,7 @@ function cifra(minutos: number) {
   return (
     <>
       ~{minutos}
-      <span className="ml-0.5 text-[0.4em] font-bold tracking-normal">min</span>
+      <span className="ml-0.5 text-[max(0.6875rem,0.4em)] font-bold tracking-normal">min</span>
     </>
   );
 }
@@ -259,8 +256,8 @@ function Horarios({
           <li key={horario.rutaId} className="flex items-center gap-3">
             <CirculoRuta color={ruta?.color ?? null} icono={ruta?.icono ?? null} />
             <span className="flex min-w-0 flex-col gap-0.5">
-              <span className="truncate text-[15px] font-bold">{horario.nombre}</span>
-              <span className="text-[13px] font-semibold text-tinta-suave">
+              <span className="truncate text-[0.9375rem] font-bold">{horario.nombre}</span>
+              <span className="text-[0.8125rem] font-semibold text-tinta-suave">
                 Horario: {horario.horario}
               </span>
             </span>

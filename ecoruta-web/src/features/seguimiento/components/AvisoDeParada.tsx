@@ -55,10 +55,10 @@ export function AvisoDeParada(props: Props) {
         </span>
 
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <span className="text-[17px] font-bold leading-tight">
+          <span className="text-[1.0625rem] font-bold leading-tight">
             {titulo(viene, ruta?.nombre ?? "Tu unidad")}
           </span>
-          <span className="text-[13px] font-semibold text-tinta-media">
+          <span className="text-[0.8125rem] font-semibold text-tinta-media">
             {detalle(props)}
           </span>
         </div>

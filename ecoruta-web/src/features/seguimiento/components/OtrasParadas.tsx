@@ -17,7 +17,7 @@ export const ID_OTRAS_PARADAS = "otras-paradas";
 export function OtrasParadas({ paradas, elegidaId, alElegir }: Props) {
   return (
     <section id={ID_OTRAS_PARADAS} aria-labelledby="titulo-otras-paradas" className="flex scroll-mt-4 flex-col gap-1">
-      <h3 id="titulo-otras-paradas" className="text-[15px] font-bold">
+      <h3 id="titulo-otras-paradas" className="text-[0.9375rem] font-bold">
         Cambiar de parada
       </h3>
 
@@ -42,10 +42,10 @@ export function OtrasParadas({ paradas, elegidaId, alElegir }: Props) {
                   {elegida && <span className="size-3 rounded-full bg-marca-profundo" />}
                 </span>
                 <span className="flex flex-1 flex-col">
-                  <span className="text-[15px] font-bold">{parada.nombre}</span>
+                  <span className="text-[0.9375rem] font-bold">{parada.nombre}</span>
                   <span className="text-xs text-tinta-media">{describirRutas(parada.rutas.length)}</span>
                 </span>
-                <span className="text-[13px] tabular-nums text-tinta-media">
+                <span className="text-[0.8125rem] tabular-nums text-tinta-media">
                   {formatearDistancia(parada.distanciaM)}
                 </span>
               </button>

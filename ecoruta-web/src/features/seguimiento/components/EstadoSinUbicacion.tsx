@@ -48,7 +48,7 @@ export function EstadoSinUbicacion({ motivo }: Props) {
         </svg>
       </div>
 
-      <h2 className="text-[22px] font-extrabold leading-tight tracking-tight">
+      <h2 className="text-[1.375rem] font-extrabold leading-tight tracking-tight">
         {titulo}
       </h2>
       <p className="text-sm leading-relaxed text-tinta-media">{detalle}</p>

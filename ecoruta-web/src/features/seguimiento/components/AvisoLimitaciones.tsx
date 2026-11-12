@@ -18,7 +18,7 @@ export function AvisoLimitaciones({ alCerrar }: Props) {
       aria-labelledby="titulo-limitaciones"
       className="flex flex-col gap-3 rounded-xl border border-advertencia-borde bg-advertencia-fondo p-4"
     >
-      <h2 id="titulo-limitaciones" className="text-[15px] font-bold">
+      <h2 id="titulo-limitaciones" className="text-[0.9375rem] font-bold">
         Antes de empezar
       </h2>
 
@@ -28,8 +28,8 @@ export function AvisoLimitaciones({ alCerrar }: Props) {
           cuentas, así que con el navegador cerrado no tiene cómo avisarte.
         </li>
         <li>
-          Tu ubicación no se guarda: solo sirve para buscar las paradas
-          cercanas.
+          Tu ubicación no se guarda. Sirve para buscar las paradas cercanas
+          y, si tocas «Cómo llegar», para trazar el camino a pie.
         </li>
         <li>
           Los tiempos son estimados y dependen de la señal GPS de cada unidad.

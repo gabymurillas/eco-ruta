@@ -28,7 +28,7 @@ export function ChipsDeRuta({ rutas }: Props) {
               seguir(ruta.rutaId);
               cambiarNivel("baja");
             }}
-            className="flex h-10 items-center gap-2 rounded-full border border-borde px-3.5 text-sm font-semibold hover:bg-marca-tenue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo aria-pressed:border-tinta aria-pressed:bg-marca-tenue"
+            className="flex min-h-12 items-center gap-2 rounded-full border border-borde px-3.5 text-sm font-semibold hover:bg-marca-tenue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo aria-pressed:border-tinta aria-pressed:bg-marca-tenue"
           >
             <span
               aria-hidden="true"

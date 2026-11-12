@@ -19,11 +19,11 @@ export function Bienvenida({
 }: Props) {
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-[24px] font-extrabold leading-tight tracking-tight">
+      <h1 className="text-[1.5rem] font-extrabold leading-tight tracking-tight">
         Encuentra tu parada
       </h1>
 
-      <p className="text-[15px] leading-relaxed text-tinta-media">
+      <p className="text-[0.9375rem] leading-relaxed text-tinta-media">
         Comparte tu ubicación para ver qué rutas pasan cerca de ti. Te avisamos
         cuando tu unidad esté a menos de{" "}
         {formatearDistancia(radioAproximacionM)} de tu parada, y cuando ya haya
@@ -34,7 +34,7 @@ export function Bienvenida({
         {buscando ? "Buscando paradas…" : "Usar mi ubicación"}
       </Boton>
 
-      <p className="text-[13px] leading-relaxed text-tinta-suave">
+      <p className="text-[0.8125rem] leading-relaxed text-tinta-suave">
         Tu ubicación solo se usa para buscar las paradas cercanas. No se guarda
         ni sale de esta búsqueda.
       </p>

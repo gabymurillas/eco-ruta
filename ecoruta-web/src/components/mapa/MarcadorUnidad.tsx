@@ -11,6 +11,7 @@ import {
   tintaSobreColorDeRuta,
 } from "@/domain/colores";
 import { svgDeIcono } from "@/domain/iconos";
+import { useNombreDeMarcador } from "./useNombreDeMarcador";
 
 type Props = {
   lat: number;
@@ -49,6 +50,10 @@ export function MarcadorUnidad({
   adaptable = false,
 }: Props) {
   const referencia = useRef<MarcadorLeaflet>(null);
+  useNombreDeMarcador(
+    referencia,
+    [nombre, rutaNombre, transmitiendo ? null : "sin señal"].filter(Boolean).join(", "),
+  );
   const marcador = useMemo(
     () => construirMarcador({ color, icono, transmitiendo, seleccionado, adaptable }),
     [color, icono, transmitiendo, seleccionado, adaptable],
@@ -65,7 +70,6 @@ export function MarcadorUnidad({
       ref={referencia}
       position={[lat, lng]}
       icon={marcador}
-      alt={`Unidad ${nombre}`}
       eventHandlers={alElegir ? { click: alElegir } : undefined}
     >
       <Popup>

@@ -240,7 +240,21 @@ derecha), mapa a pantalla completa y una hoja inferior de tres alturas: baja (la
 llegada más próxima), media (todas las llegadas y las rutas) y alta (además, cambiar de parada y
 las limitaciones). Se arrastra desde el asa; tocarla o usar las flechas hace lo mismo. En
 escritorio la hoja es una columna fija de 440 px a la derecha del mapa. Bocetos aprobados:
-`.impeccable/mocks/ciudadano/`. El admin es escritorio: barra de navegación más mapa de flota con columna de tarjetas.
+`.impeccable/mocks/ciudadano/`.
+
+Ajustes de la auditoría del 2026-11-12 (`.impeccable/audit/ciudadano-2026-11-12.md`):
+- **La hoja baja garantiza la llegada más próxima.** «Cómo llegar» vive en la línea de
+  distancia («A 180 m · 2 min a pie · Cómo llegar»), no en una fila propia.
+- **Las llegadas secundarias son filas separadas por una línea**, no tarjetas: la hoja ya es
+  la superficie. «Sin señal» se distingue por su texto y su reloj. La tarjeta de advertencia
+  de limitaciones sí se queda: es un aviso de estado, no un contenedor.
+- **Objetivos táctiles de 48 px en todo lo que se toca** (chips, botones de texto, zoom del
+  mapa, ✕ del aviso de seguimiento), con margen negativo cuando no deben agrandar la línea.
+- **Tamaños de letra en rem en la web del ciudadano**, para seguir la letra grande del
+  teléfono; nada funcional por debajo de 11 px. Los nombres de ruta pasan a dos líneas en vez
+  de truncarse.
+- **El azul de ubicación sale del tema** (`--color-ubicacion`, clases `ubicacion-*`): en oscuro
+  se aclara como el resto. El admin es escritorio: barra de navegación más mapa de flota con columna de tarjetas.
 El espaciado va en múltiplos de 4 px (4, 8, 12, 16, 20, 24). Los puntos de quiebre son los de
 Tailwind (sm 640 px, md 768 px, lg 1024 px). La foto de los Morros solo aparece en el panel
 derecho del ingreso del admin a partir de escritorio.

@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { estimarCaminataMinutos, formatearDistancia } from "@/domain/formato";
 import type { LlegadaRow } from "@/services/llegadas.service";
 import { useAvisoLimitaciones } from "../hooks/useAvisoLimitaciones";
 import { useAvisosDeParada } from "../hooks/useAvisosDeParada";
@@ -9,8 +8,7 @@ import type { EstadoLlegadas } from "../hooks/useLlegadas";
 import type { ParadaConRutas, ParadaElegida } from "../types";
 import { AvisoDeParada } from "./AvisoDeParada";
 import { AvisoLimitaciones } from "./AvisoLimitaciones";
-import { ComoLlegar } from "./ComoLlegar";
-import type { EstadoCaminata } from "../hooks/useCaminata";
+import { ComoLlegar, type AccionesCaminata } from "./ComoLlegar";
 import { ChipsDeRuta } from "./ChipsDeRuta";
 import { useHoja } from "./HojaInferior";
 import { ListaLlegadas } from "./ListaLlegadas";
@@ -28,11 +26,7 @@ type Props = {
   alCambiar: () => void;
   alElegir: (parada: ParadaConRutas) => void;
   /** Sin ubicación no hay desde dónde trazar el camino: llega null. */
-  caminata: {
-    estado: EstadoCaminata;
-    alPedir: () => void;
-    alOcultar: () => void;
-  } | null;
+  caminata: AccionesCaminata | null;
 };
 
 /**
@@ -53,9 +47,10 @@ export function VistaParada(props: Props) {
 
   return (
     <>
-      <EncabezadoParada parada={parada} alCambiar={cambiar} />
-
-      {props.caminata && <ComoLlegar {...props.caminata} />}
+      <div className="flex flex-col gap-1">
+        <EncabezadoParada parada={parada} alCambiar={cambiar} />
+        <ComoLlegar distanciaM={parada.distanciaM} caminata={props.caminata} />
+      </div>
 
       {parada.rutas.length === 0 ? (
         <p className="text-sm leading-relaxed text-tinta-media">
@@ -125,20 +120,14 @@ function useCambiarParada(hayOtras: boolean, alBuscar: () => void) {
 function EncabezadoParada({ parada, alCambiar }: { parada: ParadaElegida; alCambiar: () => void }) {
   return (
     <div className="flex items-start justify-between gap-3">
-      <div className="flex min-w-0 flex-col gap-0.5">
-        <h2 className="text-[22px] font-extrabold leading-tight tracking-tight">{parada.nombre}</h2>
-        {parada.distanciaM !== null && (
-          <span className="text-[13px] font-semibold text-tinta-suave">
-            A {formatearDistancia(parada.distanciaM)} ·{" "}
-            {estimarCaminataMinutos(parada.distanciaM)} min a pie
-          </span>
-        )}
-      </div>
+      <h2 className="min-w-0 text-[1.375rem] font-extrabold leading-tight tracking-tight text-balance">
+        {parada.nombre}
+      </h2>
 
       <button
         type="button"
         onClick={alCambiar}
-        className="-my-2 -mr-3 flex h-12 shrink-0 items-center rounded-full px-3 text-[15px] font-bold text-marca-profundo hover:bg-marca-tenue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo"
+        className="-my-2 -mr-3 flex h-12 shrink-0 items-center rounded-full px-3 text-[0.9375rem] font-bold text-marca-profundo hover:bg-marca-tenue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-profundo"
       >
         Cambiar
       </button>
@@ -151,7 +140,7 @@ function Bloque({ titulo, children }: { titulo: string; children: ReactNode }) {
     <>
       <div className="h-px shrink-0 bg-borde-suave" />
       <section className="flex flex-col gap-2.5">
-        <h3 className="text-[15px] font-bold">{titulo}</h3>
+        <h3 className="text-[0.9375rem] font-bold">{titulo}</h3>
         {children}
       </section>
     </>

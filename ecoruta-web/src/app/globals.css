@@ -177,8 +177,9 @@ body:has(.tema-admin[data-tema="oscuro"]) {
  * Controles de zoom de Leaflet: traen 30 px (34 en táctil), por debajo de los
  * 48 px táctiles de DESIGN.md para algo que se toca en la calle y con prisa.
  */
-.leaflet-bar a,
-.leaflet-touch .leaflet-bar a {
+/* Con `.leaflet-container` delante: leaflet.css se carga después de este archivo
+   (lo importa el mapa) y, a igual especificidad, ganaba con sus 30 px. */
+.leaflet-container .leaflet-bar.leaflet-control a {
   width: 48px;
   height: 48px;
   line-height: 48px;
@@ -349,12 +350,14 @@ body:has(.tema-admin[data-tema="oscuro"]) {
   .tema-ciudadano .ruta-oliva.ruta-relleno { fill: var(--ruta-oliva); }
   .tema-ciudadano .ruta-indigo.ruta-relleno { fill: var(--ruta-indigo); }
 
-  .tema-ciudadano .leaflet-control-attribution {
+  /* Mismo motivo que el zoom: sin `.leaflet-container` ganaba el fondo blanco de
+     leaflet.css y el crédito quedaba gris claro sobre blanco (1,3:1). */
+  .tema-ciudadano .leaflet-container .leaflet-control-attribution {
     background: rgb(18 18 18 / 0.85);
     color: var(--color-tinta-media);
   }
 
-  .tema-ciudadano .leaflet-control-attribution a {
+  .tema-ciudadano .leaflet-container .leaflet-control-attribution a {
     color: var(--color-marca);
   }
 
@@ -363,6 +366,17 @@ body:has(.tema-admin[data-tema="oscuro"]) {
     background: var(--color-superficie);
     color: var(--color-tinta);
   }
+}
+
+/* Lo que es del ciudadano (su punto, su precisión y su camino a pie) toma el azul
+   de ubicación del tema: en oscuro se aclara como el resto. Los atributos SVG no
+   leen var(), así que va por clase. */
+.ubicacion-trazo {
+  stroke: var(--color-ubicacion);
+}
+
+.ubicacion-relleno {
+  fill: var(--color-ubicacion);
 }
 
 .tema-ciudadano .leaflet-bar a {

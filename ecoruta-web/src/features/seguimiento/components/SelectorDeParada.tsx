@@ -23,7 +23,7 @@ export function SelectorDeParada({
 }: Props) {
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="text-[20px] font-extrabold leading-tight tracking-tight">
+      <h2 className="text-[1.25rem] font-extrabold leading-tight tracking-tight">
         Elige tu parada
       </h2>
 
@@ -42,10 +42,10 @@ export function SelectorDeParada({
                 }`}
               >
                 <span className="flex items-baseline justify-between gap-3">
-                  <span className="text-[15px] font-bold">
+                  <span className="text-[0.9375rem] font-bold">
                     {parada.nombre}
                   </span>
-                  <span className="shrink-0 text-[13px] font-semibold text-tinta-suave">
+                  <span className="shrink-0 text-[0.8125rem] font-semibold text-tinta-suave">
                     {formatearDistancia(parada.distanciaM)}
                   </span>
                 </span>
@@ -69,7 +69,7 @@ export function SelectorDeParada({
 function ChipsDeRuta({ parada }: { parada: ParadaConRutas }) {
   if (parada.rutas.length === 0) {
     return (
-      <span className="text-[13px] font-semibold text-tinta-suave">
+      <span className="text-[0.8125rem] font-semibold text-tinta-suave">
         Todavía no pasa ninguna ruta
       </span>
     );
@@ -80,7 +80,7 @@ function ChipsDeRuta({ parada }: { parada: ParadaConRutas }) {
       {parada.rutas.map((ruta) => (
         <span
           key={ruta.rutaId}
-          className="flex items-center gap-1.5 text-[13px] font-semibold text-tinta-media"
+          className="flex items-center gap-1.5 text-[0.8125rem] font-semibold text-tinta-media"
         >
           <span
             aria-hidden="true"
