@@ -25,7 +25,7 @@ type Props = {
 };
 
 /**
- * Hoja inferior de tres alturas sobre el mapa (teléfono). Se arrastra desde el
+ * Hoja inferior de cuatro alturas sobre el mapa (teléfono). Se arrastra desde el
  * asa; tocar el asa, o las flechas con el teclado, hace lo mismo para quien no
  * puede arrastrar. En escritorio es una columna fija a la derecha del mapa.
  *
@@ -50,15 +50,15 @@ export function HojaInferior({ nivelInicial, etiqueta, children }: Props) {
         ref={hoja}
         aria-label={etiqueta}
         style={{ "--alto-hoja": ALTOS[nivel] } as CSSProperties}
-        className="absolute inset-x-0 bottom-0 z-[1100] flex h-[var(--alto-hoja)] flex-col rounded-t-[20px] border-t border-borde bg-superficie transition-[height] duration-300 ease-out data-[arrastrando=true]:transition-none lg:static lg:h-full lg:w-[440px] lg:shrink-0 lg:rounded-none lg:border-t-0 lg:border-l"
+        className="absolute inset-x-0 bottom-0 z-[1100] flex h-[var(--alto-hoja)] flex-col rounded-t-[28px] border-x border-t border-borde bg-superficie transition-[height] duration-300 ease-out data-[arrastrando=true]:transition-none lg:static lg:h-full lg:w-[440px] lg:shrink-0 lg:rounded-none lg:border-t-0 lg:border-r-0 lg:border-l"
       >
         <button
           type="button"
           aria-label={nivel === "alta" ? "Mostrar menos" : "Mostrar más"}
           {...gestos}
-          className="flex h-7 w-full shrink-0 cursor-grab touch-none items-center justify-center rounded-t-[20px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-marca-profundo lg:hidden"
+          className="flex h-8 w-full shrink-0 cursor-grab touch-none items-center justify-center rounded-t-[28px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-marca-profundo lg:hidden"
         >
-          <span aria-hidden="true" className="h-1 w-10 rounded-full bg-borde" />
+          <span aria-hidden="true" className="h-[5px] w-11 rounded-full bg-tinta-suave/40" />
         </button>
 
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-5 pb-[calc(1.75rem+env(safe-area-inset-bottom))] lg:px-7 lg:pt-7">

@@ -7,16 +7,18 @@ import {
   type RefObject,
 } from "react";
 
-export type NivelHoja = "baja" | "media" | "alta";
+export type NivelHoja = "minima" | "baja" | "media" | "alta";
 
-export const NIVELES: readonly NivelHoja[] = ["baja", "media", "alta"];
+export const NIVELES: readonly NivelHoja[] = ["minima", "baja", "media", "alta"];
 
 /**
- * Alto de cada nivel, relativo al espacio bajo la cabecera. La baja muestra la
- * parada y la llegada más próxima; la alta deja una franja de mapa a la vista
+ * Alto de cada nivel, relativo al espacio bajo la cabecera. La mínima deja solo
+ * el asa y el nombre de la parada para ver el mapa casi entero; la baja muestra
+ * la parada y la llegada más próxima; la alta deja una franja de mapa a la vista
  * para que se entienda que sigue ahí debajo.
  */
 export const ALTOS: Record<NivelHoja, string> = {
+  minima: "6.5rem",
   baja: "15.5rem",
   media: "min(33rem, 70%)",
   alta: "calc(100% - 0.75rem)",
@@ -24,8 +26,9 @@ export const ALTOS: Record<NivelHoja, string> = {
 
 /** Por debajo de esto, un toque en el asa es un toque y no un arrastre. */
 const UMBRAL_ARRASTRE_PX = 6;
-const ALTO_MINIMO_PX = 120;
+const ALTO_MINIMO_PX = 72;
 const REM_PX = 16;
+const ALTO_MINIMA_REM = 6.5;
 const ALTO_BAJA_REM = 15.5;
 const ALTO_MEDIA_REM = 33;
 const FRACCION_MEDIA = 0.7;
@@ -118,6 +121,7 @@ function nivelMasCercano(hoja: HTMLElement): NivelHoja {
   const disponible = hoja.parentElement?.clientHeight ?? window.innerHeight;
   const alto = hoja.getBoundingClientRect().height;
   const altos: Record<NivelHoja, number> = {
+    minima: ALTO_MINIMA_REM * REM_PX,
     baja: ALTO_BAJA_REM * REM_PX,
     media: Math.min(ALTO_MEDIA_REM * REM_PX, disponible * FRACCION_MEDIA),
     alta: disponible - MARGEN_ALTA_PX,
