@@ -40,7 +40,7 @@
 | A3 | Spoofing | Adivinar un código de vinculación | 5 caracteres, 10 minutos, un solo uso | Considerar un límite de intentos en `vincular-dispositivo` (TS-10) |
 | A4 | Elevation of privilege | Autonombrarse admin | El rol vive en `app_metadata` (solo servidor) | — |
 | A5 | Spoofing | Robo de la cuenta del admin | Contraseña de Supabase Auth | **TS-05**: sin MFA |
-| A6 | Tampering | Teléfono robado sigue transmitiendo | `eliminar_unidad` revoca la cuenta | **TS-04**: no hay «desvincular» sin borrar la unidad |
+| A6 | Tampering | Teléfono robado sigue transmitiendo | `desvincular_dispositivo` y `eliminar_unidad` revocan la cuenta | — (TS-04 cerrada) |
 | A7 | Information disclosure | La ubicación del ciudadano queda en registros | No se guarda en tablas | **TS-09**: viaja exacta al servidor; puede quedar en los registros del proveedor |
 | A8 | Information disclosure | Texto libre de incidencias con datos personales u ofensas | Solo el chofer puede escribir | **TS-03**: legible por la API pública |
 | A9 | Repudiation | Avisos o tiempos erróneos sin trazabilidad | `eventos_geocerca` y `avisos_parada` con marcas de tiempo | — |

@@ -93,7 +93,7 @@ Parámetros previstos por el PRD (todavía no existen): `eta_historico_min_viaje
 | Editar otros campos de una incidencia, o borrarla | ✅ | ❌ (disparador `incidencias_solo_estado_para_operador`) |
 | Crear, editar o borrar rutas, trazados, paradas, unidades y parámetros | ✅ | ❌ |
 | Generar o leer un código de vinculación | ✅ | ❌ (la política `operador_lee_dispositivos` esconde la fila mientras tenga código) |
-| `eliminar_unidad` | ✅ | ❌ |
+| `eliminar_unidad`, `desvincular_dispositivo` | ✅ | ❌ |
 | Gestionar el equipo (Edge Function `gestionar-equipo`) | ✅ | ❌ |
 
 Por qué un disparador y no solo la política: RLS filtra filas, no columnas. Con la política
@@ -124,6 +124,7 @@ La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 | `es_admin`, `es_operador`, `unidad_del_dispositivo` | Auxiliares, invoker | Leen los claims de `app_metadata` para RLS (`sql/03`, `sql/17`) |
 | `incidencias_solo_estado_para_operador` | Disparador | Limita al operador a cambiar el estado de una incidencia (`sql/17`) |
 | `canjear_codigo_de_vinculacion`, `registrar_auth_de_dispositivo`, `registrar_salud_del_dispositivo`, `eliminar_unidad` | RPC, **definer** | Vinculación y ciclo de vida del dispositivo (`sql/06`) |
+| `desvincular_dispositivo` | RPC, **definer** | Solo admin. Borra el teléfono de la unidad, cierra su viaje abierto y borra su cuenta de Auth sin tocar la unidad ni su historial (`sql/18`) |
 | `posiciones_para_suavizar`, `estado_de_geocercas` | RPC, definer | Uso exclusivo de `registrar-posicion` (`sql/07`) |
 
 ## 6. Orden de migraciones
@@ -131,6 +132,6 @@ La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 `01_schema` → `02_parametros` → `03_rls` → `04_funciones` → `06_vinculacion` → `07_geocercas`
 → `08_incidencia_otro` → `09_avisos_parada` → `10_paradas_de_ciudad` → `11_trazado_asistido` →
 `12_realtime_monitoreo` → `13_exposicion_solo_en_servicio` → `14_tiempo_estimado` →
-`15_historicos_por_ruta` → `16_historicos_periodo_y_cobertura` → `17_roles_del_panel`.
+`15_historicos_por_ruta` → `16_historicos_periodo_y_cobertura` → `17_roles_del_panel` → `18_desvincular_dispositivo`.
 `05_consultas_historicos` es documentación. Se aplican a mano en
 Supabase.

@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { BOTON_PANEL_PRINCIPAL } from "@/components/ui/estilos-panel";
 import { vincular, type EstadoUnidades } from "../acciones";
+import { ConfirmarDesvincularTelefono } from "./ConfirmarDesvincularTelefono";
 import { ConfirmarEliminarUnidad } from "./ConfirmarEliminarUnidad";
 import { FilaUnidad, idBotonDeFila, type AccionDeFila, type FichaUnidad } from "./FilaUnidad";
 import { FormularioUnidad, type OpcionDeRuta } from "./FormularioUnidad";
@@ -183,26 +184,29 @@ function ContenidoPanel({
     );
   }
 
+  if (unidad.vinculado) {
+    return <ConfirmarDesvincularTelefono key={unidad.id} unidad={unidad} onCancelar={onCerrar} />;
+  }
+
   return <FormularioVinculacion key={unidad.id} unidad={unidad} />;
 }
 
 function FormularioVinculacion({ unidad }: { unidad: FichaUnidad }) {
   const [estado, enviar, generando] = useActionState(vincular, ESTADO_INICIAL);
 
-  // Con el teléfono ya vinculado no hay código que mostrar: el último se canjeó.
-  // Si no, manda el recién generado y, en su defecto, el pendiente guardado.
+  // Manda el recién generado y, en su defecto, el pendiente guardado. Una unidad
+  // vinculada no llega aquí: primero se desvincula su teléfono.
   const guardado =
     unidad.telefono === "codigo_pendiente" && unidad.codigoVinculacion && unidad.codigoExpiraAt
       ? { codigo: unidad.codigoVinculacion, expiraEn: unidad.codigoExpiraAt }
       : null;
-  const codigo = unidad.vinculado ? null : (estado.codigo ?? guardado);
+  const codigo = estado.codigo ?? guardado;
 
   return (
     <form action={enviar} className="flex flex-col gap-3">
       <input type="hidden" name="unidadId" value={unidad.id} />
       <PanelVinculacion
         unidadNombre={unidad.nombre}
-        vinculado={unidad.vinculado}
         codigo={codigo}
         generando={generando}
       />

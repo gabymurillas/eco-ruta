@@ -6,7 +6,6 @@ import { segundosRestantes, VIGENCIA_MINUTOS } from "@/domain/vinculacion";
 
 type Props = {
   unidadNombre: string;
-  vinculado: boolean;
   /** Null mientras no haya un código vigente: el panel ofrece generarlo. */
   codigo: { codigo: string; expiraEn: string } | null;
   generando: boolean;
@@ -21,7 +20,7 @@ const PASOS = [
 const VIGENCIA_S = VIGENCIA_MINUTOS * 60;
 
 /** Vive dentro del formulario de la tabla: su botón de envío genera el código. */
-export function PanelVinculacion({ unidadNombre, vinculado, codigo, generando }: Props) {
+export function PanelVinculacion({ unidadNombre, codigo, generando }: Props) {
   const titulo = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -46,17 +45,7 @@ export function PanelVinculacion({ unidadNombre, vinculado, codigo, generando }:
         </p>
       </div>
 
-      {codigo ? (
-        <CodigoVigente codigo={codigo.codigo} expiraEn={codigo.expiraEn} />
-      ) : (
-        vinculado && (
-          <Aviso>
-            Esta unidad ya tiene un teléfono vinculado. Generar un código sirve para pasar la
-            unidad a otro teléfono, pero el actual conserva su acceso: para cortarlo hoy hay que
-            eliminar la unidad.
-          </Aviso>
-        )
-      )}
+      {codigo && <CodigoVigente codigo={codigo.codigo} expiraEn={codigo.expiraEn} />}
 
       <ol className="flex flex-col gap-2.5">
         {PASOS.map((paso, indice) => (

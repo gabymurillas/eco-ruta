@@ -26,10 +26,10 @@
 ## Guías de actuación
 
 ### G1 — Teléfono de una unidad perdido o robado (S2)
-1. En `/admin/unidades`, eliminar la unidad (hoy es la única forma de revocar la sesión). Cuando
-   exista ADM-12, desvincular.
+1. En `/admin/unidades`, desvincular el teléfono de la unidad (ADM-12): revoca la sesión sin borrar
+   la unidad ni su historial.
 2. Verificar en el monitoreo que ya no lleguen posiciones.
-3. Crear la unidad de nuevo y vincular un teléfono nuevo.
+3. Generar un código nuevo para la unidad y vincular el teléfono de reemplazo.
 
 ### G2 — Clave `service_role` filtrada (S1)
 1. Rotar las claves JWT y API en el panel de Supabase.

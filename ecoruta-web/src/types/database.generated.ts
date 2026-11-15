@@ -672,6 +672,7 @@ export type Database = {
         }
         Returns: string
       }
+      desvincular_dispositivo: { Args: { unidad: string }; Returns: undefined }
       disablelongtransactions: { Args: never; Returns: string }
       dropgeometrycolumn:
         | {

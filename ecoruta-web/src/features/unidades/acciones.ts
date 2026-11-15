@@ -5,6 +5,7 @@ import { exigirAdministrador } from "@/services/auth.service";
 import {
   actualizarUnidad,
   crearUnidad,
+  desvincularDispositivo,
   eliminarUnidad,
   generarCodigoDeVinculacion,
 } from "@/services/unidades.service";
@@ -101,6 +102,25 @@ export async function editarUnidad(
   revalidatePath("/admin/unidades");
   revalidatePath("/admin");
   return { guardada: unidadId };
+}
+
+export async function desvincular(unidadId: string): Promise<{ error?: string }> {
+  const permiso = await exigirAdministrador();
+
+  if (!permiso.ok) {
+    return { error: permiso.error };
+  }
+
+  const resultado = await desvincularDispositivo(unidadId);
+
+  if (!resultado.ok) {
+    return { error: resultado.error };
+  }
+
+  revalidatePath("/admin/unidades");
+  // Si la unidad iba en recorrido, su viaje se cerró: sale del mapa de monitoreo.
+  revalidatePath("/admin");
+  return {};
 }
 
 export async function eliminar(unidadId: string): Promise<{ error?: string }> {

@@ -128,11 +128,29 @@ export async function actualizarUnidad(
  * Cada llamada invalida el anterior: si el admin lo pide dos veces, solo el último
  * sirve. El código vive en la tabla `dispositivos`, que RLS reserva al administrador,
  * así que nadie puede leerlo desde la web pública para robar una vinculación.
+ *
+ * Con un teléfono ya vinculado se niega: el canje reutiliza la cuenta de Auth de la
+ * unidad, y el teléfono anterior conservaría su sesión (brecha TS-04). Primero se
+ * desvincula, que sí la revoca.
  */
 export async function generarCodigoDeVinculacion(
   unidadId: string,
 ): Promise<Resultado<{ codigo: string; expiraEn: string }>> {
   const supabase = await crearClienteServidor();
+
+  const actual = await supabase
+    .from("dispositivos")
+    .select("vinculado")
+    .eq("unidad_id", unidadId)
+    .maybeSingle();
+
+  if (actual.error) {
+    return falloRegistrado("generar_codigo", actual.error, "No se pudo generar el código de vinculación.");
+  }
+
+  if (actual.data?.vinculado) {
+    return fallo("Esta unidad ya tiene un teléfono. Desvincúlalo antes de vincular otro.");
+  }
 
   const bytes = new Uint8Array(LONGITUD_CODIGO);
   crypto.getRandomValues(bytes);
@@ -170,6 +188,29 @@ export async function eliminarUnidad(unidadId: string): Promise<Resultado<null>>
 
   if (error) {
     return falloRegistrado("eliminar_unidad", error, "No se pudo eliminar la unidad.");
+  }
+
+  return exito(null);
+}
+
+/** Sin teléfono que desvincular: lo hizo otra pestaña o el teléfono nunca se vinculó. */
+const SIN_TELEFONO = "P0002";
+
+/**
+ * Corta el acceso del teléfono y conserva la unidad con todo su historial. Lo hace
+ * `desvincular_dispositivo` en una transacción (sql/18): borra la cuenta de Auth, que
+ * solo se alcanza con security definer, y cierra el viaje que quede abierto.
+ */
+export async function desvincularDispositivo(unidadId: string): Promise<Resultado<null>> {
+  const supabase = await crearClienteServidor();
+  const { error } = await supabase.rpc("desvincular_dispositivo", { unidad: unidadId });
+
+  if (error?.code === SIN_TELEFONO) {
+    return fallo("Esta unidad ya no tiene un teléfono vinculado. Recarga la página.");
+  }
+
+  if (error) {
+    return falloRegistrado("desvincular_dispositivo", error, "No se pudo desvincular el teléfono.");
   }
 
   return exito(null);

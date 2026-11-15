@@ -201,13 +201,13 @@ revoca la sesión del teléfono.
 | ADM-09 | CRUD de unidades y asignación de ruta | P0 | ✅ |
 | ADM-10 | Vinculación: código de 5 caracteres, de un solo uso y válido por 10 minutos | P0 | ✅ |
 | ADM-11 | Eliminar una unidad revoca la cuenta del teléfono | P0 | ✅ |
-| ADM-12 | Desvincular el teléfono sin borrar la unidad ni su historial | P1 | ⬜ (brecha TS-04) |
+| ADM-12 | Desvincular el teléfono sin borrar la unidad ni su historial | P1 | ✅ (`sql/18`; cierra TS-04) |
 | ADM-13 | Editar los parámetros calibrables desde la interfaz | P0 | ✅ |
 | ADM-14 | Históricos: viajes completados, cobertura e incidencias en los últimos 7 o 30 días; viajes por día; resumen por ruta | P1 | ✅ |
 | ADM-15 | Históricos: velocidad típica por ruta y franja (insumo de CIU-09) | P1 | ⬜ |
 | ADM-16 | Ver el recorrido real de un viaje y sus desvíos sobre el trazado | P2 | ⬜ |
 | ADM-17 | Resolver (cerrar) incidencias | P1 | 🟡 (sección `/admin/incidencias` hecha; falta probarla con un reporte real) |
-| ADM-18 | Equipo: invitar por correo con un rol, listar las cuentas del panel (rol, último ingreso, invitación pendiente), cambiar el rol y quitar el acceso. Solo un admin; nadie se modifica a sí mismo; siempre queda un admin | P1 | 🟡 (código listo; falta aplicar `sql/17`, desplegar `gestionar-equipo` y configurar la plantilla de invitación: [arquitectura § 7](../04-arquitectura/README.md#7-configurar-supabase-para-el-equipo-del-panel)) |
+| ADM-18 | Equipo: invitar por correo con un rol, listar las cuentas del panel (rol, último ingreso, invitación pendiente), cambiar el rol y quitar el acceso. Solo un admin; nadie se modifica a sí mismo; siempre queda un admin | P1 | 🟡 (`sql/17` aplicada y `gestionar-equipo` desplegada, verificado el 2026-11-15; falta la configuración de Auth ([arquitectura § 7](../04-arquitectura/README.md#7-configurar-supabase-para-el-equipo-del-panel), pasos 3 a 7) y probar una invitación real) |
 | ADM-19 | Rol operador: monitoreo, históricos y lectura de rutas, paradas y unidades; resuelve incidencias; no crea, edita ni borra nada más. Lo impone RLS, no solo la interfaz | P1 | 🟡 (ídem ADM-18) |
 
 ### 6.3 App del dispositivo de ruta (`DIS`) — repositorio aparte
@@ -340,5 +340,7 @@ al cálculo simple.
 
 | Versión | Fecha | Cambio |
 |---|---|---|
+| 1.3 | 2026-11-15 | ADM-12: desvincular el teléfono sin borrar la unidad (`sql/18_desvincular_dispositivo.sql`); cierra la brecha TS-04 |
+| 1.2 | 2026-11-15 | ADM-18 y ADM-19: `sql/17` y `gestionar-equipo` ya están en Supabase; queda la configuración de Auth y probar una invitación real |
 | 1.1 | 2026-11-10 | Roles del panel: se agregan ADM-18 (Equipo) y ADM-19 (rol operador); «roles múltiples» sale de los no-objetivos ([ADR-0015](../04-arquitectura/adr/0015-roles-del-panel-y-equipo.md)) |
 | 1.0 | 2026-11-04 | Primera versión, a partir de la entrevista de producto. Incorpora el tiempo estimado con historial (versión mínima) al alcance de la tesis; antes era trabajo futuro |

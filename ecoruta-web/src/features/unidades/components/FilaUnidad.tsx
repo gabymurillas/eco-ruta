@@ -21,8 +21,8 @@ type Props = {
 };
 
 const TEXTO_VINCULAR: Record<EstadoTelefono, string> = {
-  vinculado: "Revincular",
-  sin_reportar: "Revincular",
+  vinculado: "Desvincular",
+  sin_reportar: "Desvincular",
   codigo_pendiente: "Ver código",
   sin_vincular: "Vincular",
 };
