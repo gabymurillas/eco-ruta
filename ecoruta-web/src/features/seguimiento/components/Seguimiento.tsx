@@ -3,17 +3,20 @@
 import dynamic from "next/dynamic";
 import type { ComponentProps } from "react";
 import { Boton } from "@/components/ui/Boton";
+import { distanciaM } from "@/domain/trazado";
 import { useCamaraDelMapa } from "../hooks/useCamaraDelMapa";
-import { useCaminata } from "../hooks/useCaminata";
+import { useCaminata, type EstadoCaminata } from "../hooks/useCaminata";
+import type { EstadoDePedido } from "../hooks/useCercanas";
 import { useLlegadas, type EstadoLlegadas } from "../hooks/useLlegadas";
 import { useMiParada, type Fase } from "../hooks/useMiParada";
 import { useTrazados } from "../hooks/useTrazados";
 import { useUbicacionViva } from "../hooks/useUbicacionViva";
 import { hayUnidadEnVivo, paradasDelMapa, unidadesDelMapa } from "../mapa-de-seguimiento";
 import { ContextoSeguirRuta } from "../seguir-ruta";
-import type { ParadaConRutas, ParadaElegida } from "../types";
+import type { ParadaConRutas, ParadaElegida, Ubicacion } from "../types";
 import { Bienvenida } from "./Bienvenida";
 import { Cabecera } from "./Cabecera";
+import type { AccesoCaminata } from "./ComoLlegar";
 import { AvisoSiguiendo, BotonMiUbicacion } from "./ControlesDelMapa";
 import { EstadoSinUbicacion } from "./EstadoSinUbicacion";
 import { HojaInferior } from "./HojaInferior";
@@ -119,11 +122,13 @@ export function Seguimiento(props: Props) {
             <Contenido
               miParada={miParada}
               llegadas={llegadas}
-              caminata={
-                ubicacionViva
-                  ? { estado: caminata.estado, alPedir: pedirCaminata, alOcultar: caminata.ocultar }
-                  : null
-              }
+              caminata={accesoACaminata({
+                parada,
+                ubicacionViva,
+                ubicacion,
+                acciones: { estado: caminata.estado, alPedir: pedirCaminata, alOcultar: caminata.ocultar },
+                alPedirUbicacion: miParada.pedirUbicacion,
+              })}
               {...props}
             />
           </ContextoSeguirRuta.Provider>
@@ -131,6 +136,43 @@ export function Seguimiento(props: Props) {
       </main>
     </div>
   );
+}
+
+type EntradaAcceso = {
+  parada: ParadaElegida | null;
+  ubicacionViva: Ubicacion | null;
+  ubicacion: EstadoDePedido;
+  acciones: { estado: EstadoCaminata; alPedir: () => void; alOcultar: () => void };
+  alPedirUbicacion: () => void;
+};
+
+/**
+ * La distancia sale de la ubicación viva y no de la búsqueda de cercanas: esa
+ * búsqueda trae unas pocas filas en 1,5 km, y si la parada guardada quedaba fuera
+ * —un poco lejos, o rodeada de paradas con muchas rutas— «Cómo llegar»
+ * desaparecía aunque se supiera dónde estaba el ciudadano.
+ */
+function accesoACaminata({
+  parada,
+  ubicacionViva,
+  ubicacion,
+  acciones,
+  alPedirUbicacion,
+}: EntradaAcceso): AccesoCaminata | null {
+  if (parada && ubicacionViva) {
+    return { tipo: "con_ubicacion", distanciaM: distanciaM(ubicacionViva, parada), ...acciones };
+  }
+
+  switch (ubicacion.estado) {
+    case "no_disponible":
+      return null;
+    // Con permiso la ubicación viva arranca en la concedida; esto cubre el instante
+    // antes de que llegue.
+    case "concedida":
+      return { tipo: "sin_ubicacion", estado: "pidiendo", alPedirUbicacion };
+    default:
+      return { tipo: "sin_ubicacion", estado: ubicacion.estado, alPedirUbicacion };
+  }
 }
 
 type PropsContenido = Props & {

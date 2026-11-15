@@ -1,17 +1,30 @@
+import type { ReactNode } from "react";
 import { estimarCaminataMinutos, formatearDistancia, formatearMinutos } from "@/domain/formato";
 import type { EstadoCaminata } from "../hooks/useCaminata";
 
-export type AccionesCaminata = {
-  estado: EstadoCaminata;
-  alPedir: () => void;
-  alOcultar: () => void;
-};
+/**
+ * Sin ubicación no hay desde dónde trazar el camino, pero la opción no desaparece:
+ * se ofrece compartirla. Desaparecer en silencio era lo que hacía creer que la
+ * función a veces no estaba.
+ */
+export type AccesoCaminata =
+  | {
+      tipo: "con_ubicacion";
+      /** En línea recta desde donde está ahora: se actualiza mientras camina. */
+      distanciaM: number;
+      estado: EstadoCaminata;
+      alPedir: () => void;
+      alOcultar: () => void;
+    }
+  | {
+      tipo: "sin_ubicacion";
+      estado: "sin_pedir" | "pidiendo" | "negada" | "fallida";
+      alPedirUbicacion: () => void;
+    };
 
 type Props = {
-  /** En línea recta; null si esta vez no compartió ubicación. */
-  distanciaM: number | null;
-  /** Null sin ubicación: no hay desde dónde trazar el camino. */
-  caminata: AccionesCaminata | null;
+  /** Null solo si el navegador no tiene geolocalización: no hay nada que ofrecer. */
+  caminata: AccesoCaminata | null;
 };
 
 const SEGUNDOS_POR_MINUTO = 60;
@@ -26,36 +39,83 @@ const ACCION =
  * más próxima fuera de la hoja baja. Con el camino pedido, la línea pasa a
  * decir lo que se camina por la calle.
  */
-export function ComoLlegar({ distanciaM, caminata }: Props) {
-  if (distanciaM === null) {
+export function ComoLlegar({ caminata }: Props) {
+  if (caminata === null) {
     return null;
   }
 
-  if (caminata?.estado.tipo === "lista") {
+  if (caminata.tipo === "sin_ubicacion") {
+    return <SinUbicacion estado={caminata.estado} alPedirUbicacion={caminata.alPedirUbicacion} />;
+  }
+
+  if (caminata.estado.tipo === "lista") {
     return <CaminoListo {...caminata.estado.caminata} alOcultar={caminata.alOcultar} />;
   }
 
-  const cargando = caminata?.estado.tipo === "cargando";
+  const cargando = caminata.estado.tipo === "cargando";
 
   return (
-    <div className="flex flex-col gap-1">
-      {/* Con letra grande el botón baja a su propia línea en vez de partir la distancia. */}
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-3">
-        <span className="text-[0.8125rem] font-semibold text-tinta-suave">
-          A {formatearDistancia(distanciaM)} · {estimarCaminataMinutos(distanciaM)} min a pie
-        </span>
+    <Linea
+      texto={`A ${formatearDistancia(caminata.distanciaM)} · ${estimarCaminataMinutos(caminata.distanciaM)} min a pie`}
+      error={caminata.estado.tipo === "error" ? caminata.estado.mensaje : null}
+    >
+      <button type="button" onClick={caminata.alPedir} disabled={cargando} className={ACCION}>
+        <IconoCaminar />
+        {cargando ? "Buscando…" : "Cómo llegar"}
+      </button>
+    </Linea>
+  );
+}
 
-        {caminata && (
-          <button type="button" onClick={caminata.alPedir} disabled={cargando} className={ACCION}>
-            <IconoCaminar />
-            {cargando ? "Buscando…" : "Cómo llegar"}
-          </button>
-        )}
+/**
+ * Tocar «Cómo llegar» pide la ubicación; cuando llega, la línea pasa a la
+ * distancia con su propio «Cómo llegar». Tras un «no», el navegador ya no vuelve
+ * a preguntar: solo queda decir dónde activarla.
+ */
+function SinUbicacion({
+  estado,
+  alPedirUbicacion,
+}: {
+  estado: "sin_pedir" | "pidiendo" | "negada" | "fallida";
+  alPedirUbicacion: () => void;
+}) {
+  if (estado === "negada") {
+    return (
+      <p className="text-[0.8125rem] font-semibold text-tinta-suave">
+        Para ver cómo llegar a pie, permite la ubicación en tu navegador.
+      </p>
+    );
+  }
+
+  const pidiendo = estado === "pidiendo";
+
+  return (
+    <Linea
+      texto={pidiendo ? "Buscando tu ubicación…" : "Comparte tu ubicación para ver el camino"}
+      error={estado === "fallida" ? "No pudimos ubicarte. Intenta de nuevo." : null}
+    >
+      <button type="button" onClick={alPedirUbicacion} disabled={pidiendo} className={ACCION}>
+        <IconoCaminar />
+        {pidiendo ? "Ubicando…" : "Cómo llegar"}
+      </button>
+    </Linea>
+  );
+}
+
+function Linea({ texto, error, children }: { texto: string; error: string | null; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1">
+      {/* Con letra grande el botón baja a su propia línea en vez de partir el texto. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-3">
+        <span className="text-[0.8125rem] font-semibold text-tinta-suave" role="status">
+          {texto}
+        </span>
+        {children}
       </div>
 
-      {caminata?.estado.tipo === "error" && (
+      {error && (
         <p className="text-[0.8125rem] text-error" role="alert">
-          {caminata.estado.mensaje}
+          {error}
         </p>
       )}
     </div>

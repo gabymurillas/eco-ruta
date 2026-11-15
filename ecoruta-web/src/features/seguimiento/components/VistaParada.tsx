@@ -8,7 +8,7 @@ import type { EstadoLlegadas } from "../hooks/useLlegadas";
 import type { ParadaConRutas, ParadaElegida } from "../types";
 import { AvisoDeParada } from "./AvisoDeParada";
 import { AvisoLimitaciones } from "./AvisoLimitaciones";
-import { ComoLlegar, type AccionesCaminata } from "./ComoLlegar";
+import { ComoLlegar, type AccesoCaminata } from "./ComoLlegar";
 import { ChipsDeRuta } from "./ChipsDeRuta";
 import { useHoja } from "./HojaInferior";
 import { ListaLlegadas } from "./ListaLlegadas";
@@ -25,8 +25,8 @@ type Props = {
   /** Sin cercanas a mano (no compartió ubicación esta vez): abre la búsqueda. */
   alCambiar: () => void;
   alElegir: (parada: ParadaConRutas) => void;
-  /** Sin ubicación no hay desde dónde trazar el camino: llega null. */
-  caminata: AccionesCaminata | null;
+  /** Null solo si el navegador no tiene geolocalización. */
+  caminata: AccesoCaminata | null;
 };
 
 /**
@@ -49,7 +49,7 @@ export function VistaParada(props: Props) {
     <>
       <div className="flex flex-col gap-1">
         <EncabezadoParada parada={parada} alCambiar={cambiar} />
-        <ComoLlegar distanciaM={parada.distanciaM} caminata={props.caminata} />
+        <ComoLlegar caminata={props.caminata} />
       </div>
 
       {parada.rutas.length === 0 ? (
