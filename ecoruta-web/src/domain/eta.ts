@@ -2,7 +2,9 @@
  * Cálculo del tiempo estimado de llegada.
  *
  * Es un estimado, no una predicción: divide la distancia que le falta a la unidad
- * entre una velocidad de referencia. No usa históricos ni modelos.
+ * entre una velocidad de referencia. Esa velocidad sale de la unidad en vivo y,
+ * cuando la ruta tiene viajes suficientes en la franja, de su mediana histórica
+ * (ADR-0011). No hay modelos ni aprendizaje.
  */
 
 /**
@@ -53,4 +55,37 @@ export function calcularVelocidadReferenciaKmh(
 
   const suma = reportadas.reduce((total, velocidad) => total + velocidad, 0);
   return suma / reportadas.length;
+}
+
+/**
+ * Cuánto pesa la velocidad típica de la franja cuando la unidad va andando. Mitad y
+ * mitad: la historia dice cómo suele fluir la ruta a esa hora, la lectura en vivo
+ * cómo va esta unidad hoy, y ninguna de las dos sabe más que la otra.
+ */
+const PESO_HISTORICO = 0.5;
+
+/**
+ * Velocidad con la que se divide la distancia restante (ADR-0011).
+ *
+ * - Sin historial suficiente en la franja: la velocidad en vivo, como siempre.
+ * - Con historial y la unidad andando: mitad historial, mitad en vivo.
+ * - Con historial y la unidad detenida: solo el historial. Parada en un semáforo,
+ *   su velocidad en vivo no dice nada del resto del recorrido; la mediana sí,
+ *   porque ya incluye las paradas.
+ */
+export function elegirVelocidadReferenciaKmh(
+  velocidadesEnVivo: readonly (number | null)[],
+  velocidadHistoricaKmh: number | null,
+): number {
+  const enVivo = calcularVelocidadReferenciaKmh(velocidadesEnVivo);
+
+  if (velocidadHistoricaKmh === null) {
+    return enVivo;
+  }
+
+  const seMueve = enVivo > VELOCIDAD_MINIMA_KMH;
+
+  return seMueve
+    ? PESO_HISTORICO * velocidadHistoricaKmh + (1 - PESO_HISTORICO) * enVivo
+    : velocidadHistoricaKmh;
 }

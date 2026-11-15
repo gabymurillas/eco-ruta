@@ -20,4 +20,6 @@ insert into parametros (clave, valor, descripcion) values
   ('emision_detenido_s',   30,  'Intervalo de emision con vehiculo detenido'),
   ('radio_aproximacion_m', 500, 'Distancia a la parada a la que se avisa que la unidad se acerca'),
   ('distancia_parada_trazado_m', 40, 'Distancia maxima entre una parada y el trazado para que la ruta pase por ella'),
-  ('penalizacion_incidencia_pct', 25, 'Porcentaje que se suma al tiempo estimado mientras la ruta tiene una incidencia activa');
+  ('penalizacion_incidencia_pct', 25, 'Porcentaje que se suma al tiempo estimado mientras la ruta tiene una incidencia activa'),
+  ('eta_historico_min_viajes', 5, 'Viajes de la misma ruta y franja necesarios para usar la velocidad historica en el tiempo estimado'),
+  ('retencion_posiciones_dias', 90, 'Dias que se conservan las posiciones crudas antes de borrarlas');

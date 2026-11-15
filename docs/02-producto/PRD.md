@@ -171,7 +171,7 @@ revoca la sesión del teléfono.
 | CIU-06 | Aviso «se acerca» cuando una unidad entra a `radio_aproximacion_m` (500 m) de mi parada, una sola vez por viaje | P0 | ✅ (falta prueba de punta a punta con un recorrido real) |
 | CIU-07 | Aviso «ya pasó» tras la salida confirmada por histéresis, una sola vez por viaje | P0 | ✅ (ídem) |
 | CIU-08 | Explicar una vez las limitaciones (avisos solo con la página abierta) | P0 | ✅ |
-| CIU-09 | **Tiempo estimado con historial (versión mínima):** usar la velocidad típica de la ruta en esa franja horaria cuando haya suficientes viajes; si no, el cálculo simple. Ver [ADR-0011](../04-arquitectura/adr/0011-eta-estimado-con-historial.md) | P1 | ⬜ |
+| CIU-09 | **Tiempo estimado con historial (versión mínima):** usar la velocidad típica de la ruta en esa franja horaria cuando haya suficientes viajes; si no, el cálculo simple. Ver [ADR-0011](../04-arquitectura/adr/0011-eta-estimado-con-historial.md) | P1 | ✅ (`sql/19`; falta evaluarlo contra el cálculo simple con viajes reales, M2) |
 | CIU-10 | Mostrar el estado «sin señal» de una unidad, atenuada y sin halo | P0 | 🟡 (hecho en la lista y en el mapa: «Sin confirmar», última posición y marcador atenuado sin halo; falta verlo con una unidad real) |
 | CIU-11 | Indicar cuando una incidencia activa afecta el tiempo estimado | P1 | ✅ (margen `penalizacion_incidencia_pct` y aviso en la fila) |
 | CIU-12 | Sin ubicación: mensaje explicativo, sin elección manual | P0 | ✅ |
@@ -204,7 +204,7 @@ revoca la sesión del teléfono.
 | ADM-12 | Desvincular el teléfono sin borrar la unidad ni su historial | P1 | ✅ (`sql/18`; cierra TS-04) |
 | ADM-13 | Editar los parámetros calibrables desde la interfaz | P0 | ✅ |
 | ADM-14 | Históricos: viajes completados, cobertura e incidencias en los últimos 7 o 30 días; viajes por día; resumen por ruta | P1 | ✅ |
-| ADM-15 | Históricos: velocidad típica por ruta y franja (insumo de CIU-09) | P1 | ⬜ |
+| ADM-15 | Históricos: velocidad típica por ruta y franja (insumo de CIU-09) | P1 | ✅ (sección «Velocidad típica por hora» en Históricos) |
 | ADM-16 | Ver el recorrido real de un viaje y sus desvíos sobre el trazado | P2 | ⬜ |
 | ADM-17 | Resolver (cerrar) incidencias | P1 | 🟡 (sección `/admin/incidencias` hecha; falta probarla con un reporte real) |
 | ADM-18 | Equipo: invitar por correo con un rol, listar las cuentas del panel (rol, último ingreso, invitación pendiente), cambiar el rol y quitar el acceso. Solo un admin; nadie se modifica a sí mismo; siempre queda un admin | P1 | 🟡 (`sql/17` aplicada y `gestionar-equipo` desplegada, verificado el 2026-11-15; falta la configuración de Auth ([arquitectura § 7](../04-arquitectura/README.md#7-configurar-supabase-para-el-equipo-del-panel), pasos 3 a 7) y probar una invitación real) |
@@ -232,7 +232,7 @@ revoca la sesión del teléfono.
 | SIS-03 | Tiempo estimado sobre el trazado real (`ST_LineLocatePoint` + `ST_LineSubstring`) | P0 | ✅ |
 | SIS-04 | Todo valor calibrable en `parametros` | P0 | ✅ |
 | SIS-05 | RLS activo en todas las tablas | P0 | ✅ |
-| SIS-06 | Retención: borrar posiciones crudas con más de 90 días, tras agregarlas | P1 | ⬜ (brecha TS-02) |
+| SIS-06 | Retención: borrar posiciones crudas con más de 90 días, tras agregarlas | P1 | ✅ (cierra la brecha TS-02, `sql/19`) |
 | SIS-07 | Simulador de viajes para pruebas sin vehículo | P1 | ✅ |
 | SIS-08 | Prueba de campo de precisión GPS y calibración de parámetros | P0 | ⬜ |
 
@@ -317,7 +317,7 @@ al cálculo simple.
 | D1 | Fecha exacta de la defensa | Autora | Por confirmar |
 | D2 | Continuidad después de la tesis (piloto, réplica o cierre) | Autora y alcaldía | Después de la defensa |
 | D3 | Analítica de adopción: herramienta sin cookies (por ejemplo, Vercel Web Analytics) o ninguna | Autora | H1.5 |
-| D4 | Umbral mínimo de viajes por franja para usar el historial | Autora | H1.4 (como parámetro) |
+| D4 | Umbral mínimo de viajes por franja para usar el historial | Autora | H1.4 (como parámetro). **Resuelta el 2026-11-15:** la franja es hora + tipo de día y el umbral es `eta_historico_min_viajes` = 5 |
 | D5 | Plan de sostenibilidad de costos | Autora | H2 |
 | D6 | Verificar el reglamento de la UNERG sobre titularidad de los trabajos de grado | Autora | Antes de la defensa |
 
@@ -340,6 +340,7 @@ al cálculo simple.
 
 | Versión | Fecha | Cambio |
 |---|---|---|
+| 1.4 | 2026-11-15 | CIU-09, ADM-15 y SIS-06: velocidad por viaje, tiempo estimado con historial y retención de 90 días (`sql/19_velocidad_por_franja_y_retencion.sql`); cierra la brecha TS-02 y resuelve D4 |
 | 1.3 | 2026-11-15 | ADM-12: desvincular el teléfono sin borrar la unidad (`sql/18_desvincular_dispositivo.sql`); cierra la brecha TS-04 |
 | 1.2 | 2026-11-15 | ADM-18 y ADM-19: `sql/17` y `gestionar-equipo` ya están en Supabase; queda la configuración de Auth y probar una invitación real |
 | 1.1 | 2026-11-10 | Roles del panel: se agregan ADM-18 (Equipo) y ADM-19 (rol operador); «roles múltiples» sale de los no-objetivos ([ADR-0015](../04-arquitectura/adr/0015-roles-del-panel-y-equipo.md)) |

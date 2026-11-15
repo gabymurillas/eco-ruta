@@ -16,7 +16,8 @@ export type ClaveParametro =
   | "emision_detenido_s"
   | "sin_senal_umbral_s"
   | "bateria_alerta_pct"
-  | "penalizacion_incidencia_pct";
+  | "penalizacion_incidencia_pct"
+  | "eta_historico_min_viajes";
 
 export type DefinicionParametro = {
   clave: ClaveParametro;
@@ -141,7 +142,20 @@ export const DEFINICIONES: readonly DefinicionParametro[] = [
     explicacion:
       "Cuánto se alarga el tiempo estimado mientras la ruta tiene una incidencia sin resolver. Con 25, un estimado de 8 min pasa a 10 min. En 0 la incidencia se avisa pero no cambia el tiempo.",
   },
+  {
+    clave: "eta_historico_min_viajes",
+    titulo: "Viajes para usar el historial",
+    unidad: "viajes",
+    porDefecto: 5,
+    minimo: 1,
+    maximo: 50,
+    grupo: "tiempo",
+    explicacion:
+      "Viajes terminados de la misma ruta, a la misma hora y en el mismo tipo de día, que hacen falta para que el tiempo estimado use su velocidad típica. Con menos, usa solo la velocidad en vivo. Más alto es más confiable, pero tarda más en empezar a usarse.",
+  },
 ];
+// `retencion_posiciones_dias` vive en la tabla pero no aquí, a propósito: un valor
+// equivocado en esta pantalla borraría posiciones que no se recuperan (sql/19).
 
 function definicionDe(clave: string): DefinicionParametro | undefined {
   return DEFINICIONES.find((definicion) => definicion.clave === clave);

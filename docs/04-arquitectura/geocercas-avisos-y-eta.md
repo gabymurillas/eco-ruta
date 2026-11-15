@@ -76,22 +76,28 @@ tiempo_estimado = distancia_restante_sobre_el_trazado / velocidad_referencia
 - En la interfaz y en la documentación: «tiempo estimado» o «ETA estimado». **Nunca
   «predictivo».**
 
-## 4. Tiempo estimado con historial — versión mínima *(Propuesto, CIU-09)*
+## 4. Tiempo estimado con historial — versión mínima *(CIU-09)*
 
-Decisión de producto del 2026-11-04: entra al alcance de la tesis en su versión mínima. El
-diseño está en [ADR-0011](adr/0011-eta-estimado-con-historial.md). En resumen:
+Decisión de producto del 2026-11-04, implementada el 2026-11-15 (`sql/19`). El diseño está en
+[ADR-0011](adr/0011-eta-estimado-con-historial.md). En resumen:
 
-1. **Agregado.** Por cada viaje finalizado, la velocidad efectiva por tramo se resume en
-   `velocidades_por_franja (ruta_id, tipo_dia, franja, mediana_kmh, viajes)`, con `tipo_dia` ∈
-   {laborable, fin de semana} y una franja de `eta_historico_franja_min` (60 por defecto).
-2. **Uso.** Si la franja actual de la ruta tiene al menos `eta_historico_min_viajes` viajes, la
-   velocidad de referencia es la mediana histórica, ajustada por la velocidad en vivo cuando la
-   unidad se está moviendo. Si no, se usa el cálculo actual (§3).
-3. **Comunicación.** Sigue siendo «tiempo estimado». No cambia el texto de la interfaz.
-4. **Evaluación.** Métrica M2 del PRD: no debe ser peor que el cálculo simple sobre los mismos
-   viajes.
-5. **Datos.** El agregado sobrevive a la retención de 90 días de las posiciones crudas; por eso
-   el agregado corre **antes** del borrado.
+1. **Agregado.** Cada noche, el job `ecoruta-mantenimiento-nocturno` guarda la velocidad efectiva
+   de cada viaje finalizado en `velocidades_de_viaje`: la suma de los tramos entre posiciones
+   usables consecutivas dividida entre la duración (las paradas cuentan). No sirve de muestra
+   (velocidad nula) un viaje con menos de 10 lecturas, menos de 300 s, menos de 500 m o más de
+   90 km/h. La franja es la hora de inicio del viaje (Caracas) y el tipo de día (hábil o fin de
+   semana).
+2. **Mediana al vuelo.** `velocidad_historica_kmh(ruta, momento)` calcula la mediana de la franja
+   y la devuelve solo si hay al menos `eta_historico_min_viajes` viajes (5); si no, nula.
+   `llegadas_a_parada` la entrega en la columna `velocidad_historica_kmh`.
+3. **Velocidad de referencia.** Sin historial: la velocidad en vivo de §3. Con historial y la
+   unidad andando (más de 8 km/h): 50 % mediana y 50 % velocidad en vivo. Con historial y la
+   unidad detenida: solo la mediana.
+4. **Comunicación.** Sigue siendo «tiempo estimado». No cambia el texto de la interfaz.
+5. **Evaluación.** Métrica M2 del PRD: no debe ser peor que el cálculo simple sobre los mismos
+   viajes. Falta contrastarlo con viajes reales.
+6. **Datos.** Los viajes agregados sobreviven a la retención de 90 días de las posiciones crudas
+   (ADR-0013); por eso el agregado corre **antes** del borrado, en el mismo job.
 
 Riesgo declarado: al 2026-11-04 no hay viajes reales. Si la prueba de campo no produce
 suficientes viajes por franja, el sistema cae al cálculo simple y la tesis presenta el mecanismo

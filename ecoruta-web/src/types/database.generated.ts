@@ -426,6 +426,61 @@ export type Database = {
           },
         ]
       }
+      velocidades_de_viaje: {
+        Row: {
+          calculado_at: string
+          distancia_m: number | null
+          duracion_s: number | null
+          hora: number
+          ruta_id: string
+          tipo_dia: string
+          velocidad_kmh: number | null
+          viaje_id: string
+        }
+        Insert: {
+          calculado_at?: string
+          distancia_m?: number | null
+          duracion_s?: number | null
+          hora: number
+          ruta_id: string
+          tipo_dia: string
+          velocidad_kmh?: number | null
+          viaje_id: string
+        }
+        Update: {
+          calculado_at?: string
+          distancia_m?: number | null
+          duracion_s?: number | null
+          hora?: number
+          ruta_id?: string
+          tipo_dia?: string
+          velocidad_kmh?: number | null
+          viaje_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "velocidades_de_viaje_ruta_id_fkey"
+            columns: ["ruta_id"]
+            isOneToOne: false
+            referencedRelation: "paradas_por_ruta"
+            referencedColumns: ["ruta_id"]
+          },
+          {
+            foreignKeyName: "velocidades_de_viaje_ruta_id_fkey"
+            columns: ["ruta_id"]
+            isOneToOne: false
+            referencedRelation: "rutas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "velocidades_de_viaje_viaje_id_fkey"
+            columns: ["viaje_id"]
+            isOneToOne: true
+            referencedRelation: "viajes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       viajes: {
         Row: {
           finalizado_at: string | null
@@ -653,6 +708,7 @@ export type Database = {
             }
             Returns: string
           }
+      agregar_velocidades_de_viajes: { Args: never; Returns: number }
       canjear_codigo_de_vinculacion: {
         Args: { codigo: string }
         Returns: {
@@ -672,6 +728,7 @@ export type Database = {
         }
         Returns: string
       }
+      depurar_posiciones_antiguas: { Args: never; Returns: number }
       desvincular_dispositivo: { Args: { unidad: string }; Returns: undefined }
       disablelongtransactions: { Args: never; Returns: string }
       dropgeometrycolumn:
@@ -853,6 +910,7 @@ export type Database = {
         Args: { coordenadas: Json; puntos: Json; ruta: string }
         Returns: undefined
       }
+      hora_de: { Args: { momento: string }; Returns: number }
       inicio_del_periodo: { Args: { dias: number }; Returns: string }
       llegadas_a_parada: {
         Args: { parada: string }
@@ -871,12 +929,14 @@ export type Database = {
           unidad_lat: number
           unidad_lng: number
           unidad_nombre: string
+          velocidad_historica_kmh: number
           velocidades_kmh: number[]
           viaje_id: string
           ya_paso: boolean
         }[]
       }
       longtransactionsenabled: { Args: never; Returns: boolean }
+      mantenimiento_nocturno: { Args: never; Returns: undefined }
       mover_parada: {
         Args: { lat: number; lng: number; parada: string; radio_m: number }
         Returns: undefined
@@ -1609,6 +1669,7 @@ export type Database = {
         Args: { geom: unknown; move: number; wrap: number }
         Returns: unknown
       }
+      tipo_dia_de: { Args: { momento: string }; Returns: string }
       unidad_del_dispositivo: { Args: never; Returns: string }
       unlockrows: { Args: { "": string }; Returns: number }
       updategeometrysrid: {
@@ -1620,6 +1681,20 @@ export type Database = {
           table_name: string
         }
         Returns: string
+      }
+      velocidad_historica_kmh: {
+        Args: { momento?: string; ruta: string }
+        Returns: number
+      }
+      velocidades_por_franja: {
+        Args: never
+        Returns: {
+          hora: number
+          mediana_kmh: number
+          ruta_id: string
+          tipo_dia: string
+          viajes: number
+        }[]
       }
       viajes_grabados: {
         Args: { ruta: string }

@@ -3,6 +3,7 @@ import { FallaDeCarga } from "@/components/ui/FallaDeCarga";
 import { IndicadorKpi } from "@/components/ui/IndicadorKpi";
 import { formatearMinutos } from "@/domain/formato";
 import {
+  agruparVelocidadesPorRuta,
   apilarPorDia,
   describirRango,
   diasDelPeriodo,
@@ -12,12 +13,15 @@ import {
 } from "@/domain/historicos";
 import { GraficoViajesPorDia, type RutaDelGrafico } from "@/features/historicos/components/GraficoViajesPorDia";
 import { TablaPorRuta } from "@/features/historicos/components/TablaPorRuta";
+import { TablaVelocidadesPorFranja } from "@/features/historicos/components/TablaVelocidadesPorFranja";
 import {
   obtenerResumen,
   obtenerResumenPorRuta,
+  obtenerVelocidadesPorFranja,
   obtenerViajesPorDia,
   type ResumenHistoricos,
 } from "@/services/historicos.service";
+import { obtenerValoresDeParametros } from "@/services/parametros.service";
 
 export const metadata = {
   title: "Históricos · EcoRuta administración",
@@ -27,10 +31,12 @@ export const dynamic = "force-dynamic";
 
 export default async function HistoricosPage({ searchParams }: PageProps<"/admin/historicos">) {
   const periodo = leerPeriodo([(await searchParams).dias].flat()[0]);
-  const [resumen, porDia, porRuta] = await Promise.all([
+  const [resumen, porDia, porRuta, velocidades, parametros] = await Promise.all([
     obtenerResumen(periodo),
     obtenerViajesPorDia(periodo),
     obtenerResumenPorRuta(periodo),
+    obtenerVelocidadesPorFranja(),
+    obtenerValoresDeParametros(),
   ]);
 
   if (!resumen.ok) {
@@ -71,6 +77,18 @@ export default async function HistoricosPage({ searchParams }: PageProps<"/admin
           <NotaCobertura />
         </section>
       </div>
+
+      <section className="flex flex-col gap-3 rounded-2xl border border-borde bg-superficie pt-4">
+        <h2 className="px-4 text-base font-bold">Velocidad típica por hora</h2>
+        {velocidades.ok ? (
+          <TablaVelocidadesPorFranja
+            rutas={agruparVelocidadesPorRuta(velocidades.datos)}
+            minimoDeViajes={parametros.eta_historico_min_viajes}
+          />
+        ) : (
+          <p role="alert" className="px-4 pb-4 text-sm text-error">{velocidades.error}</p>
+        )}
+      </section>
     </div>
   );
 }

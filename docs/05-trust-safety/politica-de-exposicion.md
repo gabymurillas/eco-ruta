@@ -19,6 +19,8 @@
 | Posición en vivo | ✅ **solo durante un viaje activo** | Solo la suya (escritura) | ✅ | ✅ |
 | Recorridos de viajes terminados | ❌ | ❌ | ✅ (90 días) | ✅ (90 días) |
 | Viajes abiertos (en servicio o no) | ✅ | Solo los suyos | ✅ | ✅ |
+| Velocidad típica de la ruta en la franja (`velocidad_historica_kmh`) | ✅ (mediana por ruta y franja; nula sin datos suficientes) | — | ✅ | ✅ |
+| Velocidad de cada viaje (`velocidades_de_viaje`) | ❌ | ❌ | ✅ (lectura) | ✅ (lectura) |
 | Avisos «se acerca» y «ya pasó» | ✅ | — | ✅ | ✅ |
 | Incidencias activas: tipo y ruta | ✅ | Inserta las suyas | ✅; las resuelve | ✅ |
 | Texto libre de incidencias | ❌ (objetivo; hoy ✅, TS-03) | Inserta | ✅ (lectura) | ✅ |
@@ -37,7 +39,7 @@
    función que lo requiera necesita revisión de Trust & Safety y un ADR.
 3. **Sin evaluación de personas.** Los históricos miden rutas y unidades, nunca choferes.
 4. **Retención.** Las posiciones crudas se borran a los 90 días; quedan solo los agregados por
-   ruta y franja, que no permiten reconstruir un recorrido individual.
+   ruta y franja, que no permiten reconstruir un recorrido individual. El job nocturno de `sql/19` lo cumple (brecha TS-02 cerrada).
 5. **Mínimo en tránsito.** La ubicación del ciudadano se usa para buscar paradas y no se guarda.
    Objetivo: redondearla en el cliente antes de enviarla (TS-09).
    - **«Cómo llegar» (CIU-21):** solo cuando el ciudadano lo toca, su posición y la de la parada

@@ -43,6 +43,7 @@ export function evaluarLlegadas(
       distanciaTrazadoM: fila.distancia_trazado_m,
       yaPaso: fila.ya_paso,
       velocidadesKmh: fila.velocidades_kmh ?? [],
+      velocidadHistoricaKmh: fila.velocidad_historica_kmh,
       incidenciaActiva: fila.incidencia_activa,
       penalizacionIncidenciaPct,
     });

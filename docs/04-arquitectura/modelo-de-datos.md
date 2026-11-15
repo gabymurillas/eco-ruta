@@ -4,7 +4,7 @@
 |---|---|
 | Estado | Aprobado |
 | Fuente autoritativa | `sql/01_schema.sql` (este documento la resume; si difieren, gana el SQL) |
-| Última revisión | 2026-11-04 |
+| Última revisión | 2026-11-15 |
 
 ## 1. Entidades
 
@@ -18,6 +18,7 @@ erDiagram
   viajes ||--o{ posiciones : ""
   viajes ||--o{ eventos_geocerca : ""
   viajes ||--o{ avisos_parada : ""
+  viajes ||--o| velocidades_de_viaje : "resume"
   paradas ||--o{ eventos_geocerca : ""
   paradas ||--o{ avisos_parada : ""
 ```
@@ -33,6 +34,7 @@ erDiagram
 | `eventos_geocerca` | Estado interno del algoritmo | `unique (viaje_id, parada_id)`; `entro_at`, `notificado_at` y `salio_at` |
 | `avisos_parada` | Lo que se publica al ciudadano | `tipo ∈ {acercandose, paso}`; `unique (viaje_id, parada_id, tipo)` |
 | `incidencias` | Reportes del chofer | `tipo ∈ {calle_cerrada, falla_mecanica, desvio, congestion, otro}`; `otro` exige descripción |
+| `velocidades_de_viaje` | Una fila por viaje finalizado (`sql/19`) | `viaje_id` (pk), `ruta_id`, `tipo_dia ∈ {habil, fin_de_semana}`, `hora` (0–23, Caracas), `velocidad_kmh` (nula = viaje no apto), `distancia_m`, `duracion_s`. Solo la leen admin y operador |
 | `parametros` | Valores calibrables | `clave`, `valor` y `descripcion` |
 
 ## 2. Invariantes que no se negocian
@@ -64,8 +66,14 @@ erDiagram
 > **Ninguno está calibrado todavía.** Se ajustan tras la prueba de campo (SIS-08) con un
 > `update`, sin tocar código.
 
-Parámetros previstos por el PRD (todavía no existen): `eta_historico_min_viajes`,
-`eta_historico_franja_min` y `retencion_posiciones_dias`.
+Desde `sql/19` existen además:
+
+| Clave | Valor | Uso |
+|---|---|---|
+| `eta_historico_min_viajes` | 5 | Viajes mínimos en la franja para usar el historial en el tiempo estimado. Editable en `/admin/parametros` (1–50) |
+| `retencion_posiciones_dias` | 90 | Días que se conservan las posiciones crudas. Solo en la tabla, no en la pantalla: un error borraría datos; la función aplica un piso de 30 días |
+
+`eta_historico_franja_min` ya no se prevé: la franja es la hora más el tipo de día.
 
 ## 4. Seguridad a nivel de fila
 
@@ -112,7 +120,7 @@ La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 |---|---|---|
 | `paradas_por_ruta` | Vista | Rutas que pasan por cada parada, según el trazado |
 | `paradas_cercanas(lat, lng)` | RPC, invoker | Paradas cerca del ciudadano |
-| `llegadas_a_parada(parada)` | RPC, invoker | Unidades en camino y tiempo estimado |
+| `llegadas_a_parada(parada)` | RPC, invoker | Unidades en camino, tiempo estimado y, desde `sql/19`, `velocidad_historica_kmh` |
 | `rutas_para_mapa`, `paradas_de_ruta`, `paradas_de_la_ciudad` | RPC | Lectura para los mapas |
 | `guardar_trazado_de_ruta`, `crear_parada`, `mover_parada` | RPC | Edición del admin |
 | `resumen_historicos(dias)` | RPC | Históricos del admin. Desde `sql/16`, también `incidencias_activas` |
@@ -121,6 +129,10 @@ La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 | `resumen_por_ruta(dias)` | RPC | Históricos del admin: viajes, duración, cobertura e incidencias (y cuántas siguen activas) por ruta. En `sql/15` |
 | `viajes_grabados`, `recorrido_de_viaje` | RPC | Trazado desde un viaje grabado |
 | `estado_flota` | RPC | Monitoreo |
+| `velocidad_historica_kmh(ruta, momento)` | RPC, **definer**, anon | Mediana de la franja si hay al menos `eta_historico_min_viajes` viajes; si no, nula. Nunca expone viajes individuales (`sql/19`) |
+| `velocidades_por_franja()` | RPC, invoker | Velocidad típica por ruta y franja para Históricos (ADM-15). Solo admin y operador (`sql/19`) |
+| `tipo_dia_de`, `hora_de` | Auxiliares | Franja de un instante en hora de Caracas (`sql/19`) |
+| `agregar_velocidades_de_viajes`, `depurar_posiciones_antiguas`, `mantenimiento_nocturno` | Mantenimiento, sin `execute` para public, anon ni authenticated | Agregan los viajes finalizados y borran las posiciones antiguas; las llama el job pg_cron `ecoruta-mantenimiento-nocturno` (3:30 de Caracas), primero agregar y luego borrar (`sql/19`) |
 | `es_admin`, `es_operador`, `unidad_del_dispositivo` | Auxiliares, invoker | Leen los claims de `app_metadata` para RLS (`sql/03`, `sql/17`) |
 | `incidencias_solo_estado_para_operador` | Disparador | Limita al operador a cambiar el estado de una incidencia (`sql/17`) |
 | `canjear_codigo_de_vinculacion`, `registrar_auth_de_dispositivo`, `registrar_salud_del_dispositivo`, `eliminar_unidad` | RPC, **definer** | Vinculación y ciclo de vida del dispositivo (`sql/06`) |
@@ -132,6 +144,6 @@ La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 `01_schema` → `02_parametros` → `03_rls` → `04_funciones` → `06_vinculacion` → `07_geocercas`
 → `08_incidencia_otro` → `09_avisos_parada` → `10_paradas_de_ciudad` → `11_trazado_asistido` →
 `12_realtime_monitoreo` → `13_exposicion_solo_en_servicio` → `14_tiempo_estimado` →
-`15_historicos_por_ruta` → `16_historicos_periodo_y_cobertura` → `17_roles_del_panel` → `18_desvincular_dispositivo`.
+`15_historicos_por_ruta` → `16_historicos_periodo_y_cobertura` → `17_roles_del_panel` → `18_desvincular_dispositivo` → `19_velocidad_por_franja_y_retencion`.
 `05_consultas_historicos` es documentación. Se aplican a mano en
 Supabase.

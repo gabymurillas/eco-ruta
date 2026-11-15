@@ -40,6 +40,7 @@ flowchart LR
 | Edge Function `vincular-dispositivo` | Deno/TypeScript, `verify_jwt=false` | Canje del código; graba `app_metadata.unidad_id` | `supabase/functions/` |
 | Edge Function `registrar-posicion` | Deno/TypeScript, `verify_jwt=true` | Recibe la telemetría y evalúa geocercas y avisos de forma síncrona | `supabase/functions/` |
 | Edge Function `gestionar-equipo` | Deno/TypeScript, `verify_jwt=true`; exige rol admin | Lista, invita, cambia el rol y quita el acceso de las cuentas del panel ([ADR-0015](adr/0015-roles-del-panel-y-equipo.md)) | `supabase/functions/` |
+| Mantenimiento nocturno | pg_cron (job `ecoruta-mantenimiento-nocturno`, 3:30 de Caracas) | Agrega la velocidad de los viajes finalizados y luego borra las posiciones con más de 90 días | `sql/19_velocidad_por_franja_y_retencion.sql` |
 | Realtime | Supabase Realtime | Difunde posiciones, viajes, incidencias y avisos | `sql/12_realtime_monitoreo.sql` |
 | Hospedaje web | Vercel (equipo eva-projecs, proyecto eco-ruta) | Despliegue de `master` | — |
 
@@ -155,7 +156,7 @@ Solo `services/` importa Supabase. Las reglas completas y los límites de tamañ
 | Entorno | Dónde | Notas |
 |---|---|---|
 | Producción web | `eco-ruta-nine.vercel.app` | Push a `master`; `autoAssignCustomDomains` debe estar encendido |
-| Backend | Supabase `yumfwnqvmcitjnskazgx` | Las migraciones de `sql/` se aplican a mano (SQL Editor o CLI) |
+| Backend | Supabase `yumfwnqvmcitjnskazgx` | Las migraciones de `sql/` se aplican a mano (SQL Editor o CLI). `sql/19` programa el job pg_cron de mantenimiento nocturno |
 | Edge Functions | `npx supabase functions deploy <f> --remote=yumfwnqvmcitjnskazgx --use-api --yes` | `vincular-dispositivo`, `registrar-posicion`, `gestionar-equipo` |
 | Pruebas de SQL | Clúster desechable de Postgres 17 + PostGIS | Ver la guía del repositorio |
 | Supabase Auth | *Authentication → URL Configuration → Redirect URLs* | Debe incluir `https://eco-ruta-nine.vercel.app/admin/auth/confirmar` (y la de `localhost`). Si falta, Supabase manda el enlace de recuperación a la *Site URL* sin avisar y nadie lo canjea |

@@ -8,12 +8,16 @@ type FilaLlegada =
 /**
  * El generador declara obligatorias todas las columnas de una función. Estas llegan
  * nulas sin posición, sin trazado o con la parada ya atrás, y una lectura sin
- * velocidad es null dentro del arreglo: se corrigen para que el compilador obligue
- * a tratarlo.
+ * velocidad es null dentro del arreglo; la velocidad histórica, sin viajes
+ * suficientes en la franja. Se corrigen para que el compilador obligue a tratarlo.
  */
-export type LlegadaRow = Omit<FilaLlegada, "distancia_trazado_m" | "velocidades_kmh"> & {
+export type LlegadaRow = Omit<
+  FilaLlegada,
+  "distancia_trazado_m" | "velocidades_kmh" | "velocidad_historica_kmh"
+> & {
   distancia_trazado_m: number | null;
   velocidades_kmh: (number | null)[] | null;
+  velocidad_historica_kmh: number | null;
 };
 
 /**

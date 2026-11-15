@@ -38,7 +38,7 @@
 | Ubicación del ciudadano | Latitud y longitud aproximadas del navegador | Permiso explícito del navegador | Consentimiento; buscar paradas cercanas | **No se almacena** en la base. Puede figurar de forma transitoria en los registros técnicos del proveedor (Supabase). (Pendiente: se redondeará a unos 100 m antes de enviarse) |
 | Preferencias | Parada elegida; si ya viste el aviso de limitaciones | El ciudadano | Funcionamiento | Solo en `localStorage` del navegador; nunca se envía |
 | Datos técnicos | IP, agente de usuario | Conexión | Funcionamiento y seguridad de la plataforma | Según los proveedores (Vercel, Supabase, OSM) |
-| Telemetría de unidades | Posición, velocidad, exactitud y hora de los vehículos | Teléfono de la unidad | Interés público del servicio; seguimiento y tiempo estimado | 90 días en crudo (pendiente: job de borrado); los agregados por ruta y franja se conservan indefinidamente |
+| Telemetría de unidades | Posición, velocidad, exactitud y hora de los vehículos | Teléfono de la unidad | Interés público del servicio; seguimiento y tiempo estimado | 90 días en crudo (borrado nocturno, `sql/19`); los agregados por ruta y franja se conservan indefinidamente |
 | Salud del dispositivo | Batería y última señal | Teléfono de la unidad | Operación | Mientras exista la unidad |
 | Incidencias | Tipo, ruta, ubicación y texto libre opcional | Chofer | Operación y aviso al público | Mientras exista la ruta |
 | Cuenta del admin | Correo y credenciales | Ente gestor | Acceso al panel | Mientras tenga acceso |

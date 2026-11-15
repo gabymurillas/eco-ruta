@@ -1,3 +1,4 @@
+import type { TipoDia, VelocidadDeFranja } from "@/domain/historicos";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 import { exito, fallo, falloRegistrado, type Resultado } from "./resultado";
@@ -48,4 +49,47 @@ export async function obtenerResumenPorRuta(
   }
 
   return exito(data ?? []);
+}
+
+/**
+ * La mediana de velocidad de cada ruta por hora y tipo de día, con todo el
+ * historial (no depende del período de la pantalla).
+ *
+ * El nombre y el color se leen de `rutas` y no de `resumen_por_ruta`: una ruta
+ * desactivada y sin viajes en el período no aparece allí, pero su historial sí.
+ */
+export async function obtenerVelocidadesPorFranja(): Promise<Resultado<VelocidadDeFranja[]>> {
+  const supabase = await crearClienteServidor();
+  const [velocidades, rutas] = await Promise.all([
+    supabase.rpc("velocidades_por_franja"),
+    supabase.from("rutas").select("id, nombre, color"),
+  ]);
+
+  if (velocidades.error || rutas.error) {
+    return falloRegistrado(
+      "velocidades_por_franja",
+      velocidades.error ?? rutas.error,
+      "No se pudo calcular la velocidad típica por hora.",
+    );
+  }
+
+  const rutaPorId = new Map(rutas.data.map((ruta) => [ruta.id, ruta]));
+
+  return exito(
+    (velocidades.data ?? []).flatMap((fila) => {
+      const ruta = rutaPorId.get(fila.ruta_id);
+      if (!ruta) return [];
+
+      return [{
+        rutaId: fila.ruta_id,
+        rutaNombre: ruta.nombre,
+        rutaColor: ruta.color,
+        // La base lo restringe con un check: solo puede ser uno de los dos.
+        tipoDia: fila.tipo_dia as TipoDia,
+        hora: fila.hora,
+        medianaKmh: Number(fila.mediana_kmh),
+        viajes: fila.viajes,
+      }];
+    }),
+  );
 }

@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | Aceptado (implementación pendiente: brecha TS-02) |
+| Estado | Aceptado (implementado en `sql/19`; cierra la brecha TS-02) |
 | Registrado | 2026-11-04 |
 | Responsable | Gabrieli Murillas Ramírez |
 
@@ -13,6 +13,8 @@
 ## Decisión
 
 Las posiciones crudas con más de `retencion_posiciones_dias` (90) se borran con un job programado (pg_cron), **después** de alimentar los agregados (ADR-0011) e históricos. Los agregados se conservan indefinidamente.
+
+Implementación (`sql/19_velocidad_por_franja_y_retencion.sql`): el job `ecoruta-mantenimiento-nocturno` de pg_cron corre a las 3:30 de Caracas (07:30 UTC) y ejecuta primero `agregar_velocidades_de_viajes()` y luego `depurar_posiciones_antiguas()`. Solo se borran posiciones sin viaje o cuyo viaje ya tiene su fila en `velocidades_de_viaje`; las de un viaje abierto se quedan. `retencion_posiciones_dias` vive solo en la tabla, no en `/admin/parametros`, porque un error borraría datos; además la función aplica un piso de 30 días.
 
 ## Consecuencias
 

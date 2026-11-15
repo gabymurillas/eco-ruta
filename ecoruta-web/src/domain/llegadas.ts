@@ -1,4 +1,4 @@
-import { calcularEtaEstimadoMinutos, calcularVelocidadReferenciaKmh } from "./eta";
+import { calcularEtaEstimadoMinutos, elegirVelocidadReferenciaKmh } from "./eta";
 
 /**
  * Estado de una llegada desde el punto de vista del ciudadano que espera.
@@ -61,6 +61,8 @@ export type EntradaTiempoLlegada = {
   distanciaTrazadoM: number | null;
   yaPaso: boolean;
   velocidadesKmh: readonly (number | null)[];
+  /** Mediana de la ruta en la franja de ahora; nula sin viajes suficientes. */
+  velocidadHistoricaKmh: number | null;
   incidenciaActiva: boolean;
   /** Cuánto alarga el tiempo una incidencia activa, en porcentaje (25 → ×1,25). */
   penalizacionIncidenciaPct: number;
@@ -95,7 +97,10 @@ export function estimarLlegada(entrada: EntradaTiempoLlegada): TiempoLlegada {
     tipo: "minutos",
     minutos: calcularEtaEstimadoMinutos({
       distanciaRestanteM: entrada.distanciaTrazadoM,
-      velocidadPromedioKmh: calcularVelocidadReferenciaKmh(entrada.velocidadesKmh),
+      velocidadPromedioKmh: elegirVelocidadReferenciaKmh(
+        entrada.velocidadesKmh,
+        entrada.velocidadHistoricaKmh,
+      ),
       penalizacionIncidencia: penalizacion,
     }),
     conIncidencia: entrada.incidenciaActiva,

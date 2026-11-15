@@ -95,3 +95,78 @@ export function etiquetaNumeroDia(dia: string): string {
 function limpiar(texto: string): string {
   return texto.replace(/\./g, "");
 }
+
+// ── Velocidad típica por hora (ADM-15) ──
+
+export type TipoDia = "habil" | "fin_de_semana";
+
+export type VelocidadDeFranja = {
+  rutaId: string;
+  rutaNombre: string;
+  rutaColor: string;
+  tipoDia: TipoDia;
+  /** Hora de Caracas en que empezaron los viajes, de 0 a 23. */
+  hora: number;
+  medianaKmh: number;
+  viajes: number;
+};
+
+export type MedicionDeFranja = { medianaKmh: number; viajes: number };
+
+/** Una hora de la ruta: hábil y fin de semana lado a lado, porque así se comparan. */
+export type FranjaDeRuta = {
+  hora: number;
+  habil: MedicionDeFranja | null;
+  finDeSemana: MedicionDeFranja | null;
+};
+
+export type VelocidadesDeRuta = {
+  rutaId: string;
+  nombre: string;
+  color: string;
+  franjas: FranjaDeRuta[];
+};
+
+/** Rutas por nombre y, dentro de cada una, franjas por hora. */
+export function agruparVelocidadesPorRuta(filas: readonly VelocidadDeFranja[]): VelocidadesDeRuta[] {
+  const rutas = new Map<string, VelocidadesDeRuta>();
+
+  for (const fila of filas) {
+    const ruta = rutas.get(fila.rutaId) ?? { rutaId: fila.rutaId, nombre: fila.rutaNombre, color: fila.rutaColor, franjas: [] };
+    rutas.set(fila.rutaId, ruta);
+
+    const franja = franjaDeHora(ruta.franjas, fila.hora);
+    const medicion = { medianaKmh: fila.medianaKmh, viajes: fila.viajes };
+    if (fila.tipoDia === "habil") {
+      franja.habil = medicion;
+    } else {
+      franja.finDeSemana = medicion;
+    }
+  }
+
+  return [...rutas.values()]
+    .map((ruta) => ({ ...ruta, franjas: [...ruta.franjas].sort((a, b) => a.hora - b.hora) }))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+}
+
+function franjaDeHora(franjas: FranjaDeRuta[], hora: number): FranjaDeRuta {
+  const existente = franjas.find((franja) => franja.hora === hora);
+
+  if (existente) {
+    return existente;
+  }
+
+  const nueva: FranjaDeRuta = { hora, habil: null, finDeSemana: null };
+  franjas.push(nueva);
+  return nueva;
+}
+
+/** «7:00–8:00»; la última hora del día cierra en «24:00». */
+export function etiquetaFranja(hora: number): string {
+  return `${hora}:00–${hora + 1}:00`;
+}
+
+/** El tiempo estimado del ciudadano solo confía en una franja con viajes suficientes. */
+export function franjaEnUso(viajes: number, minimoDeViajes: number): boolean {
+  return viajes >= minimoDeViajes;
+}
