@@ -707,6 +707,7 @@ export type Database = {
       enablelongtransactions: { Args: never; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       es_admin: { Args: never; Returns: boolean }
+      es_operador: { Args: never; Returns: boolean }
       estado_de_geocercas: {
         Args: {
           lat: number
