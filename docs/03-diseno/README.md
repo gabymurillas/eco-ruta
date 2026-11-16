@@ -50,8 +50,8 @@ se regenera el archivo complementario con `/impeccable document`.
 | Ciudadano | Sin unidades | `usuario/SinUnidades` | 🟡 |
 | Ciudadano | Señal perdida | `usuario/SenalPerdida` | 🟡 |
 | Ciudadano | Escritorio | `usuario/Escritorio` | 🟡 |
-| Ciudadano | Detalle de ruta | `usuario/RutaDetalle` | ⬜ (CIU-16) |
-| Ciudadano | Portada | — | ⬜ (CIU-15) |
+| Ciudadano | Detalle de ruta | `usuario/RutaDetalle` | 🟡 (CIU-16: sin «Avisarme al acercarse» ni el tramo recorrido en gris) |
+| Ciudadano | Portada | — | ✅ (CIU-15, `/conoce`) |
 | Admin | Ingreso | `admin/Ingreso` | ✅ |
 | Admin | Monitoreo | `admin/Main` | ✅ |
 | Admin | Editar ruta | `admin/RutaEditar` | ✅ |

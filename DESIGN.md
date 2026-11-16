@@ -257,7 +257,8 @@ Ajustes de la auditoría del 2026-11-12 (`.impeccable/audit/ciudadano-2026-11-12
   se aclara como el resto. El admin es escritorio: barra de navegación más mapa de flota con columna de tarjetas.
 El espaciado va en múltiplos de 4 px (4, 8, 12, 16, 20, 24). Los puntos de quiebre son los de
 Tailwind (sm 640 px, md 768 px, lg 1024 px). La foto de los Morros solo aparece en el panel
-derecho del ingreso del admin a partir de escritorio.
+derecho del ingreso del admin a partir de escritorio y en el hero de la portada (`/conoce`),
+al lado del texto en escritorio y encima de él en el teléfono.
 
 ## Elevation & Depth
 
@@ -307,7 +308,9 @@ círculos con un aro crema de 3 px.
 
 ### Navigation
 Admin: menú superior con acentos terracota en el ítem activo. Ciudadano: sin menú; un solo flujo
-(mi parada).
+(mi parada). Dos salidas puntuales, sin convertirse en menú: el ícono de información de la
+cabecera lleva a la portada (`/conoce`) y «Ver recorrido», junto a cada chip de ruta, al
+detalle de esa ruta (`/ruta/[id]`). Las dos vuelven a mi parada con «Ver mi parada».
 
 ### Marcador de unidad (signature)
 Círculo de 40 px en el color de su ruta, con el ícono del servicio (bus, camión, cisterna, van o

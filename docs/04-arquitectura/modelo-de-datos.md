@@ -121,6 +121,7 @@ La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 | `paradas_por_ruta` | Vista | Rutas que pasan por cada parada, según el trazado |
 | `paradas_cercanas(lat, lng)` | RPC, invoker | Paradas cerca del ciudadano |
 | `llegadas_a_parada(parada)` | RPC, invoker | Unidades en camino, tiempo estimado y, desde `sql/19`, `velocidad_historica_kmh` |
+| `llegadas_de_ruta(ruta)` | RPC, invoker | Detalle de ruta (CIU-16): las paradas de la ruta en orden (`avance`) y, por cada una, lo que `llegadas_a_parada` da para esa ruta; una parada sin unidades sale con la unidad nula (`sql/20`) |
 | `rutas_para_mapa`, `paradas_de_ruta`, `paradas_de_la_ciudad` | RPC | Lectura para los mapas |
 | `guardar_trazado_de_ruta`, `crear_parada`, `mover_parada` | RPC | Edición del admin |
 | `resumen_historicos(dias)` | RPC | Históricos del admin. Desde `sql/16`, también `incidencias_activas` |
@@ -144,6 +145,6 @@ La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 `01_schema` → `02_parametros` → `03_rls` → `04_funciones` → `06_vinculacion` → `07_geocercas`
 → `08_incidencia_otro` → `09_avisos_parada` → `10_paradas_de_ciudad` → `11_trazado_asistido` →
 `12_realtime_monitoreo` → `13_exposicion_solo_en_servicio` → `14_tiempo_estimado` →
-`15_historicos_por_ruta` → `16_historicos_periodo_y_cobertura` → `17_roles_del_panel` → `18_desvincular_dispositivo` → `19_velocidad_por_franja_y_retencion`.
+`15_historicos_por_ruta` → `16_historicos_periodo_y_cobertura` → `17_roles_del_panel` → `18_desvincular_dispositivo` → `19_velocidad_por_franja_y_retencion` → `20_detalle_de_ruta`.
 `05_consultas_historicos` es documentación. Se aplican a mano en
 Supabase.

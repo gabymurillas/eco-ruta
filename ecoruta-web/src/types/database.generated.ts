@@ -935,6 +935,27 @@ export type Database = {
           ya_paso: boolean
         }[]
       }
+      llegadas_de_ruta: {
+        Args: { ruta: string }
+        Returns: {
+          avance: number
+          distancia_trazado_m: number
+          incidencia_activa: boolean
+          parada_id: string
+          parada_lat: number
+          parada_lng: number
+          parada_nombre: string
+          segundos_sin_senal: number
+          unidad_id: string
+          unidad_lat: number
+          unidad_lng: number
+          unidad_nombre: string
+          velocidad_historica_kmh: number
+          velocidades_kmh: number[]
+          viaje_id: string
+          ya_paso: boolean
+        }[]
+      }
       longtransactionsenabled: { Args: never; Returns: boolean }
       mantenimiento_nocturno: { Args: never; Returns: undefined }
       mover_parada: {

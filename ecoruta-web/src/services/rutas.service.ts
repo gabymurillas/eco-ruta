@@ -115,6 +115,43 @@ export async function actualizarRuta(
 // bundle del navegador y el build fallaría. Por lo mismo, las paradas del admin
 // están en `catalogo-paradas.service.ts`.
 
+const FORMATO_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export type RutaPublica = {
+  id: string;
+  nombre: string;
+  tipo: string | null;
+  icono: string | null;
+  color: string;
+  horario: string | null;
+};
+
+/**
+ * La cabecera del detalle de ruta del ciudadano (CIU-16). Null si no existe o está
+ * inactiva: la lectura pública de `rutas` ya filtra por `activa`, así que una ruta
+ * que el admin apagó responde igual que una inexistente.
+ */
+export async function obtenerRutaPublica(id: string): Promise<Resultado<RutaPublica | null>> {
+  // Un enlace mal copiado no es una falla de la base: es una ruta que no existe.
+  if (!FORMATO_UUID.test(id)) {
+    return exito(null);
+  }
+
+  const supabase = await crearClienteServidor();
+  const { data, error } = await supabase
+    .from("rutas")
+    .select("id, nombre, tipo, icono, color, horario")
+    .eq("id", id)
+    .eq("activa", true)
+    .maybeSingle();
+
+  if (error) {
+    return fallo("No se pudo cargar la ruta.");
+  }
+
+  return exito(data);
+}
+
 export type RutaDeMapa =
   Database["public"]["Functions"]["rutas_para_mapa"]["Returns"][number];
 

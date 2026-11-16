@@ -160,7 +160,8 @@ function Llegada({ llegada, grande = false }: { llegada: LlegadaEvaluada; grande
 
 const MINUTOS_POR_HORA = 60;
 
-function TiempoEstimado({
+/** También la usa el detalle de ruta: los dos dicen el tiempo con las mismas palabras. */
+export function TiempoEstimado({
   estado,
   tiempo,
   grande,

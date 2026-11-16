@@ -21,6 +21,7 @@
 | Viajes abiertos (en servicio o no) | ✅ | Solo los suyos | ✅ | ✅ |
 | Velocidad típica de la ruta en la franja (`velocidad_historica_kmh`) | ✅ (mediana por ruta y franja; nula sin datos suficientes) | — | ✅ | ✅ |
 | Velocidad de cada viaje (`velocidades_de_viaje`) | ❌ | ❌ | ✅ (lectura) | ✅ (lectura) |
+| Recorrido de una ruta con la próxima unidad por parada (`llegadas_de_ruta`, CIU-16) | ✅ (es `llegadas_a_parada` parada por parada: ningún dato nuevo) | — | ✅ | ✅ |
 | Avisos «se acerca» y «ya pasó» | ✅ | — | ✅ | ✅ |
 | Incidencias activas: tipo y ruta | ✅ | Inserta las suyas | ✅; las resuelve | ✅ |
 | Texto libre de incidencias | ❌ (objetivo; hoy ✅, TS-03) | Inserta | ✅ (lectura) | ✅ |

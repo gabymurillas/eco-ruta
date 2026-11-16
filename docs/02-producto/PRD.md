@@ -177,8 +177,8 @@ revoca la sesión del teléfono.
 | CIU-12 | Sin ubicación: mensaje explicativo, sin elección manual | P0 | ✅ |
 | CIU-13 | Sin paradas a 1,5 km: mostrar la más cercana y su distancia | P1 | ✅ |
 | CIU-14 | Estado vacío: no hay unidades en servicio en mi parada | P0 | 🟡 (hecho: mensaje y horario de cada ruta de la parada; «última unidad vista» de la maqueta queda fuera por TS-01, el público no lee viajes cerrados; falta verlo con una parada con rutas) |
-| CIU-15 | **Portada (landing)** con la foto de los Morros: qué es, cómo funciona y botón para ver mi parada | P1 | ⬜ |
-| CIU-16 | **Detalle de ruta** `/ruta/[id]`: trazado, paradas, unidades en vivo y horario | P1 | ⬜ (maqueta `RutaDetalle`) |
+| CIU-15 | **Portada (landing)** con la foto de los Morros: qué es, cómo funciona y botón para ver mi parada | P1 | ✅ (`/conoce`; la dirección principal sigue abriendo el mapa, decisión de la autora del 2026-11-15) |
+| CIU-16 | **Detalle de ruta** `/ruta/[id]`: trazado, paradas, unidades en vivo y horario | P1 | ✅ (`sql/20`, `llegadas_de_ruta`; se entra con «Ver recorrido» en cada chip de ruta. Sin avisos propios: siguen siendo de mi parada. Falta verlo con unidades reales) |
 | CIU-17 | Vista previa al compartir (Open Graph) | P2 | ✅ |
 | CIU-18 | Mostrar al público solo unidades en viaje activo; sin recorridos pasados | P0 | ✅ (cierra TS-01; `sql/13`) |
 | CIU-19 | Botón «Ir a mi ubicación» sobre el mapa; el punto azul sigue al ciudadano mientras camina (solo en el navegador, la posición no se envía) | P1 | ✅ |
@@ -340,6 +340,7 @@ al cálculo simple.
 
 | Versión | Fecha | Cambio |
 |---|---|---|
+| 1.5 | 2026-11-15 | CIU-15 y CIU-16: portada en `/conoce` y detalle de ruta en `/ruta/[id]` (`sql/20`) |
 | 1.4 | 2026-11-15 | CIU-09, ADM-15 y SIS-06: velocidad por viaje, tiempo estimado con historial y retención de 90 días (`sql/19_velocidad_por_franja_y_retencion.sql`); cierra la brecha TS-02 y resuelve D4 |
 | 1.3 | 2026-11-15 | ADM-12: desvincular el teléfono sin borrar la unidad (`sql/18_desvincular_dispositivo.sql`); cierra la brecha TS-04 |
 | 1.2 | 2026-11-15 | ADM-18 y ADM-19: `sql/17` y `gestionar-equipo` ya están en Supabase; queda la configuración de Auth y probar una invitación real |

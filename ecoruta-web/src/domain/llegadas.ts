@@ -107,6 +107,33 @@ export function estimarLlegada(entrada: EntradaTiempoLlegada): TiempoLlegada {
   };
 }
 
+/**
+ * Orden de lectura de las llegadas: primero lo que tiene un tiempo, del más
+ * cercano al más lejano; después lo que viene sin cifra, lo que no se puede
+ * confirmar, lo que ya pasó y lo que no está en recorrido. Lo usan «mi parada»
+ * y el detalle de ruta, que deben elegir la misma «próxima» unidad.
+ */
+const RANGO_SIN_CIFRA = 10_000;
+const RANGO_SIN_SENAL = 20_000;
+const RANGO_YA_PASO = 30_000;
+const RANGO_SIN_RECORRIDO = 40_000;
+
+export function rangoDeLlegada(estado: EstadoLlegada, tiempo: TiempoLlegada): number {
+  if (estado.tipo === "sin_recorrido") {
+    return RANGO_SIN_RECORRIDO;
+  }
+
+  if (estado.tipo === "senal_perdida") {
+    return RANGO_SIN_SENAL;
+  }
+
+  if (tiempo.tipo === "ya_paso") {
+    return RANGO_YA_PASO;
+  }
+
+  return tiempo.tipo === "minutos" ? tiempo.minutos : RANGO_SIN_CIFRA;
+}
+
 /** "hace 4 min". Devuelve null cuando nunca hubo señal. */
 export function describirAntiguedad(segundos: number | null): string | null {
   if (segundos === null) {

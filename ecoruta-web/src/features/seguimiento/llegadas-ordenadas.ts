@@ -1,6 +1,7 @@
 import {
   estimarLlegada,
   evaluarLlegada,
+  rangoDeLlegada,
   type EstadoLlegada,
   type TiempoLlegada,
 } from "@/domain/llegadas";
@@ -17,16 +18,7 @@ export type LlegadaEvaluada = {
   tiempo: TiempoLlegada;
 };
 
-/**
- * Orden de lectura de las llegadas: primero lo que tiene un tiempo, del más
- * cercano al más lejano; después lo que viene sin cifra, lo que no se puede
- * confirmar y lo que ya pasó. La primera es la que se muestra en grande.
- */
-const RANGO_SIN_CIFRA = 10_000;
-const RANGO_SIN_SENAL = 20_000;
-const RANGO_YA_PASO = 30_000;
-const RANGO_SIN_RECORRIDO = 40_000;
-
+/** Las llegadas en orden de lectura (ver `rangoDeLlegada`). La primera se muestra en grande. */
 export function evaluarLlegadas(
   filas: readonly LlegadaRow[],
   { umbralSinSenalS, penalizacionIncidenciaPct }: AjustesDeLlegada,
@@ -51,21 +43,5 @@ export function evaluarLlegadas(
     return { fila, estado, tiempo };
   });
 
-  return evaluadas.sort((a, b) => rango(a) - rango(b));
-}
-
-function rango({ estado, tiempo }: LlegadaEvaluada): number {
-  if (estado.tipo === "sin_recorrido") {
-    return RANGO_SIN_RECORRIDO;
-  }
-
-  if (estado.tipo === "senal_perdida") {
-    return RANGO_SIN_SENAL;
-  }
-
-  if (tiempo.tipo === "ya_paso") {
-    return RANGO_YA_PASO;
-  }
-
-  return tiempo.tipo === "minutos" ? tiempo.minutos : RANGO_SIN_CIFRA;
+  return evaluadas.sort((a, b) => rangoDeLlegada(a.estado, a.tiempo) - rangoDeLlegada(b.estado, b.tiempo));
 }
