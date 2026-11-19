@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Estándar · Monitoreo</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--suelo:#F8FAFC;--sup:#FFFFFF;--linea:#E2E8F0;--tinta:#0F172A;--media:#475569;--acento:#2563EB;--teal:#2E8B8B;--mostaza:#C9A227;--ciruela:#8E3B6E;--ok:#16A34A;--alerta:#C2410C}
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:var(--suelo);color:var(--tinta);font:14px/1.45 Manrope,sans-serif;display:flex;font-variant-numeric:tabular-nums}
+nav{width:240px;background:var(--sup);border-right:1px solid var(--linea);padding:20px 12px;display:flex;flex-direction:column;gap:2px}
+.marca{font-weight:700;font-size:18px;padding:0 12px 20px;display:flex;gap:10px;align-items:center}.marca i{width:28px;height:28px;border-radius:8px;background:var(--acento)}
+nav a{padding:10px 12px;border-radius:8px;color:var(--media);font-weight:600;display:flex;gap:10px;align-items:center}
+nav a.on{background:#EFF6FF;color:var(--acento)}
+nav svg{width:18px;height:18px}
+.main{flex:1;padding:24px 28px;display:flex;flex-direction:column;gap:18px}
+.cab{display:flex;align-items:center}.cab h1{font-size:22px;font-weight:700}
+.cab .vivo{margin-left:auto;color:var(--media);display:flex;gap:8px;align-items:center}.pt{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpi{background:var(--sup);border:1px solid var(--linea);border-radius:12px;padding:14px 16px}
+.kpi span{color:var(--media);font-size:13px;font-weight:600}.kpi b{display:block;font-size:26px;font-weight:700;margin-top:4px}
+.kpi.al{border-color:#FED7AA;background:#FFF7ED}.kpi.al b{color:var(--alerta)}
+.trabajo{flex:1;display:grid;grid-template-columns:1fr 420px;gap:18px;min-height:0}
+.mapa{position:relative;background:#EEF2F6;border:1px solid var(--linea);border-radius:12px;overflow:hidden}
+.mapa svg{position:absolute;inset:0}
+.panel{background:var(--sup);border:1px solid var(--linea);border-radius:12px;overflow:hidden}
+.panel h2{font-size:15px;padding:14px 16px;border-bottom:1px solid var(--linea)}
+table{width:100%;border-collapse:collapse}
+td{padding:11px 16px;border-bottom:1px solid var(--linea)}td.r{text-align:right;color:var(--media)}
+.ru{display:flex;gap:8px;align-items:center}.ru i{width:9px;height:9px;border-radius:50%}
+.badge{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:#DCFCE7;color:#166534}
+.badge.m{background:#FFEDD5;color:#9A3412}.badge.o{background:#F1F5F9;color:var(--media)}
+</style></head><body>
+<nav><div class="marca"><i></i>EcoRuta</div>
+  <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Monitoreo</a>
+  <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8 17c6-1 2-9 8-10"/></svg>Rutas</a>
+  <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11z"/></svg>Paradas</a>
+  <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="13" rx="3"/></svg>Unidades</a>
+  <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7"/></svg>Históricos</a>
+  <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/></svg>Parámetros</a></nav>
+<div class="main">
+  <div class="cab"><h1>Monitoreo</h1><span class="vivo"><span class="pt"></span>En vivo · hace 3 s</span></div>
+  <div class="kpis"><div class="kpi"><span>Flota</span><b>6</b></div><div class="kpi"><span>En servicio</span><b>4</b></div><div class="kpi al"><span>Incidencias activas</span><b>1</b></div><div class="kpi al"><span>Alertas de equipo</span><b>1</b></div></div>
+  <div class="trabajo">
+    <div class="mapa"><svg width="740" height="640" viewBox="0 0 740 640" fill="none">
+      <g stroke="#fff" stroke-width="9"><path d="M-20 180 L760 220"/><path d="M-20 450 L760 420"/><path d="M200 -20 L240 660"/><path d="M500 -20 L460 660"/></g>
+      <path d="M100 520 L240 450 L460 430 L500 320 L700 260" stroke="#2E8B8B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M200 90 L240 220 L340 320 L460 420 L500 600" stroke="#8E3B6E" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <g stroke="#fff" stroke-width="3"><circle cx="480" cy="370" r="10" fill="#2E8B8B"/><circle cx="660" cy="270" r="10" fill="#2E8B8B"/><circle cx="300" cy="280" r="10" fill="#8E3B6E"/></g>
+    </svg></div>
+    <div class="panel"><h2>Unidades</h2><table>
+      <tr><td><div class="ru"><i style="background:var(--teal)"></i>Unidad 12</div></td><td><span class="badge">En servicio</span></td><td class="r">32 km/h</td></tr>
+      <tr><td><div class="ru"><i style="background:var(--teal)"></i>Unidad 07</div></td><td><span class="badge">En servicio</span></td><td class="r">18 km/h</td></tr>
+      <tr><td><div class="ru"><i style="background:var(--ciruela)"></i>Unidad 03</div></td><td><span class="badge">En servicio</span></td><td class="r">25 km/h</td></tr>
+      <tr><td><div class="ru"><i style="background:var(--ciruela)"></i>Unidad 09</div></td><td><span class="badge m">Sin señal</span></td><td class="r">—</td></tr>
+      <tr><td><div class="ru"><i style="background:var(--mostaza)"></i>Camión 2</div></td><td><span class="badge">En servicio</span></td><td class="r">12 km/h</td></tr>
+      <tr><td><div class="ru"><i style="background:#94A3B8"></i>Camión 4</div></td><td><span class="badge o">Sin vincular</span></td><td class="r">—</td></tr>
+    </table></div>
+  </div>
+</div>
+</body></html>

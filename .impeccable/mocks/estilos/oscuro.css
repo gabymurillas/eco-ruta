@@ -1,0 +1,25 @@
+/* Modo oscuro: solo redefine colores. Contrastes verificados (WCAG 2.2 AA). */
+:root{
+  --noche:#06141A;--noche-3:#173A44;
+  --agua:#4FC1BE;--agua-claro:rgba(79,193,190,.16);
+  --suelo:#0B1B21;--sup:#11262D;--sup-2:#0E2128;--linea:#24414A;--campo:#6E878E;
+  --tinta:#E4EDEF;--media:#A9BCC2;--suave:#8FA5AC;
+  --primario:#E4EDEF;--sobre-primario:#0E2A33;
+  --teal:#3BA7A6;--mostaza:#D9B23E;--ciruela:#C0649A;--icono-claro:#FFFFFF;--icono-oscuro:#0E2A33;
+  --ok:#3CC283;--ok-f:#123528;--ok-t:#8EE3B6;
+  --alerta:#F08A4B;--alerta-f:#33210F;--alerta-b:#6B3F1F;--alerta-t:#FFC197;
+  --error:#F28B82;--error-f:#3A1714;--error-t:#FFB4AB;
+  --mapa:#152A31;--calle:#22393F;--parque:#173329;--parada-f:#0B1B21;--parada-b:#E4EDEF;
+  --sombra:0 10px 28px rgba(0,0,0,.45);
+}
+.nav{border-right:1px solid var(--linea)}
+.ico{background:#173A44;color:#CFE0E4}
+.kpi.al .ico{background:#4A2C14}
+.est.al{background:#4A2C14}.est.off{background:#1C333A}
+.est.info{color:#9FE3E0}
+tr.elegida td{background:#173A44}
+.interruptor:after{background:#0B1B21}.interruptor.off{background:#3A5259}
+/* En oscuro el verde azulado y el mostaza son claros: su ícono va en tinta oscura (5,2:1 y 7,4:1). */
+.ruta-ic[style*="--teal"],.ruta-ic[style*="--mostaza"]{color:#0E2A33}
+:root{--alerta-f:#152A31;--alerta-b:#24414A;--alerta-t:var(--tinta);--error-f:#152A31;--error-t:var(--tinta);--ok-f:var(--sup-2);--ok-t:var(--tinta)}
+.est.al,.est.off{background:var(--sup-2)}.kpi.al .ico{background:#173A44}.est.info{color:var(--tinta)}

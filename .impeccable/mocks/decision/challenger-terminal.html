@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Banda del terminal · Monitoreo</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--suelo:#F5F5F2;--sup:#FFFFFF;--linea:#E0E0DA;--tinta:#111111;--media:#56564F;--senal:#FFCC00;--teal:#2E8B8B;--mostaza:#C9A227;--ciruela:#8E3B6E;--ok:#1F8A5B;--alerta:#B4531A}
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:var(--suelo);color:var(--tinta);font:15px/1.45 "Atkinson Hyperlegible",sans-serif;font-variant-numeric:tabular-nums}
+.banda{height:64px;background:var(--senal);display:flex;align-items:center;gap:0;padding:0 0 0 24px}
+.banda .pic{width:40px;height:40px;background:var(--tinta);color:var(--senal);display:grid;place-items:center;border-radius:4px;margin-right:16px}
+.banda p{font-size:19px;font-weight:700}
+.banda p span{font-weight:400;margin-left:10px}
+.banda .ir{margin-left:auto;height:64px;padding:0 24px;background:var(--tinta);color:var(--senal);display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
+.banda .mas{padding:0 20px;font-weight:700}
+.cuerpo{display:flex;height:836px}
+nav{width:232px;background:var(--sup);border-right:1px solid var(--linea);padding:20px 14px;display:flex;flex-direction:column;gap:2px}
+.marca{font-weight:700;font-size:20px;padding:0 10px 18px}
+nav a{display:flex;align-items:center;gap:12px;padding:11px 10px;border-radius:8px;color:var(--media);font-weight:700}
+nav a.on{background:var(--tinta);color:#fff}
+nav a b{margin-left:auto;background:var(--senal);color:var(--tinta);font-size:12px;padding:1px 7px;border-radius:999px}
+nav svg{width:20px;height:20px}
+.area{flex:1;display:flex;flex-direction:column}
+.cab{height:68px;display:flex;align-items:center;padding:0 28px;gap:28px;border-bottom:1px solid var(--linea);background:var(--sup)}
+.cab h1{font-size:24px;font-weight:700}
+.met{display:flex;gap:28px;color:var(--media)}.met b{color:var(--tinta);font-size:20px;margin-right:6px}
+.vivo{margin-left:auto;color:var(--media);display:flex;gap:8px;align-items:center}.pt{width:9px;height:9px;border-radius:50%;background:var(--ok)}
+.trabajo{flex:1;display:flex}
+.mapa{flex:1;position:relative;background:#ECECE7;overflow:hidden}
+.mapa svg{position:absolute;inset:0}
+.tabla{width:440px;background:var(--sup);border-left:1px solid var(--linea);padding:18px 0}
+.tabla h2{font-size:17px;padding:0 20px 10px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;color:var(--media);font-weight:700;padding:8px 20px;border-bottom:1px solid var(--linea)}
+td{padding:12px 20px;border-bottom:1px solid var(--linea)}
+td.r,th.r{text-align:right}
+.ru{display:flex;align-items:center;gap:8px}.ru i{width:10px;height:10px;border-radius:50%}
+.ru small{display:block;color:var(--media);font-size:12px}
+tr.sel td{background:#FFF8D6}
+.mu{color:var(--alerta);font-weight:700}
+</style></head><body>
+<div class="banda">
+  <div class="pic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.1"/></svg></div>
+  <p>Congestión en Av. Bolívar<span>Terminal – Los Morros · reportada hace 12 min por Unidad 03</span></p>
+  <span class="mas">+1 alerta: Unidad 09 sin señal</span>
+  <a class="ir">Revisar incidencia
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</div>
+<div class="cuerpo">
+  <nav>
+    <div class="marca">EcoRuta admin</div>
+    <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Monitoreo<b>2</b></a>
+    <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8 17c6-1 2-9 8-10"/></svg>Rutas</a>
+    <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11z"/></svg>Paradas</a>
+    <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="13" rx="3"/><path d="M8 20v-3M16 20v-3"/></svg>Unidades</a>
+    <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7"/></svg>Históricos</a>
+    <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Parámetros</a>
+  </nav>
+  <div class="area">
+    <header class="cab"><h1>Monitoreo</h1>
+      <div class="met"><span><b>4</b>en servicio</span><span><b>6</b>en la flota</span></div>
+      <span class="vivo"><span class="pt"></span>En vivo · hace 3 s</span></header>
+    <div class="trabajo">
+      <section class="mapa">
+        <svg width="768" height="768" viewBox="0 0 768 768" fill="none">
+          <g stroke="#fff" stroke-width="9"><path d="M-20 200 L800 250"/><path d="M-20 520 L800 480"/><path d="M200 -20 L240 800"/><path d="M520 -20 L480 800"/></g>
+          <g stroke="#fff" stroke-width="4"><path d="M-20 360 L800 370"/><path d="M360 -20 L340 800"/><path d="M660 -20 L690 800"/><path d="M80 -20 L110 800"/></g>
+          <path d="M100 600 L240 520 L480 490 L520 370 L740 300" stroke="#2E8B8B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M200 100 L240 250 L340 360 L480 480 L520 680" stroke="#8E3B6E" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M560 60 L700 100 L690 470" stroke="#C9A227" stroke-width="5" stroke-linecap="round"/>
+          <g stroke="#fff" stroke-width="3"><circle cx="500" cy="420" r="11" fill="#2E8B8B"/><circle cx="700" cy="310" r="11" fill="#2E8B8B"/><circle cx="300" cy="320" r="11" fill="#8E3B6E"/><circle cx="694" cy="250" r="11" fill="#C9A227"/></g>
+          <circle cx="510" cy="620" r="11" fill="#fff" stroke="#B4531A" stroke-width="2.5" stroke-dasharray="4 3"/>
+          <g transform="translate(400 470)"><rect x="-16" y="-16" width="32" height="32" rx="4" fill="#FFCC00" stroke="#111" stroke-width="2"/><path d="M0 -8 L9 8 H-9Z" fill="#111"/></g>
+        </svg>
+      </section>
+      <section class="tabla"><h2>Flota</h2>
+        <table><thead><tr><th>Unidad</th><th class="r">Velocidad</th><th class="r">Batería</th><th class="r">Señal</th></tr></thead><tbody>
+          <tr class="sel"><td><div class="ru"><i style="background:var(--teal)"></i><div>Unidad 12<small>Centro – UNERG</small></div></div></td><td class="r">32 km/h</td><td class="r">78 %</td><td class="r">3 s</td></tr>
+          <tr><td><div class="ru"><i style="background:var(--teal)"></i><div>Unidad 07<small>Centro – UNERG</small></div></div></td><td class="r">18 km/h</td><td class="r">64 %</td><td class="r">5 s</td></tr>
+          <tr><td><div class="ru"><i style="background:var(--ciruela)"></i><div>Unidad 03<small>Terminal – Los Morros</small></div></div></td><td class="r">25 km/h</td><td class="r">91 %</td><td class="r">2 s</td></tr>
+          <tr><td><div class="ru"><i style="background:var(--ciruela)"></i><div>Unidad 09<small>Terminal – Los Morros</small></div></div></td><td class="r">—</td><td class="r">22 %</td><td class="r mu">6 min</td></tr>
+          <tr><td><div class="ru"><i style="background:var(--mostaza)"></i><div>Camión 2<small>Aseo · zona norte</small></div></div></td><td class="r">12 km/h</td><td class="r">85 %</td><td class="r">4 s</td></tr>
+          <tr><td><div class="ru"><i style="background:#999"></i><div>Camión 4<small>Sin dispositivo</small></div></div></td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+        </tbody></table></section>
+    </div>
+  </div>
+</div>
+</body></html>

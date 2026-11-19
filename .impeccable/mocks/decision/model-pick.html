@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Línea de metro · Monitoreo</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--suelo:#F2F2F0;--sup:#FFFFFF;--linea:#DEDEDA;--tinta:#111111;--media:#55554F;--teal:#2E8B8B;--mostaza:#C9A227;--ciruela:#8E3B6E;--ok:#1F8A5B;--alerta:#B4531A}
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:var(--suelo);color:var(--tinta);font:14px/1.45 Archivo,sans-serif;font-variant-numeric:tabular-nums;display:flex}
+.riel{width:84px;background:var(--tinta);color:#fff;display:flex;flex-direction:column;align-items:center;padding:18px 0;gap:6px}
+.logo{width:44px;height:44px;border-radius:50%;border:3px solid #fff;display:grid;place-items:center;font-weight:800;font-size:15px;margin-bottom:18px}
+.riel a{width:72px;padding:10px 0;border-radius:8px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#BDBDB6}
+.riel a.on{background:#2A2A28;color:#fff}
+.riel svg{width:22px;height:22px}
+.main{flex:1;display:flex;flex-direction:column}
+.cab{height:64px;display:flex;align-items:center;padding:0 28px;gap:16px;background:var(--sup);border-bottom:1px solid var(--linea)}
+.cab h1{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.chip{padding:5px 12px;border:1px solid var(--linea);border-radius:999px;font-size:13px;font-weight:600;color:var(--media)}
+.chip b{color:var(--tinta)}
+.chip.al{border-color:#E9B48F;background:#FFF4EA;color:#7A3410}
+.vivo{margin-left:auto;display:flex;gap:8px;align-items:center;color:var(--media);font-weight:500}
+.p{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.lineas{background:var(--sup);border-bottom:1px solid var(--linea);padding:14px 28px 6px}
+.l{display:grid;grid-template-columns:210px 1fr 120px;align-items:center;height:78px}
+.nom{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px}
+.nom span{width:28px;height:28px;border-radius:6px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px}
+.traza{position:relative;height:78px}
+.barra{position:absolute;left:0;right:0;top:38px;height:8px;border-radius:4px}
+.est{position:absolute;top:33px;width:18px;height:18px;border-radius:50%;background:#fff;border:4px solid var(--tinta);transform:translateX(-50%)}
+.est small{position:absolute;top:22px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;font-weight:600;color:var(--media)}
+.uni{position:absolute;top:6px;transform:translateX(-50%);padding:2px 8px;border-radius:999px;background:var(--tinta);color:#fff;font-size:12px;font-weight:700;white-space:nowrap}
+.uni:after{content:"";position:absolute;left:50%;top:100%;width:2px;height:12px;background:var(--tinta);margin-left:-1px}
+.uni.muda{background:#fff;color:var(--alerta);border:1.5px dashed var(--alerta)}
+.uni.muda:after{background:var(--alerta)}
+.res{text-align:right;font-size:13px;color:var(--media)}.res b{display:block;color:var(--tinta);font-size:15px}
+.mapa{flex:1;position:relative;background:#EAEAE6;overflow:hidden}
+.mapa svg{position:absolute;inset:0}
+.ficha{position:absolute;right:24px;top:24px;width:320px;background:var(--sup);border:1px solid var(--linea);border-radius:12px;padding:16px}
+.ficha h3{font-size:17px;font-weight:800}
+.ficha p{color:var(--media);font-size:13px;margin:2px 0 12px}
+.dl{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.dl div{font-size:12px;color:var(--media)}.dl b{display:block;font-size:18px;color:var(--tinta)}
+</style></head><body>
+<nav class="riel">
+  <div class="logo">ER</div>
+  <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Monitoreo</a>
+  <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8 17c6-1 2-9 8-10"/></svg>Rutas</a>
+  <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Paradas</a>
+  <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="13" rx="3"/><path d="M4 12h16M8 20v-3M16 20v-3"/></svg>Unidades</a>
+  <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Históricos</a>
+  <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>Ajustes</a>
+</nav>
+<div class="main">
+  <header class="cab"><h1>Monitoreo</h1>
+    <span class="chip"><b>4</b> en servicio</span><span class="chip"><b>1</b> sin señal</span><span class="chip al"><b>1</b> incidencia · Av. Bolívar</span>
+    <span class="vivo"><span class="p"></span>En vivo · hace 3 s</span></header>
+  <section class="lineas">
+    <div class="l"><div class="nom"><span style="background:var(--teal)">1</span>Centro – UNERG</div>
+      <div class="traza"><div class="barra" style="background:var(--teal)"></div>
+        <div class="est" style="left:2%"><small>Terminal</small></div><div class="est" style="left:30%"><small>Plaza Bolívar</small></div><div class="est" style="left:62%"><small>Hospital</small></div><div class="est" style="left:98%"><small>UNERG</small></div>
+        <div class="uni" style="left:41%">Unidad 12</div><div class="uni" style="left:80%">Unidad 07</div></div>
+      <div class="res"><b>~4 min</b>07 a UNERG</div></div>
+    <div class="l"><div class="nom"><span style="background:var(--ciruela)">2</span>Terminal – Los Morros</div>
+      <div class="traza"><div class="barra" style="background:var(--ciruela)"></div>
+        <div class="est" style="left:2%"><small>Terminal</small></div><div class="est" style="left:48%"><small>Mercado</small></div><div class="est" style="left:98%"><small>Los Morros</small></div>
+        <div class="uni" style="left:22%">Unidad 03</div><div class="uni muda" style="left:70%">09 · sin señal 6 min</div></div>
+      <div class="res"><b>~9 min</b>03 a Mercado</div></div>
+    <div class="l"><div class="nom"><span style="background:var(--mostaza);color:#111">3</span>Aseo · zona norte</div>
+      <div class="traza"><div class="barra" style="background:var(--mostaza)"></div>
+        <div class="est" style="left:2%"><small>Galpón</small></div><div class="est" style="left:55%"><small>Urb. Rómulo Gallegos</small></div><div class="est" style="left:98%"><small>Relleno</small></div>
+        <div class="uni" style="left:36%">Camión 2</div></div>
+      <div class="res"><b>~6 min</b>a Rómulo Gallegos</div></div>
+  </section>
+  <section class="mapa">
+    <svg width="1356" height="600" viewBox="0 0 1356 600" fill="none">
+      <g stroke="#fff" stroke-width="9"><path d="M-20 120 L1380 160"/><path d="M-20 330 L1380 300"/><path d="M-20 520 L1380 540"/><path d="M260 -20 L300 480"/><path d="M700 -20 L660 480"/><path d="M1080 -20 L1120 480"/></g>
+      <g stroke="#fff" stroke-width="4"><path d="M-20 230 L1380 240"/><path d="M480 -20 L470 480"/><path d="M900 -20 L920 480"/><path d="M120 -20 L140 480"/></g>
+      <path d="M140 400 L300 330 L660 300 L700 160 L1120 150" stroke="#2E8B8B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M300 40 L320 160 L480 240 L660 330 L900 420" stroke="#8E3B6E" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M760 30 L1080 60 L1120 300 L940 380" stroke="#C9A227" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <g stroke="#fff" stroke-width="3"><circle cx="640" cy="302" r="10" fill="#2E8B8B"/><circle cx="1010" cy="152" r="10" fill="#2E8B8B"/><circle cx="400" cy="200" r="10" fill="#8E3B6E"/><circle cx="1110" cy="200" r="10" fill="#C9A227"/></g>
+      <circle cx="780" cy="372" r="10" fill="#fff" stroke="#B4531A" stroke-width="2.5" stroke-dasharray="4 3"/>
+      <circle cx="640" cy="302" r="17" stroke="#111" stroke-width="2.5"/>
+    </svg>
+    <div class="ficha"><h3>Unidad 12 · Centro – UNERG</h3><p>Transmitiendo · pasó por Plaza Bolívar hace 2 min</p>
+      <div class="dl"><div><b>32</b>km/h</div><div><b>78 %</b>batería</div><div><b>3 s</b>últ. señal</div></div></div>
+  </section>
+</div>
+</body></html>
