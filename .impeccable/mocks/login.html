@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>EcoRuta · Iniciar sesión (boceto)</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--noche:#0E2A33;--noche-2:#163B47;--agua:#197878;--agua-claro:#D7F0EE;--sol:#F2B33D;
+--suelo:#F4F7F8;--sup:#FFFFFF;--linea:#D5DEE1;--campo:#78898F;--tinta:#10232A;--media:#4B5E65}
+*{box-sizing:border-box;margin:0}
+body{width:100vw;height:100vh;min-width:1280px;min-height:720px;overflow:hidden;display:flex;font:15px/1.5 Figtree,sans-serif;color:var(--tinta);background:var(--suelo)}
+.foto{position:relative;flex:1.35;background:url("../../ecoruta-web/src/assets/morros-panoramico.jpg") 42% 50%/cover;color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:40px 48px}
+.foto:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,42,51,.55) 0%,rgba(14,42,51,0) 30%,rgba(14,42,51,0) 45%,rgba(14,42,51,.92) 100%)}
+.foto>*{position:relative}
+.marca{display:flex;align-items:center;gap:12px;font-weight:800;font-size:20px}
+.logo{width:42px;height:42px;border-radius:12px;background:var(--sol);display:grid;place-items:center;color:var(--noche)}
+.marca small{display:block;font-weight:500;font-size:13px;opacity:.85}
+.texto h1{font-size:44px;line-height:1.1;font-weight:800;letter-spacing:-.02em;max-width:620px}
+.texto p{font-size:18px;opacity:.9;margin-top:12px;max-width:540px}
+.puntos{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:32px;max-width:720px}
+.punto{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:14px 16px;backdrop-filter:blur(6px)}
+.punto svg{color:var(--sol)}
+.punto b{display:block;font-size:15px;margin-top:8px}
+.punto span{font-size:13px;opacity:.85}
+.pie{font-size:13px;opacity:.8;display:flex;gap:8px;align-items:center}
+.lado{width:560px;background:var(--sup);display:flex;flex-direction:column;justify-content:center;padding:0 72px;position:relative}
+.tema{position:absolute;top:28px;right:28px;display:flex;border:1px solid var(--linea);border-radius:999px;padding:3px}
+.tema span{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:600;color:var(--media)}
+.tema span.on{background:var(--noche);color:#fff}
+.lado h2{font-size:30px;font-weight:800;letter-spacing:-.015em}
+.lado .sub{color:var(--media);margin:6px 0 32px}
+label{display:block;font-size:14px;font-weight:600;margin-bottom:7px}
+.campo{display:flex;align-items:center;gap:10px;height:52px;border:1.5px solid var(--campo);border-radius:12px;padding:0 14px;margin-bottom:18px;color:var(--media)}
+.campo.foco{border-color:var(--agua);box-shadow:0 0 0 4px var(--agua-claro)}
+.campo input{border:0;outline:0;font:16px Figtree;flex:1;color:var(--tinta);background:transparent}
+.campo .ver{font-size:13px;font-weight:700;color:var(--agua)}
+.fila{display:flex;justify-content:space-between;align-items:center;margin:-4px 0 26px;font-size:14px}
+.fila a{color:var(--agua);font-weight:700;text-decoration:none}
+.chk{display:flex;align-items:center;gap:8px;color:var(--media)}
+.chk i{width:18px;height:18px;border:1.5px solid var(--campo);border-radius:5px;display:grid;place-items:center;background:var(--noche);border-color:var(--noche)}
+button{width:100%;height:54px;border:0;border-radius:12px;background:var(--noche);color:#fff;font:700 16px Figtree;display:flex;align-items:center;justify-content:center;gap:10px}
+.aviso{margin-top:28px;display:flex;gap:12px;padding:14px 16px;border-radius:12px;background:var(--suelo);color:var(--media);font-size:13.5px}
+.aviso svg{flex:none;color:var(--agua);margin-top:2px}
+</style></head><body>
+<section class="foto">
+  <div class="marca"><div class="logo">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.3 17C15 16 9 8 15.7 7"/></svg></div>
+    <div>EcoRuta San Juan<small>Panel de gestión</small></div></div>
+  <div class="texto">
+    <h1>La flota de San Juan de los Morros, en vivo y en un solo lugar.</h1>
+    <p>Sigue las unidades en servicio, ordena rutas y paradas y responde a las incidencias que reportan los choferes.</p>
+    <div class="puntos">
+      <div class="punto"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><b>Monitoreo en vivo</b><span>Posición y señal de cada unidad</span></div>
+      <div class="punto"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><b>Rutas y paradas</b><span>Trazados sobre las calles reales</span></div>
+      <div class="punto"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.1"/></svg><b>Incidencias</b><span>Reportes de la calle al momento</span></div>
+    </div>
+  </div>
+  <div class="pie"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11z"/></svg>Los Morros, San Juan de los Morros · Guárico</div>
+</section>
+<section class="lado">
+  <div class="tema"><span class="on">Claro</span><span>Oscuro</span></div>
+  <h2>Inicia sesión</h2>
+  <p class="sub">Entra con la cuenta de administración del ente gestor.</p>
+  <label>Correo</label>
+  <div class="campo foco"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><input value="gestor@ecoruta.ve"></div>
+  <label>Contraseña</label>
+  <div class="campo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><input type="password" value="contraseña"><span class="ver">Mostrar</span></div>
+  <div class="fila"><span class="chk"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>Mantener la sesión</span><a>¿Olvidaste la contraseña?</a></div>
+  <button>Entrar al panel <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+  <div class="aviso"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.1"/></svg>
+    Solo el personal del ente gestor tiene cuenta. Los ciudadanos usan la web sin registrarse y cada unidad se vincula con un código.</div>
+</section>
+</body></html>

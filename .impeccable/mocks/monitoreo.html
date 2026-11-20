@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>EcoRuta · Monitoreo (boceto)</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--noche:#0E2A33;--noche-2:#163B47;--noche-3:#21505E;--agua:#197878;--sol:#F2B33D;
+--suelo:#F1F5F6;--sup:#FFFFFF;--linea:#DCE4E7;--tinta:#10232A;--media:#4B5E65;--suave:#5F7178;
+--teal:#2E8B8B;--mostaza:#C9A227;--ciruela:#8E3B6E;
+--ok:#1E8E5A;--ok-f:#E3F4EB;--alerta:#B4531A;--alerta-f:#FDF0E4;--error:#C0392B;--error-f:#FBE9E7}
+*{box-sizing:border-box;margin:0}
+body{width:100vw;height:100vh;min-width:1280px;min-height:720px;overflow:hidden;display:flex;font:14px/1.45 Figtree,sans-serif;color:var(--tinta);background:var(--suelo);font-variant-numeric:tabular-nums}
+svg{flex:none}
+/* Navegación */
+.nav{width:248px;background:var(--noche);color:#fff;display:flex;flex-direction:column;padding:22px 16px}
+.marca{display:flex;align-items:center;gap:12px;padding:0 6px 26px;font-weight:800;font-size:17px}
+.marca small{display:block;font-weight:500;font-size:12px;opacity:.7}
+.logo{width:38px;height:38px;border-radius:11px;background:var(--sol);display:grid;place-items:center;color:var(--noche)}
+.grupo{font-size:12px;font-weight:600;color:#8FB0B9;padding:14px 10px 6px}
+.nav a{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;color:#CFE0E4;font-weight:600;margin-bottom:2px}
+.nav a.on{background:var(--noche-3);color:#fff}
+.nav a.on svg{color:var(--sol)}
+.nav a b{margin-left:auto;background:var(--sol);color:var(--noche);font-size:12px;padding:1px 8px;border-radius:999px}
+.yo{margin-top:auto;display:flex;align-items:center;gap:10px;padding:12px 8px 0;border-top:1px solid var(--noche-3)}
+.av{width:34px;height:34px;border-radius:50%;background:var(--agua);display:grid;place-items:center;font-weight:700;font-size:13px}
+.yo span{font-size:13px;font-weight:600}.yo small{display:block;font-size:12px;opacity:.7;font-weight:500}
+/* Área */
+.area{flex:1;display:flex;flex-direction:column;padding:22px 26px;gap:16px;min-width:0}
+.cab{display:flex;align-items:center;gap:14px}
+.cab h1{font-size:26px;font-weight:800;letter-spacing:-.015em}
+.vivo{display:flex;align-items:center;gap:8px;background:var(--ok-f);color:#145C3B;font-weight:700;font-size:13px;padding:6px 12px;border-radius:999px}
+.pt{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(30,142,90,.18)}
+.cab .der{margin-left:auto;display:flex;gap:10px}
+.btn{height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--linea);background:var(--sup);display:flex;align-items:center;gap:8px;font-weight:600;color:var(--tinta)}
+.btn.osc{background:var(--noche);color:#fff;border-color:var(--noche)}
+/* Indicadores */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpi{background:var(--sup);border:1px solid var(--linea);border-radius:14px;padding:14px 16px;display:flex;gap:14px;align-items:center}
+.ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center}
+.kpi b{font-size:26px;font-weight:800;line-height:1}.kpi span{display:block;color:var(--media);font-weight:600;font-size:13px;margin-top:4px}
+.kpi small{display:block;color:var(--suave);font-size:12px}
+.kpi.al{border-color:#F0C9A6;background:var(--alerta-f)}
+/* Trabajo */
+.trabajo{flex:1;display:flex;gap:16px;min-height:0}
+.mapa{flex:1;position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--linea);background:#E9EEF0}
+.mapa>svg{position:absolute;inset:0}
+.mk{position:absolute;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;border:3px solid #fff;display:grid;place-items:center;color:#fff}
+.mk.sel{box-shadow:0 0 0 3px var(--noche)}
+.mk.mudo{background:#fff!important;color:var(--alerta);border:2.5px dashed var(--alerta)}
+.pop{position:absolute;width:250px;background:var(--sup);border-radius:12px;border:1px solid var(--linea);padding:12px 14px;box-shadow:0 8px 24px rgba(14,42,51,.16)}
+.pop h4{font-size:15px;font-weight:800}.pop p{color:var(--media);font-size:12.5px;margin:2px 0 10px}
+.pop .d{display:flex;gap:16px}.pop .d div{font-size:12px;color:var(--media)}.pop .d b{display:block;font-size:16px;color:var(--tinta)}
+.ley{position:absolute;left:14px;bottom:14px;background:var(--sup);border:1px solid var(--linea);border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600}
+.ley i{display:inline-block;width:18px;height:5px;border-radius:3px;margin-right:8px;vertical-align:middle}
+.zoom{position:absolute;right:14px;top:14px;background:var(--sup);border:1px solid var(--linea);border-radius:12px;overflow:hidden}
+.zoom div{width:44px;height:44px;display:grid;place-items:center;color:var(--media)}.zoom div+div{border-top:1px solid var(--linea)}
+/* Panel de flota */
+.panel{width:400px;background:var(--sup);border:1px solid var(--linea);border-radius:16px;display:flex;flex-direction:column;overflow:hidden}
+.inc{margin:14px 14px 4px;padding:12px;border-radius:12px;background:var(--alerta-f);border:1px solid #F0C9A6;display:flex;gap:10px}
+.inc .t{font-weight:700;color:#5C2609}.inc p{font-size:12.5px;color:#7A3410}
+.inc .acc{display:flex;gap:8px;margin-top:8px}
+.inc .acc span{font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:8px;background:#fff;border:1px solid #E3AE84;color:#5C2609}
+.tabs{display:flex;gap:4px;padding:10px 14px;border-bottom:1px solid var(--linea)}
+.tabs span{padding:7px 12px;border-radius:9px;font-weight:600;color:var(--media);font-size:13px}
+.tabs span.on{background:var(--noche);color:#fff}
+.tabs span em{font-style:normal;opacity:.7;margin-left:4px}
+.lista{overflow:auto;padding:6px 10px}
+.u{padding:11px 10px;border-radius:12px;display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center}
+.u.sel{background:#EAF2F4;outline:2px solid var(--noche)}
+.u .ic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.u h5{font-size:14.5px;font-weight:700}
+.ruta{font-size:12.5px;color:var(--media)}
+.est{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;margin-top:4px}
+.est.ok{background:var(--ok-f);color:#145C3B}.est.al{background:var(--alerta-f);color:#8A3A10}.est.off{background:#EEF1F2;color:var(--media)}
+.dat{text-align:right;font-size:12.5px;color:var(--media)}
+.dat b{display:block;font-size:15px;color:var(--tinta)}
+.bat{display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-top:4px}
+.bat i{width:34px;height:6px;border-radius:3px;background:#E3E9EB;overflow:hidden}.bat i s{display:block;height:100%;background:var(--ok)}
+
+/* Tono sobrio */
+.vivo{background:var(--sup);border:1px solid var(--linea);color:var(--tinta)}
+.kpi.al{background:var(--sup);border-color:var(--linea)}.kpi.al .ico{background:var(--suelo)!important;color:var(--alerta)!important}
+.inc{background:var(--sup);border-color:var(--linea)}.inc .t{color:var(--tinta)}.inc p{color:var(--media)}
+.inc .acc span{background:var(--sup);border-color:var(--linea);color:var(--tinta)}
+.est.ok,.est.al{background:var(--suelo);border:1px solid var(--linea);color:var(--tinta)}
+.est.ok{}.est.al{}
+</style></head><body>
+<nav class="nav">
+  <div class="marca"><div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.3 17C15 16 9 8 15.7 7"/></svg></div><div>EcoRuta San Juan<small>Panel de gestión</small></div></div>
+  <div class="grupo">Operación</div>
+  <a class="on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Monitoreo<b>2</b></a>
+  <a><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 10v4"/></svg>Incidencias</a>
+  <div class="grupo">Red de servicio</div>
+  <a><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.3 17C15 16 9 8 15.7 7"/></svg>Rutas</a>
+  <a><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Paradas</a>
+  <a><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="13" rx="3"/><path d="M4 11h16M8 20v-3M16 20v-3"/></svg>Unidades</a>
+  <div class="grupo">Análisis y ajustes</div>
+  <a><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Históricos</a>
+  <a><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Parámetros</a>
+  <div class="yo"><div class="av">GM</div><span>Gaby Murillas<small>Administración</small></span></div>
+</nav>
+<main class="area">
+  <div class="cab"><h1>Monitoreo</h1><span class="vivo"><span class="pt"></span>En vivo · actualizado hace 3 s</span>
+    <div class="der"><span class="btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>Oscuro</span><span class="btn osc"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>Nueva ruta</span></div></div>
+  <div class="kpis">
+    <div class="kpi"><div class="ico" style="background:#E3EFF1;color:var(--noche)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="13" rx="3"/><path d="M4 11h16M8 20v-3M16 20v-3"/></svg></div><div><b>6</b><span>Flota</span><small>5 con equipo vinculado</small></div></div>
+    <div class="kpi"><div class="ico" style="background:var(--ok-f);color:var(--ok)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div><div><b>4</b><span>En servicio</span><small>transmitiendo ahora</small></div></div>
+    <div class="kpi al"><div class="ico" style="background:#fff;color:var(--alerta)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.1"/></svg></div><div><b>1</b><span>Incidencia activa</span><small>Av. Bolívar · hace 12 min</small></div></div>
+    <div class="kpi al"><div class="ico" style="background:#fff;color:var(--alerta)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/></svg></div><div><b>1</b><span>Sin señal</span><small>Unidad 09 · hace 6 min</small></div></div>
+  </div>
+  <div class="trabajo">
+    <section class="mapa">
+      <svg width="1400" height="1000" viewBox="0 0 1400 1000" fill="none">
+        <path d="M520 0 C560 120 680 140 740 120 L740 0Z" fill="#DCE9DF"/><path d="M0 560 C150 520 240 580 330 642 L0 642Z" fill="#DCE9DF"/>
+        <g stroke="#fff" stroke-width="10"><path d="M-20 170 L1420 210"/><path d="M-20 430 L1420 400"/><path d="M150 -20 L200 1020"/><path d="M420 -20 L370 1020"/><path d="M640 -20 L690 1020"/></g>
+        <g stroke="#fff" stroke-width="4"><path d="M-20 300 L1420 310"/><path d="M280 -20 L265 1020"/><path d="M530 -20 L560 1020"/><path d="M-20 70 L1420 90"/><path d="M60 -20 L85 1020"/><path d="M-20 540 L1420 560"/><path d="M-20 660 L1420 640"/><path d="M-20 820 L1420 800"/><path d="M820 -20 L840 1020"/><path d="M980 -20 L1000 1020"/><path d="M1140 -20 L1160 1020"/></g>
+        <path d="M70 500 L190 430 L380 410 L420 300 L560 300 L680 220" stroke="#2E8B8B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M150 70 L190 210 L280 300 L380 405 L420 530 L520 640" stroke="#8E3B6E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M440 60 L640 90 L670 400 L560 470" stroke="#C9A227" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <g fill="#fff" stroke="#10232A" stroke-width="2.5"><circle cx="190" cy="430" r="6"/><circle cx="380" cy="410" r="6"/><circle cx="560" cy="300" r="6"/><circle cx="280" cy="300" r="6"/><circle cx="420" cy="530" r="6"/><circle cx="670" cy="400" r="6"/></g>
+        <g transform="translate(330 360)"><circle r="16" fill="#B4531A" stroke="#fff" stroke-width="3"/><path d="M0 -7 L7 6 H-7Z" fill="#fff"/></g>
+      </svg>
+      <div class="mk sel" style="left:450px;top:300px;background:var(--teal)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="4" width="16" height="13" rx="3"/><path d="M4 11h16M8 20v-3M16 20v-3"/></svg></div>
+      <div class="pop" style="left:470px;top:418px"><h4>Unidad 12</h4><p>Centro – UNERG · pasó por Plaza Bolívar</p><div class="d"><div><b>32 km/h</b>velocidad</div><div><b>78 %</b>batería</div><div><b>3 s</b>señal</div></div></div>
+      <div class="mk" style="left:640px;top:247px;background:var(--teal)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="4" width="16" height="13" rx="3"/><path d="M4 11h16M8 20v-3M16 20v-3"/></svg></div>
+      <div class="mk" style="left:235px;top:255px;background:var(--ciruela)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="4" width="16" height="13" rx="3"/><path d="M4 11h16M8 20v-3M16 20v-3"/></svg></div>
+      <div class="mk mudo" style="left:470px;top:585px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="4" width="16" height="13" rx="3"/><path d="M4 11h16M8 20v-3M16 20v-3"/></svg></div>
+      <div class="mk" style="left:655px;top:200px;background:var(--mostaza);color:var(--tinta)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg></div>
+      <div class="ley"><span><i style="background:var(--teal)"></i>Centro – UNERG</span><span><i style="background:var(--ciruela)"></i>Terminal – Los Morros</span><span><i style="background:var(--mostaza)"></i>Aseo · zona norte</span></div>
+      <div class="zoom"><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg></div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"/></svg></div></div>
+    </section>
+    <aside class="panel">
+      <div class="inc"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B4531A" stroke-width="2.2"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.1"/></svg>
+        <div><div class="t">Congestión en Av. Bolívar</div><p>Terminal – Los Morros · reportada por Unidad 03 hace 12 min</p>
+        <div class="acc"><span>Ver en el mapa</span><span>Marcar resuelta</span></div></div></div>
+      <div class="tabs"><span class="on">Todas<em>6</em></span><span>En servicio<em>4</em></span><span>Con alertas<em>2</em></span></div>
+      <div class="lista">
+        <div class="u sel"><div class="ic" style="background:var(--teal)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="4" width="16" height="13" rx="3"/><path d="M4 11h16M8 20v-3M16 20v-3"/></svg></div>
+          <div><h5>Unidad 12</h5><div class="ruta">Centro – UNERG</div><span class="est ok"><svg style="color:var(--ok)" width="8" height="8" viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Transmitiendo</span></div>
+          <div class="dat"><b>32 km/h</b>hace 3 s<div class="bat"><i><s style="width:78%"></s></i>78 %</div></div></div>
+        <div class="u"><div class="ic" style="background:var(--teal)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="4" width="16" height="13" rx="3"/><path d="M4 11h16M8 20v-3M16 20v-3"/></svg></div>
+          <div><h5>Unidad 07</h5><div class="ruta">Centro – UNERG</div><span class="est ok"><svg style="color:var(--ok)" width="8" height="8" viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Transmitiendo</span></div>
+          <div class="dat"><b>18 km/h</b>hace 5 s<div class="bat"><i><s style="width:64%"></s></i>64 %</div></div></div>
+        <div class="u"><div class="ic" style="background:var(--ciruela)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="4" width="16" height="13" rx="3"/><path d="M4 11h16M8 20v-3M16 20v-3"/></svg></div>
+          <div><h5>Unidad 03</h5><div class="ruta">Terminal – Los Morros</div><span class="est ok"><svg style="color:var(--ok)" width="8" height="8" viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Transmitiendo</span></div>
+          <div class="dat"><b>25 km/h</b>hace 2 s<div class="bat"><i><s style="width:91%"></s></i>91 %</div></div></div>
+        <div class="u"><div class="ic" style="background:#fff;border:2.5px dashed var(--alerta);color:var(--alerta)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="4" width="16" height="13" rx="3"/><path d="M4 11h16M8 20v-3M16 20v-3"/></svg></div>
+          <div><h5>Unidad 09</h5><div class="ruta">Terminal – Los Morros</div><span class="est al"><svg style="color:var(--alerta)" width="11" height="11" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L23 21H1z" fill="currentColor"/></svg> Sin señal · 6 min</span></div>
+          <div class="dat"><b>—</b>última posición<div class="bat"><i><s style="width:22%;background:var(--alerta)"></s></i>22 %</div></div></div>
+        <div class="u"><div class="ic" style="background:var(--mostaza);color:var(--tinta)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg></div>
+          <div><h5>Camión 2</h5><div class="ruta">Aseo · zona norte</div><span class="est ok"><svg style="color:var(--ok)" width="8" height="8" viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Transmitiendo</span></div>
+          <div class="dat"><b>12 km/h</b>hace 4 s<div class="bat"><i><s style="width:85%"></s></i>85 %</div></div></div>
+      </div>
+    </aside>
+  </div>
+</main>
+</body></html>
