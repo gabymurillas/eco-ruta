@@ -1,7 +1,7 @@
 import { clienteNavegador } from "@/lib/supabase/client";
 
 type Escucha = {
-  /** Algo cambió en la flota: una posición, un viaje o una incidencia. */
+  /** Algo cambió en la flota: una posición, un viaje, una incidencia o un letrero. */
   alCambiar: () => void;
   /** El canal quedó conectado (true) o se cayó (false). */
   alCambiarConexion: (conectado: boolean) => void;
@@ -15,7 +15,7 @@ type Escucha = {
  * `estado_flota` y no se repite aquí, y no hay que leer la geografía de
  * `posiciones`, que por el canal llega como WKB en hexadecimal.
  *
- * Las tres tablas se publican en sql/12_realtime_monitoreo.sql.
+ * Las tablas se publican en sql/12_realtime_monitoreo.sql; `unidades`, en sql/21_letreros.sql.
  */
 export function escucharCambiosDeFlota({ alCambiar, alCambiarConexion }: Escucha): () => void {
   const cliente = clienteNavegador();
@@ -25,6 +25,8 @@ export function escucharCambiosDeFlota({ alCambiar, alCambiarConexion }: Escucha
     .on("postgres_changes", { event: "INSERT", schema: "public", table: "posiciones" }, alCambiar)
     .on("postgres_changes", { event: "*", schema: "public", table: "viajes" }, alCambiar)
     .on("postgres_changes", { event: "*", schema: "public", table: "incidencias" }, alCambiar)
+    // El conductor cambió el letrero desde la app (sql/21): el nombre de la tarjeta cambia.
+    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "unidades" }, alCambiar)
     .subscribe((estado, causa) => {
       alCambiarConexion(estado === "SUBSCRIBED");
 

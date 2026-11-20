@@ -234,6 +234,30 @@ export type Database = {
           },
         ]
       }
+      letreros: {
+        Row: {
+          activo: boolean
+          creado_at: string
+          id: string
+          nombre: string
+          orden: number
+        }
+        Insert: {
+          activo?: boolean
+          creado_at?: string
+          id?: string
+          nombre: string
+          orden?: number
+        }
+        Update: {
+          activo?: boolean
+          creado_at?: string
+          id?: string
+          nombre?: string
+          orden?: number
+        }
+        Relationships: []
+      }
       paradas: {
         Row: {
           id: string
@@ -390,26 +414,69 @@ export type Database = {
         }
         Relationships: []
       }
+      unidad_letreros: {
+        Row: {
+          letrero_id: string
+          unidad_id: string
+        }
+        Insert: {
+          letrero_id: string
+          unidad_id: string
+        }
+        Update: {
+          letrero_id?: string
+          unidad_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unidad_letreros_letrero_id_fkey"
+            columns: ["letrero_id"]
+            isOneToOne: false
+            referencedRelation: "letreros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unidad_letreros_unidad_id_fkey"
+            columns: ["unidad_id"]
+            isOneToOne: false
+            referencedRelation: "unidades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       unidades: {
         Row: {
           activa: boolean
           id: string
+          letrero_desde: string | null
+          letrero_id: string | null
           nombre: string
           ruta_id: string | null
         }
         Insert: {
           activa?: boolean
           id?: string
+          letrero_desde?: string | null
+          letrero_id?: string | null
           nombre: string
           ruta_id?: string | null
         }
         Update: {
           activa?: boolean
           id?: string
+          letrero_desde?: string | null
+          letrero_id?: string | null
           nombre?: string
           ruta_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "unidades_letrero_id_fkey"
+            columns: ["letrero_id"]
+            isOneToOne: false
+            referencedRelation: "letreros"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "unidades_ruta_id_fkey"
             columns: ["ruta_id"]
@@ -709,6 +776,7 @@ export type Database = {
             Returns: string
           }
       agregar_velocidades_de_viajes: { Args: never; Returns: number }
+      cambiar_letrero: { Args: { p_letrero_id: string }; Returns: Json }
       canjear_codigo_de_vinculacion: {
         Args: { codigo: string }
         Returns: {
@@ -793,6 +861,7 @@ export type Database = {
           capturado_at: string
           dispositivo_vinculado: boolean
           en_recorrido: boolean
+          letrero: string
           ruta_color: string
           ruta_icono: string
           ruta_id: string
@@ -807,6 +876,7 @@ export type Database = {
           viaje_id: string
         }[]
       }
+      exigir_dispositivo_vinculado: { Args: never; Returns: string }
       geometry: { Args: { "": string }; Returns: unknown }
       geometry_above: {
         Args: { geom1: unknown; geom2: unknown }
@@ -912,12 +982,21 @@ export type Database = {
       }
       hora_de: { Args: { momento: string }; Returns: number }
       inicio_del_periodo: { Args: { dias: number }; Returns: string }
+      letrero_vigente: {
+        Args: { unidad: string }
+        Returns: {
+          id: string
+          nombre: string
+        }[]
+      }
+      letreros_disponibles: { Args: never; Returns: Json }
       llegadas_a_parada: {
         Args: { parada: string }
         Returns: {
           distancia_recta_m: number
           distancia_trazado_m: number
           incidencia_activa: boolean
+          letrero: string
           ruta_color: string
           ruta_icono: string
           ruta_id: string
@@ -941,6 +1020,7 @@ export type Database = {
           avance: number
           distancia_trazado_m: number
           incidencia_activa: boolean
+          letrero: string
           parada_id: string
           parada_lat: number
           parada_lng: number

@@ -1,4 +1,5 @@
 import { formatearMinutos } from "@/domain/formato";
+import { conLetrero } from "@/domain/letrero";
 import { describirAntiguedad, type EstadoLlegada, type TiempoLlegada } from "@/domain/llegadas";
 import { useHorarios } from "../hooks/useHorarios";
 import type { EstadoLlegadas } from "../hooks/useLlegadas";
@@ -137,7 +138,7 @@ function Llegada({ llegada, grande = false }: { llegada: LlegadaEvaluada; grande
               apagado ? "text-tinta-media" : ""
             }`}
           >
-            {fila.ruta_nombre}
+            {conLetrero(fila.ruta_nombre, fila.letrero)}
           </span>
           <span className="truncate text-xs font-semibold text-tinta-suave">
             {fila.unidad_nombre}

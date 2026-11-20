@@ -185,6 +185,7 @@ revoca la sesión del teléfono.
 | CIU-20 | **Seguir una ruta:** tocar una llegada o una ruta de la parada resalta su trazado y la cámara acompaña a la unidad; si el ciudadano mueve el mapa, la cámara se suelta y puede volver con un toque | P1 | ✅ (falta verlo con una unidad real) |
 | CIU-21 | **Cómo llegar a pie** a la parada, con el camino por las calles dibujado en el mapa, la distancia y los minutos | P1 | ✅ (openrouteservice desde una Server Action; ver la política de exposición) |
 | CIU-22 | **Cómo llegar a cualquier punto** tocando el mapa: caminar a una parada, tomar una ruta, bajarse y caminar | P2 | ⬜ (necesita el sentido de cada ruta en la base) |
+| CIU-23 | **Letrero de la unidad:** junto al nombre de la ruta, el nombre que eligió el conductor (p. ej. «Terminal – Villa Olímpica»), en mi parada y en el detalle de ruta | P1 | ✅ (`sql/21`; solo un nombre: trazado, paradas y tiempo estimado siguen siendo los de la ruta. Decisión de la autora del 2026-11-20) |
 
 ### 6.2 Web de administración (`ADM`)
 
@@ -209,6 +210,7 @@ revoca la sesión del teléfono.
 | ADM-17 | Resolver (cerrar) incidencias | P1 | 🟡 (sección `/admin/incidencias` hecha; falta probarla con un reporte real) |
 | ADM-18 | Equipo: invitar por correo con un rol, listar las cuentas del panel (rol, último ingreso, invitación pendiente), cambiar el rol y quitar el acceso. Solo un admin; nadie se modifica a sí mismo; siempre queda un admin | P1 | 🟡 (`sql/17` aplicada y `gestionar-equipo` desplegada, verificado el 2026-11-15; falta la configuración de Auth ([arquitectura § 7](../04-arquitectura/README.md#7-configurar-supabase-para-el-equipo-del-panel), pasos 3 a 7) y probar una invitación real) |
 | ADM-19 | Rol operador: monitoreo, históricos y lectura de rutas, paradas y unidades; resuelve incidencias; no crea, edita ni borra nada más. Lo impone RLS, no solo la interfaz | P1 | 🟡 (ídem ADM-18) |
+| ADM-20 | **Letreros:** catálogo de nombres que puede mostrar una unidad, qué unidades pueden usar cada uno y el letrero vigente en el monitoreo, al instante por Realtime | P1 | ✅ (`sql/21`, `/admin/letreros`; falta probarlo con la app) |
 
 ### 6.3 App del dispositivo de ruta (`DIS`) — repositorio aparte
 
@@ -222,6 +224,7 @@ revoca la sesión del teléfono.
 | DIS-06 | Latido de salud (batería) aunque no haya viaje | P0 | ✅ |
 | DIS-07 | Modo kiosco, arranque automático y servicio en primer plano resiliente | P0 | ✅ |
 | DIS-08 | Vinculación por QR | P2 | ⬜ |
+| DIS-09 | Elegir el letrero desde la app (selector con las opciones del admin), en espera o en recorrido; vuelve al nombre normal al finalizar | P1 | 🟡 (contrato en [contrato-vinculacion](../contrato-vinculacion.md); la app lo implementa en su repositorio) |
 
 ### 6.4 Sistema y backend (`SIS`)
 
@@ -340,6 +343,7 @@ al cálculo simple.
 
 | Versión | Fecha | Cambio |
 |---|---|---|
+| 1.6 | 2026-11-20 | ADM-20, CIU-23 y DIS-09: letreros que el conductor elige de la lista del admin (`sql/21`) |
 | 1.5 | 2026-11-15 | CIU-15 y CIU-16: portada en `/conoce` y detalle de ruta en `/ruta/[id]` (`sql/20`) |
 | 1.4 | 2026-11-15 | CIU-09, ADM-15 y SIS-06: velocidad por viaje, tiempo estimado con historial y retención de 90 días (`sql/19_velocidad_por_franja_y_retencion.sql`); cierra la brecha TS-02 y resuelve D4 |
 | 1.3 | 2026-11-15 | ADM-12: desvincular el teléfono sin borrar la unidad (`sql/18_desvincular_dispositivo.sql`); cierra la brecha TS-04 |

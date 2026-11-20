@@ -32,6 +32,8 @@ export type FilaDeRecorrido = {
   velocidadesKmh: readonly (number | null)[];
   incidenciaActiva: boolean;
   velocidadHistoricaKmh: number | null;
+  /** El que eligió el conductor, si sigue vigente (sql/21). */
+  letrero: string | null;
 };
 
 export type AjustesDelRecorrido = {
@@ -42,6 +44,7 @@ export type AjustesDelRecorrido = {
 export type ProximaLlegada = {
   unidadId: string;
   unidadNombre: string;
+  letrero: string | null;
   estado: EstadoLlegada;
   tiempo: TiempoLlegada;
 };
@@ -134,7 +137,7 @@ function llegadaDe(fila: FilaDeRecorrido, ajustes: AjustesDelRecorrido): Proxima
     penalizacionIncidenciaPct: ajustes.penalizacionIncidenciaPct,
   });
 
-  return { unidadId: fila.unidadId, unidadNombre: fila.unidadNombre, estado, tiempo };
+  return { unidadId: fila.unidadId, unidadNombre: fila.unidadNombre, letrero: fila.letrero, estado, tiempo };
 }
 
 /** Cada unidad aparece una vez por parada en las filas: aquí, una sola vez. */

@@ -1,4 +1,5 @@
 import { colorDeRutaAdaptable } from "@/domain/colores";
+import { conLetrero } from "@/domain/letrero";
 import type { ParadaDelRecorrido } from "@/domain/recorrido";
 import { EstadoDeParada } from "./EstadoDeParada";
 
@@ -69,7 +70,10 @@ type PropsFila = {
 
 function FilaParada({ parada, esMiParada, extremo, color }: PropsFila) {
   const tono = colorDeRutaAdaptable(color);
-  const unidad = parada.proxima?.tiempo.tipo === "minutos" ? parada.proxima.unidadNombre : null;
+  const unidad =
+    parada.proxima?.tiempo.tipo === "minutos"
+      ? conLetrero(parada.proxima.unidadNombre, parada.proxima.letrero)
+      : null;
 
   return (
     <li className="flex gap-3.5">

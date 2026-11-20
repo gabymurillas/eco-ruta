@@ -34,6 +34,7 @@ export async function obtenerRecorrido(rutaId: string): Promise<Resultado<FilaDe
       velocidadesKmh: fila.velocidades_kmh ?? [],
       incidenciaActiva: fila.incidencia_activa ?? false,
       velocidadHistoricaKmh: fila.velocidad_historica_kmh ?? null,
+      letrero: fila.letrero ?? null,
     })),
   );
 }

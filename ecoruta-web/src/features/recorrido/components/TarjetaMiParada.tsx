@@ -1,3 +1,4 @@
+import { conLetrero } from "@/domain/letrero";
 import { describirAntiguedad } from "@/domain/llegadas";
 import type { ParadaDelRecorrido } from "@/domain/recorrido";
 import { TiempoEstimado } from "@/features/seguimiento/components/ListaLlegadas";
@@ -27,7 +28,7 @@ export function TarjetaMiParada({ parada }: Props) {
         <div className="flex items-center gap-3">
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <p className="text-[1.1875rem] font-extrabold leading-tight tracking-tight break-words">
-              {proxima.unidadNombre}
+              {conLetrero(proxima.unidadNombre, proxima.letrero)}
             </p>
             <p className="text-xs font-semibold text-tinta-suave">Tiempo estimado a tu parada</p>
           </div>

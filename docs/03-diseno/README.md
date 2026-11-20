@@ -56,6 +56,7 @@ se regenera el archivo complementario con `/impeccable document`.
 | Admin | Monitoreo | `admin/Main` | ✅ |
 | Admin | Editar ruta | `admin/RutaEditar` | ✅ |
 | Admin | Unidades | `admin/Unidades` | ✅ |
+| Admin | Letreros | — | ✅ (ADM-20, sigue el patrón de Unidades: tabla y panel lateral) |
 | Admin | Parámetros | `admin/Parametros` | ✅ |
 | Admin | Históricos | `admin/Historicos` | 🟡 |
 

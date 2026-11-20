@@ -27,7 +27,7 @@ erDiagram
 |---|---|---|
 | `rutas` | Recorrido y servicio | `tipo` (texto libre), `icono`, `color` (token), `trazado` (LineString), `puntos_clave` (jsonb), `activa` |
 | `paradas` | Paradas de la ciudad | `ubicacion` (Point), `radio_geocerca_m` (150 por defecto), `notifica` |
-| `unidades` | Vehículos | `ruta_id`, `activa` |
+| `unidades` | Vehículos | `ruta_id`, `activa`; `letrero_id` y `letrero_desde`: el letrero que eligió el conductor y cuándo (`sql/21`) |
 | `dispositivos` | Teléfono-baliza | `unidad_id` (unique), `auth_user_id`, código y expiración, `ultima_bateria`, `ultima_senal_at` |
 | `viajes` | De «iniciar» a «finalizar» | Un solo viaje abierto por unidad (índice único parcial) |
 | `posiciones` | Telemetría (alta escritura) | `ubicacion`, `velocidad_kmh`, `exactitud_m`, `usable`, `capturado_at` y `recibido_at` |
@@ -35,6 +35,8 @@ erDiagram
 | `avisos_parada` | Lo que se publica al ciudadano | `tipo ∈ {acercandose, paso}`; `unique (viaje_id, parada_id, tipo)` |
 | `incidencias` | Reportes del chofer | `tipo ∈ {calle_cerrada, falla_mecanica, desvio, congestion, otro}`; `otro` exige descripción |
 | `velocidades_de_viaje` | Una fila por viaje finalizado (`sql/19`) | `viaje_id` (pk), `ruta_id`, `tipo_dia ∈ {habil, fin_de_semana}`, `hora` (0–23, Caracas), `velocidad_kmh` (nula = viaje no apto), `distancia_m`, `duracion_s`. Solo la leen admin y operador |
+| `letreros` | Catálogo de nombres que puede mostrar una unidad (`sql/21`) | `nombre` (1–60, único sin mayúsculas), `activo`, `orden`. Solo la leen admin y operador |
+| `unidad_letreros` | Qué letreros puede elegir cada unidad (`sql/21`) | pk (`unidad_id`, `letrero_id`) |
 | `parametros` | Valores calibrables | `clave`, `valor` y `descripcion` |
 
 ## 2. Invariantes que no se negocian
@@ -102,6 +104,7 @@ Desde `sql/19` existen además:
 | Crear, editar o borrar rutas, trazados, paradas, unidades y parámetros | ✅ | ❌ |
 | Generar o leer un código de vinculación | ✅ | ❌ (la política `operador_lee_dispositivos` esconde la fila mientras tenga código) |
 | `eliminar_unidad`, `desvincular_dispositivo` | ✅ | ❌ |
+| Catálogo de letreros y su asignación a unidades | ✅ | ✅ (lectura) |
 | Gestionar el equipo (Edge Function `gestionar-equipo`) | ✅ | ❌ |
 
 Por qué un disparador y no solo la política: RLS filtra filas, no columnas. Con la política
@@ -129,7 +132,10 @@ La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 | `viajes_por_dia(dias)` | RPC | Históricos del admin: viajes cerrados por día (hora de Caracas) y ruta. En `sql/15` |
 | `resumen_por_ruta(dias)` | RPC | Históricos del admin: viajes, duración, cobertura e incidencias (y cuántas siguen activas) por ruta. En `sql/15` |
 | `viajes_grabados`, `recorrido_de_viaje` | RPC | Trazado desde un viaje grabado |
-| `estado_flota` | RPC | Monitoreo |
+| `estado_flota` | RPC | Monitoreo; desde `sql/21` incluye el letrero vigente |
+| `letrero_vigente(unidad)` | Auxiliar, definer | La única regla del letrero que se muestra: el elegido, solo si sigue activo y asignado a la unidad (`sql/21`) |
+| `letreros_disponibles`, `cambiar_letrero` | RPC, definer | Solo para el teléfono: opciones de su unidad y elegir una. La unidad sale del JWT; 401 sin dispositivo (`sql/21`) |
+| `volver_al_nombre_normal` | Disparador en `viajes` | Al cerrar un recorrido limpia el letrero si se eligió antes del cierre (`letrero_desde <= finalizado_at`) (`sql/21`) |
 | `velocidad_historica_kmh(ruta, momento)` | RPC, **definer**, anon | Mediana de la franja si hay al menos `eta_historico_min_viajes` viajes; si no, nula. Nunca expone viajes individuales (`sql/19`) |
 | `velocidades_por_franja()` | RPC, invoker | Velocidad típica por ruta y franja para Históricos (ADM-15). Solo admin y operador (`sql/19`) |
 | `tipo_dia_de`, `hora_de` | Auxiliares | Franja de un instante en hora de Caracas (`sql/19`) |
@@ -145,6 +151,6 @@ La exposición pública se limita a los viajes abiertos (ADR-0012, `sql/13`).
 `01_schema` → `02_parametros` → `03_rls` → `04_funciones` → `06_vinculacion` → `07_geocercas`
 → `08_incidencia_otro` → `09_avisos_parada` → `10_paradas_de_ciudad` → `11_trazado_asistido` →
 `12_realtime_monitoreo` → `13_exposicion_solo_en_servicio` → `14_tiempo_estimado` →
-`15_historicos_por_ruta` → `16_historicos_periodo_y_cobertura` → `17_roles_del_panel` → `18_desvincular_dispositivo` → `19_velocidad_por_franja_y_retencion` → `20_detalle_de_ruta`.
+`15_historicos_por_ruta` → `16_historicos_periodo_y_cobertura` → `17_roles_del_panel` → `18_desvincular_dispositivo` → `19_velocidad_por_franja_y_retencion` → `20_detalle_de_ruta` → `21_letreros`.
 `05_consultas_historicos` es documentación. Se aplican a mano en
 Supabase.

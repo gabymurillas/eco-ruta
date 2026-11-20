@@ -121,6 +121,7 @@ Con el token de dispositivo, RLS le permite exactamente esto:
 | Reportar batería y señal | `dispositivos` | vía RPC, ver abajo |
 | Abrir y cerrar viajes | `viajes` | `unidad_id` = el suyo |
 | Reportar incidencias | `incidencias` | `unidad_id` = el suyo |
+| Elegir el letrero de la unidad | `unidades` | vía RPC, ver abajo; sin acceso directo a la tabla |
 | Leer rutas, paradas, parámetros | varias | lectura pública |
 
 Cualquier intento de escribir con otro `unidad_id` lo rechaza Postgres, no el cliente.
@@ -253,6 +254,42 @@ cuatro tipos la descripción es opcional.
 Valídalo también en la pantalla, para que el botón no se active sin texto: el 400 está
 para que un cliente con un error no pueda colar el registro, no para avisarle al
 conductor.
+
+### El letrero se elige por RPC, de la lista del admin (`sql/21`)
+
+El letrero es el nombre que muestra la unidad, como el cartel del parabrisas: «Terminal –
+Villa Olímpica». El admin arma el catálogo y decide qué opciones tiene cada unidad; el
+conductor elige una en la app, en espera o en pleno recorrido. Es **solo un nombre**: el
+trazado, las paradas, las geocercas y el tiempo estimado siguen saliendo de la ruta de la
+unidad. La web lo muestra junto al nombre de la ruta, nunca en su lugar.
+
+```
+POST /rest/v1/rpc/letreros_disponibles      {}
+→ 200 {"actual": {"id","nombre"} | null, "opciones": [{"id","nombre"}]}
+
+POST /rest/v1/rpc/cambiar_letrero           {"p_letrero_id": "<uuid>" | null}
+→ 200 {"actual": {"id","nombre"} | null}
+```
+
+- La unidad sale del JWT. Las opciones son las activas y asignadas a esa unidad, en el orden
+  del admin. `null` vuelve al nombre normal.
+- `cambiar_letrero` renueva la hora de la elección (`letrero_desde`) en **cada** llamada,
+  también si repite la opción. Así un cierre de recorrido que llega tarde no borra lo que el
+  conductor eligió después (ver el cierre, abajo).
+- Errores, con el mismo mecanismo que el latido:
+  - 400 `{"code":"letrero_no_permitido"}`: la opción no está asignada o está inactiva.
+    La app recarga la lista y avisa.
+  - 401 `{"code":"dispositivo_revocado"}`: la unidad del token ya no tiene teléfono
+    vinculado. Es el mismo camino que el latido.
+- **Vigente al leer.** Si el admin desactiva la opción o se la quita a la unidad, deja de ser
+  vigente y la unidad vuelve al nombre normal en la app y en la web, sin que nadie limpie nada.
+- **Al cerrar el recorrido** vuelve al nombre normal. Lo hace un trigger en `viajes`, en el
+  update de `finalizado_at` o en el insert de un viaje ya finalizado, y solo si
+  `letrero_desde <= finalizado_at`. Un cierre hecho sin red que llega tarde no borra una
+  elección posterior.
+- El teléfono no puede escribir `unidades` directo: no tiene política de UPDATE. Solo por la RPC.
+- La app guarda la lista en caché para abrir el selector sin señal; el cambio exige red y no
+  queda en cola. El selector se desactiva con el vehículo en movimiento.
 
 ### Los parámetros de emisión salen de la base, no del código
 

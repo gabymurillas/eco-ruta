@@ -1,5 +1,6 @@
 import { IconoRuta } from "@/components/ui/IconoRuta";
 import { colorDeRuta, tintaSobreColorDeRuta } from "@/domain/colores";
+import { conLetrero } from "@/domain/letrero";
 import {
   bateriaEnAlerta,
   describirUltimaSenal,
@@ -100,7 +101,7 @@ function ContenidoTarjeta({
       <span className="flex min-w-0 flex-col">
         <span className="truncate text-[14.5px] font-bold">{unidad.unidad_nombre}</span>
         <span className="truncate text-[13px] text-tinta-media">
-          {unidad.ruta_nombre ?? "Sin ruta asignada"}
+          {unidad.ruta_nombre ? conLetrero(unidad.ruta_nombre, unidad.letrero) : "Sin ruta asignada"}
         </span>
         <span className="mt-1 inline-flex w-fit items-center gap-1.5 rounded-full border border-borde bg-fondo px-2 py-0.5 text-xs font-semibold">
           {estado.alerta ? (

@@ -13,11 +13,13 @@ type FilaLlegada =
  */
 export type LlegadaRow = Omit<
   FilaLlegada,
-  "distancia_trazado_m" | "velocidades_kmh" | "velocidad_historica_kmh"
+  "distancia_trazado_m" | "velocidades_kmh" | "velocidad_historica_kmh" | "letrero"
 > & {
   distancia_trazado_m: number | null;
   velocidades_kmh: (number | null)[] | null;
   velocidad_historica_kmh: number | null;
+  /** Nulo si el conductor no eligió uno o dejó de ser vigente (sql/21). */
+  letrero: string | null;
 };
 
 /**

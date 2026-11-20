@@ -74,6 +74,16 @@ const GRUPOS: Grupo[] = [
           </>
         ),
       },
+      {
+        href: "/admin/letreros",
+        titulo: "Letreros",
+        icono: (
+          <>
+            <rect x="3" y="4" width="18" height="10" rx="2" />
+            <path d="M7 9h10M12 14v6" />
+          </>
+        ),
+      },
     ],
   },
   {
