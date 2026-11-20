@@ -224,7 +224,7 @@ revoca la sesión del teléfono.
 | DIS-06 | Latido de salud (batería) aunque no haya viaje | P0 | ✅ |
 | DIS-07 | Modo kiosco, arranque automático y servicio en primer plano resiliente | P0 | ✅ |
 | DIS-08 | Vinculación por QR | P2 | ⬜ |
-| DIS-09 | Elegir el letrero desde la app (selector con las opciones del admin), en espera o en recorrido; vuelve al nombre normal al finalizar | P1 | 🟡 (contrato en [contrato-vinculacion](../contrato-vinculacion.md); la app lo implementa en su repositorio) |
+| DIS-09 | Elegir el letrero desde la app (selector con las opciones del admin), en espera o en recorrido; vuelve al nombre normal al finalizar | P1 | ✅ (app: commit 9823fe7 en su repositorio; contrato en [contrato-vinculacion](../contrato-vinculacion.md). Falta la prueba de punta a punta con una unidad real) |
 
 ### 6.4 Sistema y backend (`SIS`)
 
